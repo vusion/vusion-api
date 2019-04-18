@@ -1,4 +1,4 @@
-# ts-repo-boilerplate
+# vusion-api
 
 - [中文说明](README.zh-CN.md)
 
@@ -9,14 +9,14 @@ A boilerplate for creating npm package repo.
 [![Dependencies][david-img]][david-url]
 [![NPM Download][download-img]][download-url]
 
-[circleci-img]: https://img.shields.io/circleci/project/github/necfe/ts-repo-boilerplate.svg?style=flat-square
-[circleci-url]: https://circleci.com/gh/necfe/ts-repo-boilerplate
-[npm-img]: http://img.shields.io/npm/v/ts-repo-boilerplate.svg?style=flat-square
-[npm-url]: http://npmjs.org/package/ts-repo-boilerplate
-[david-img]: http://img.shields.io/david/necfe/ts-repo-boilerplate.svg?style=flat-square
-[david-url]: https://david-dm.org/necfe/ts-repo-boilerplate
-[download-img]: https://img.shields.io/npm/dm/ts-repo-boilerplate.svg?style=flat-square
-[download-url]: https://npmjs.org/package/ts-repo-boilerplate
+[circleci-img]: https://img.shields.io/circleci/project/github/vusion/vusion-api.svg?style=flat-square
+[circleci-url]: https://circleci.com/gh/vusion/vusion-api
+[npm-img]: http://img.shields.io/npm/v/vusion-api.svg?style=flat-square
+[npm-url]: http://npmjs.org/package/vusion-api
+[david-img]: http://img.shields.io/david/vusion/vusion-api.svg?style=flat-square
+[david-url]: https://david-dm.org/vusion/vusion-api
+[download-img]: https://img.shields.io/npm/dm/vusion-api.svg?style=flat-square
+[download-url]: https://npmjs.org/package/vusion-api
 
 ## Example
 
@@ -33,7 +33,7 @@ Introduce some major features of this project.
 ## Install
 
 ``` shell
-npm install --save-dev ts-repo-boilerplate
+npm install --save-dev vusion-api
 ```
 
 ## Options
@@ -74,7 +74,7 @@ npm run test
 
 ## Changelog
 
-See [Releases](https://github.com/necfe/ts-repo-boilerplate/releases)
+See [Releases](https://github.com/vusion/vusion-api/releases)
 
 ## Contributing
 
