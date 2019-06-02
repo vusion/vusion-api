@@ -1,7 +1,15 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import FSObject from './FSObject';
 import * as shell from 'shelljs';
+
+import FSObject from './FSObject';
+import TemplateHandler from './TemplateHandler';
+import ScriptHandler from './ScriptHandler';
+import StyleHandler from './StyleHandler';
+
+import traverse from 'babel-traverse';
+import { rule } from 'postcss';
+
 
 const fetchPartialContent = (content: string, tag: string) => {
     const reg = new RegExp(`<${tag}.*?>([\\s\\S]+)<\\/${tag}>`);
@@ -14,16 +22,16 @@ export default class VueFile extends FSObject {
 
     content: string;
     template: string;
-    style: string;
     script: string;
+    style: string;
     sample: string;
 
-    isParsed: boolean;
+    templateHandler: TemplateHandler; // 根据 handler 是否存在判断是否已解析
+    scriptHandler: ScriptHandler; // 根据 handler 是否存在判断是否已解析
+    styleHandler: StyleHandler; // 根据 handler 是否存在判断是否已解析
 
     constructor(fullPath: string) {
         super(fullPath, false);
-
-        this.isParsed = false;
     }
 
     async open() {
@@ -67,26 +75,119 @@ export default class VueFile extends FSObject {
 
     async save() {
         shell.rm('-rf', this.fullPath);
+
+        let template = this.template;
+        let script = this.script;
+        let style = this.style;
+
+        if (this.templateHandler)
+            template = this.templateHandler.generate();
+        if (this.scriptHandler)
+            script = this.scriptHandler.generate();
+        if (this.styleHandler)
+            style = this.styleHandler.generate();
+
+
         if (this.isDirectory) {
             shell.mkdir(this.fullPath);
 
             const promises = [];
-            this.template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), this.template));
-            this.script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), this.script));
-            this.style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), this.style));
+            template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), template));
+            script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), script));
+            style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), style));
 
             return Promise.all(promises);
         } else {
             const contents = [];
-            this.template && contents.push(`<template>\n${this.template}</template>`);
-            this.script && contents.push(`<script>\n${this.script}</script>`);
-            this.style && contents.push(`<style module>\n${this.style}</style>`);
+            template && contents.push(`<template>\n${template}</template>`);
+            script && contents.push(`<script>\n${script}</script>`);
+            style && contents.push(`<style module>\n${style}</style>`);
 
             return fs.writeFile(this.fullPath, contents.join('\n\n') + '\n');
         }
     }
 
+    parseTemplate() {
+        if (this.templateHandler)
+            return;
+
+        this.templateHandler = new TemplateHandler(this.template);
+    }
+
+    parseScript() {
+        if (this.scriptHandler)
+            return;
+
+        this.scriptHandler = new ScriptHandler(this.script);
+    }
+
+    parseStyle() {
+        if (this.styleHandler)
+            return;
+
+        this.styleHandler = new StyleHandler(this.style);
+    }
+
     transform() {
+        const isDirectory = this.isDirectory;
+
+        this.parseScript();
+        this.parseStyle();
+        // this.parseTemplate();
+
+        function shortenPath(filePath: string) {
+            if (filePath.startsWith('../')) {
+                let newPath = filePath.replace(/^\.\.\//, '');
+                if (!newPath.startsWith('../'))
+                    newPath = './' + newPath;
+                return newPath;
+            } else
+                return filePath;
+        }
+
+        function lengthenPath(filePath: string) {
+            if (filePath.startsWith('.'))
+                return path.join('../', filePath);
+            else
+                return filePath;
+        }
+
+        traverse(this.scriptHandler.ast, {
+            ImportDeclaration(nodePath) {
+                if (nodePath.node.source)
+                    nodePath.node.source.value = isDirectory ? shortenPath(nodePath.node.source.value) : lengthenPath(nodePath.node.source.value);
+            },
+            ExportAllDeclaration(nodePath) {
+                if (nodePath.node.source)
+                    nodePath.node.source.value = isDirectory ? shortenPath(nodePath.node.source.value) : lengthenPath(nodePath.node.source.value);
+            },
+            ExportNamedDeclaration(nodePath) {
+                if (nodePath.node.source)
+                    nodePath.node.source.value = isDirectory ? shortenPath(nodePath.node.source.value) : lengthenPath(nodePath.node.source.value);
+            },
+        });
+
+        this.styleHandler.ast.walkAtRules((node) => {
+            if (node.name !== 'import')
+                return;
+
+            const value = node.params.slice(1, -1);
+            node.params = `'${isDirectory ? shortenPath(value) : lengthenPath(value)}'`;
+        });
+
+        this.styleHandler.ast.walkDecls((node) => {
+            const re = /url\((['"])(.+?)['"]\)/;
+
+            const cap = re.exec(node.value);
+            if (cap) {
+                node.value = node.value.replace(re, (m, quote, url) => {
+                    url = isDirectory ? shortenPath(url) : lengthenPath(url);
+
+                    return `url(${quote}${url}${quote})`;
+                });
+            }
+        });
+
         this.isDirectory = !this.isDirectory;
     }
 }

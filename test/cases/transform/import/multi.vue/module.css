@@ -1,0 +1,6 @@
+@import '../../base.css';
+
+.root {
+    color: black;
+    background: red url('../../assets/back.png');
+}
