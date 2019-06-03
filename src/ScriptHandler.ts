@@ -13,7 +13,8 @@ class ScriptHandler {
 
     parse(code: string) {
         return transform(code, {
-            plugins: ['syntax-dynamic-import'],
+            // Must require manually in VSCode
+            plugins: [require('babel-plugin-syntax-dynamic-import')],
         }).ast;
     }
 

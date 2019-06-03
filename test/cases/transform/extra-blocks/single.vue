@@ -13,3 +13,11 @@ export default {
     color: black;
 }
 </style>
+
+<docs>
+# README
+</docs>
+
+<test>
+import xxx from './single.vue';
+</test>

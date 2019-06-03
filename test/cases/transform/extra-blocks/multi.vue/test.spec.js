@@ -1,0 +1,1 @@
+import XXX from './index';

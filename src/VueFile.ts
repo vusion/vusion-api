@@ -8,8 +8,6 @@ import ScriptHandler from './ScriptHandler';
 import StyleHandler from './StyleHandler';
 
 import traverse from 'babel-traverse';
-import { rule } from 'postcss';
-
 
 const fetchPartialContent = (content: string, tag: string) => {
     const reg = new RegExp(`<${tag}.*?>([\\s\\S]+)<\\/${tag}>`);
@@ -32,6 +30,11 @@ export default class VueFile extends FSObject {
 
     constructor(fullPath: string) {
         super(fullPath, false);
+
+        if (fs.existsSync(this.fullPath)) {
+            const stats = fs.statSync(this.fullPath);
+            this.isDirectory = stats.isDirectory();
+        }
     }
 
     async open() {
@@ -46,8 +49,8 @@ export default class VueFile extends FSObject {
         if (!fs.existsSync(this.fullPath))
             throw new Error(`Cannot find: ${this.fullPath}!`);
 
-        const stats = fs.statSync(this.fullPath);
-        this.isDirectory = stats.isDirectory();
+        // const stats = fs.statSync(this.fullPath);
+        // this.isDirectory = stats.isDirectory();
 
         if (this.isDirectory) {
             if (fs.existsSync(path.join(this.fullPath, 'index.js')))
@@ -126,6 +129,22 @@ export default class VueFile extends FSObject {
             return;
 
         this.styleHandler = new StyleHandler(this.style);
+    }
+
+    checkTransform() {
+        if (!this.isDirectory)
+            return true; // @TODO
+        else {
+            const files = fs.readdirSync(this.fullPath);
+            const normalBlocks = ['index.html', 'index.js', 'module.css'];
+            const extraBlocks: Array<string> = [];
+            files.forEach((file) => {
+                if (!normalBlocks.includes(file))
+                    extraBlocks.push(file);
+            });
+
+            return extraBlocks.length ? extraBlocks : true;
+        }
     }
 
     transform() {
