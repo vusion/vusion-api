@@ -45,7 +45,7 @@ export default class VueFile extends FSEntry {
 
     async loadDirectory() {
         if (!fs.existsSync(this.fullPath))
-        throw new Error(`Cannot find: ${this.fullPath}`);
+            throw new Error(`Cannot find: ${this.fullPath}`);
 
         this.children = [];
         const fileNames = await fs.readdir(this.fullPath);
