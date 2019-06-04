@@ -1,10 +1,10 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import FSObject from './FSObject';
+import FSEntry from './FSEntry';
 import File from './File';
 
-export default class Directory extends FSObject {
-    children: FSObject[];
+export default class Directory extends FSEntry {
+    children: FSEntry[];
 
     constructor(fullPath: string) {
         super(fullPath, true);
@@ -37,19 +37,16 @@ export default class Directory extends FSObject {
                 return;
 
             const fullPath = path.join(this.fullPath, name);
-            const stats = fs.statSync(fullPath);
+            const isDirectory = fs.statSync(fullPath).isDirectory();
 
-            const fsObject = stats.isDirectory() ? new Directory(fullPath) : new File(fullPath);
-            this.children.push(fsObject);
+            const fsEntry = isDirectory ? new Directory(fullPath) : new File(fullPath);
+            this.children.push(fsEntry);
         });
 
         this.children.sort((a, b) => {
-            if (a.isDirectory === b.isDirectory) {
-                if (a.fileName === b.fileName)
-                    return 0;
-                else
-                    return a.fileName < b.fileName ? -1 : 1;
-            } else
+            if (a.isDirectory === b.isDirectory)
+                return a.fileName.localeCompare(b.fileName);
+            else
                 return a.isDirectory ? -1 : 1;
         });
     }

@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs-extra");
-const FSObject_1 = require("./FSObject");
-class File extends FSObject_1.default {
+const FSEntry_1 = require("./FSEntry");
+class File extends FSEntry_1.default {
     constructor(fullPath) {
         super(fullPath, false);
         this.content = undefined;

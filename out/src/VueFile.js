@@ -11,7 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs-extra");
 const path = require("path");
 const shell = require("shelljs");
-const FSObject_1 = require("./FSObject");
+const FSEntry_1 = require("./FSEntry");
 const TemplateHandler_1 = require("./TemplateHandler");
 const ScriptHandler_1 = require("./ScriptHandler");
 const StyleHandler_1 = require("./StyleHandler");
@@ -21,18 +21,45 @@ const fetchPartialContent = (content, tag) => {
     const m = content.match(reg);
     return m ? m[1].trim() + '\n' : '';
 };
-class VueFile extends FSObject_1.default {
+class VueFile extends FSEntry_1.default {
     constructor(fullPath) {
         super(fullPath, false);
-        if (fs.existsSync(this.fullPath)) {
+        this.isVue = true;
+    }
+    preopen() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!fs.existsSync(this.fullPath))
+                return;
             const stats = fs.statSync(this.fullPath);
             this.isDirectory = stats.isDirectory();
-        }
+            if (this.isDirectory)
+                yield this.loadDirectory();
+        });
+    }
+    loadDirectory() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!fs.existsSync(this.fullPath))
+                throw new Error(`Cannot find: ${this.fullPath}`);
+            this.children = [];
+            const fileNames = yield fs.readdir(this.fullPath);
+            fileNames.forEach((name) => {
+                if (!name.endsWith('.vue'))
+                    return;
+                const fullPath = path.join(this.fullPath, name);
+                this.children.push(new VueFile(fullPath));
+            });
+        });
     }
     open() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.isOpen)
                 return;
+            yield this.load();
+            this.isOpen = true;
+        });
+    }
+    reopen() {
+        return __awaiter(this, void 0, void 0, function* () {
             yield this.load();
             this.isOpen = true;
         });

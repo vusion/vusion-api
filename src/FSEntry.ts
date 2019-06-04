@@ -1,12 +1,13 @@
 import * as path from 'path';
 
-export default class FSObject {
+export default class FSEntry {
     fullPath: string;
     fileName: string;
     baseName: string;
     extName: string;
     title: string;
     isDirectory: boolean;
+    isVue: boolean;
     isOpen: boolean;
 
     constructor(fullPath: string, isDirectory: boolean) {
@@ -16,6 +17,7 @@ export default class FSObject {
         this.baseName = path.basename(this.fileName, this.extName);
         this.title = this.baseName;
         this.isDirectory = isDirectory;
+        this.isVue = false;
         this.isOpen = false;
     }
 

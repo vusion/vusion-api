@@ -10,35 +10,49 @@ function handleSame(dirPath: string, basename: string = 'u-sample') {
     return dest;
 }
 
-export function createSingleFile(dirPath: string) {
-    return fs.copy(path.resolve(__dirname, '../', '../templates/u-single-file.vue'), handleSame(dirPath));
+export async function createSingleFile(dirPath: string) {
+    const dest = handleSame(dirPath);
+    await fs.copy(path.resolve(__dirname, '../', '../templates/u-single-file.vue'), dest);
+    return dest;
 }
 
-export function createMultiFile(dirPath: string) {
-    return fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file.vue'), handleSame(dirPath))
+export async function createMultiFile(dirPath: string) {
+    const dest = handleSame(dirPath);
+    await fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file.vue'), dest);
+    return dest;
 }
 
-export function createMultiFileWithSubdocs(dirPath: string) {
-    return fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue'), handleSame(dirPath))
+export async function createMultiFileWithSubdocs(dirPath: string) {
+    const dest = handleSame(dirPath);
+    await fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue'), dest);
+    return dest;
 }
 
-export function createPage(dirPath: string) {
-    return fs.copy(path.resolve(__dirname, '../', '../templates/page.vue'), handleSame(dirPath, 'page'))
+export async function createPage(dirPath: string) {
+    const dest = handleSame(dirPath, 'page');
+    await fs.copy(path.resolve(__dirname, '../', '../templates/page.vue'), dest);
+    return dest;
 }
 
-export function createListPage(dirPath: string) {
-    return fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue'), handleSame(dirPath, 'list'))
+export async function createListPage(dirPath: string) {
+    const dest = handleSame(dirPath, 'list');
+    await fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue'), dest);
+    return dest;
 }
 
-export function createFormPage(dirPath: string) {
-    return fs.copy(path.resolve(__dirname, '../', '../templates/page.vue'), handleSame(dirPath, 'form'))
+export async function createFormPage(dirPath: string) {
+    const dest = handleSame(dirPath, 'form');
+    await fs.copy(path.resolve(__dirname, '../', '../templates/page.vue'), dest);
+    return dest;
 }
 
-export function createDetailPage(dirPath: string) {
-    return fs.copy(path.resolve(__dirname, '../', '../templates/page.vue'), handleSame(dirPath, 'detail'))
+export async function createDetailPage(dirPath: string) {
+    const dest = handleSame(dirPath, 'detail');
+    await fs.copy(path.resolve(__dirname, '../', '../templates/page.vue'), dest);
+    return dest;
 }
 
-export function addDoc(vuePath: string) {
+export async function addDoc(vuePath: string) {
     if (!fs.statSync(vuePath).isDirectory())
         throw new Error('Unsupport adding blocks in single vue file!');
 
@@ -46,10 +60,11 @@ export function addDoc(vuePath: string) {
     if (fs.existsSync(dest))
         throw new Error('File README.md exists!');
 
-    fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file.vue/README.md'), dest);
+    await fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file.vue/README.md'), dest);
+    return dest;
 }
 
-export function addDocAndSubs(vuePath: string) {
+export async function addDocAndSubs(vuePath: string) {
     if (!fs.statSync(vuePath).isDirectory())
         throw new Error('Unsupport adding blocks in single vue file!');
 
@@ -57,16 +72,17 @@ export function addDocAndSubs(vuePath: string) {
     if (fs.existsSync(dest))
         throw new Error('File "README.md" exists!');
 
-    fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue/README.md'), dest);
+    await fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue/README.md'), dest);
 
     const dest2 = path.resolve(vuePath, 'docs');
     if (fs.existsSync(dest2))
         throw new Error('Directory "docs/" exists!');
 
-    fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue/docs'), dest2);
+    await fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue/docs'), dest2);
+    return dest;
 }
 
-export function addModuleCSS(vuePath: string) {
+export async function addModuleCSS(vuePath: string) {
     if (!fs.statSync(vuePath).isDirectory())
         throw new Error('Unsupport adding blocks in single vue file!');
 
@@ -74,5 +90,6 @@ export function addModuleCSS(vuePath: string) {
     if (fs.existsSync(dest))
         throw new Error('File module.css exists!');
 
-    fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file.vue/module.css'), dest);
+    await fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file.vue/module.css'), dest);
+    return dest;
 }

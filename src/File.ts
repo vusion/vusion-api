@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
-import FSObject from './FSObject';
+import FSEntry from './FSEntry';
 
-export default class File extends FSObject {
+export default class File extends FSEntry {
     content: Buffer;
 
     constructor(fullPath: string) {

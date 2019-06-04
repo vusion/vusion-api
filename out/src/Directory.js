@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs-extra");
 const path = require("path");
-const FSObject_1 = require("./FSObject");
+const FSEntry_1 = require("./FSEntry");
 const File_1 = require("./File");
-class Directory extends FSObject_1.default {
+class Directory extends FSEntry_1.default {
     constructor(fullPath) {
         super(fullPath, true);
         this.children = [];
@@ -41,17 +41,13 @@ class Directory extends FSObject_1.default {
                 if (name === '.DS_Store' || name === '.git')
                     return;
                 const fullPath = path.join(this.fullPath, name);
-                const stats = fs.statSync(fullPath);
-                const fsObject = stats.isDirectory() ? new Directory(fullPath) : new File_1.default(fullPath);
-                this.children.push(fsObject);
+                const isDirectory = fs.statSync(fullPath).isDirectory();
+                const fsEntry = isDirectory ? new Directory(fullPath) : new File_1.default(fullPath);
+                this.children.push(fsEntry);
             });
             this.children.sort((a, b) => {
-                if (a.isDirectory === b.isDirectory) {
-                    if (a.fileName === b.fileName)
-                        return 0;
-                    else
-                        return a.fileName < b.fileName ? -1 : 1;
-                }
+                if (a.isDirectory === b.isDirectory)
+                    return a.fileName.localeCompare(b.fileName);
                 else
                     return a.isDirectory ? -1 : 1;
             });

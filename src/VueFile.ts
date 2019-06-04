@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as shell from 'shelljs';
 
-import FSObject from './FSObject';
+import FSEntry from './FSEntry';
 import TemplateHandler from './TemplateHandler';
 import ScriptHandler from './ScriptHandler';
 import StyleHandler from './StyleHandler';
@@ -15,8 +15,9 @@ const fetchPartialContent = (content: string, tag: string) => {
     return m ? m[1].trim() + '\n' : '';
 };
 
-export default class VueFile extends FSObject {
+export default class VueFile extends FSEntry {
     componentName: string;
+    children: VueFile[];
 
     content: string;
     template: string;
@@ -30,17 +31,43 @@ export default class VueFile extends FSObject {
 
     constructor(fullPath: string) {
         super(fullPath, false);
+        this.isVue = true;
+    }
 
-        if (fs.existsSync(this.fullPath)) {
-            const stats = fs.statSync(this.fullPath);
-            this.isDirectory = stats.isDirectory();
-        }
+    async preopen() {
+        if (!fs.existsSync(this.fullPath))
+            return;
+        const stats = fs.statSync(this.fullPath);
+        this.isDirectory = stats.isDirectory();
+        if (this.isDirectory)
+            await this.loadDirectory();
+    }
+
+    async loadDirectory() {
+        if (!fs.existsSync(this.fullPath))
+        throw new Error(`Cannot find: ${this.fullPath}`);
+
+        this.children = [];
+        const fileNames = await fs.readdir(this.fullPath);
+
+        fileNames.forEach((name) => {
+            if (!name.endsWith('.vue'))
+                return;
+
+            const fullPath = path.join(this.fullPath, name);
+            this.children.push(new VueFile(fullPath));
+        });
     }
 
     async open() {
         if (this.isOpen)
             return;
 
+        await this.load();
+        this.isOpen = true;
+    }
+
+    async reopen() {
         await this.load();
         this.isOpen = true;
     }
