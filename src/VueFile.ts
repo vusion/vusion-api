@@ -17,23 +17,31 @@ const fetchPartialContent = (content: string, tag: string) => {
 
 export default class VueFile extends FSEntry {
     componentName: string;
+    // 子组件
+    // 为`undefined`表示未打开过，为数组表示已经打开。
     children: VueFile[];
 
+    // 单文件内容
+    // 为`undefined`表示未打开过
     content: string;
     template: string;
     script: string;
     style: string;
     sample: string;
 
-    templateHandler: TemplateHandler; // 根据 handler 是否存在判断是否已解析
-    scriptHandler: ScriptHandler; // 根据 handler 是否存在判断是否已解析
-    styleHandler: StyleHandler; // 根据 handler 是否存在判断是否已解析
+    templateHandler: TemplateHandler; // 为`undefined`表示还未解析
+    scriptHandler: ScriptHandler; // 为`undefined`表示还未解析
+    styleHandler: StyleHandler; // 为`undefined`表示还未解析
 
     constructor(fullPath: string) {
         super(fullPath, false);
         this.isVue = true;
     }
 
+    /**
+     * 提前检测 VueFile 文件类型，以及子组件等
+     * 需要异步，否则可能会比较慢
+     */
     async preopen() {
         if (!fs.existsSync(this.fullPath))
             return;
@@ -47,7 +55,7 @@ export default class VueFile extends FSEntry {
         if (!fs.existsSync(this.fullPath))
             throw new Error(`Cannot find: ${this.fullPath}`);
 
-        this.children = [];
+        const children: Array<VueFile> = [];
         const fileNames = await fs.readdir(this.fullPath);
 
         fileNames.forEach((name) => {
@@ -55,8 +63,10 @@ export default class VueFile extends FSEntry {
                 return;
 
             const fullPath = path.join(this.fullPath, name);
-            this.children.push(new VueFile(fullPath));
+            children.push(new VueFile(fullPath));
         });
+
+        return children;
     }
 
     async open() {
@@ -72,7 +82,7 @@ export default class VueFile extends FSEntry {
         this.isOpen = true;
     }
 
-    async load() {
+    protected async load() {
         if (!fs.existsSync(this.fullPath))
             throw new Error(`Cannot find: ${this.fullPath}!`);
 
@@ -101,6 +111,8 @@ export default class VueFile extends FSEntry {
             this.script = fetchPartialContent(this.content, 'script');
             this.style = fetchPartialContent(this.content, 'style');
         }
+
+        return this;
     }
 
     async save() {

@@ -2,12 +2,12 @@ import * as fs from 'fs-extra';
 import FSEntry from './FSEntry';
 
 export default class File extends FSEntry {
+    // 原文件内容
+    // 为`undefined`表示未打开过
     content: Buffer;
 
     constructor(fullPath: string) {
         super(fullPath, false);
-
-        this.content = undefined;
     }
 
     async open() {
@@ -23,10 +23,10 @@ export default class File extends FSEntry {
         this.isOpen = true;
     }
 
-    async load() {
+    protected async load() {
         if (!fs.existsSync(this.fullPath))
             throw new Error(`Cannot find: ${this.fullPath}`);
 
-        this.content = await fs.readFile(this.fullPath);
+        return this.content = await fs.readFile(this.fullPath);
     }
 }

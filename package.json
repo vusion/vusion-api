@@ -25,18 +25,20 @@
     "api"
   ],
   "dependencies": {
-    "@types/babel-core": "^6.25.6",
+    "@types/semver": "^6.0.0",
     "babel-core": "^6.26.3",
     "babel-generator": "^6.26.1",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-traverse": "^6.26.0",
     "fs-extra": "^7.0.1",
     "postcss": "^6.0.23",
+    "semver": "^6.1.1",
     "shelljs": "^0.8.3",
     "vue": "^2.6.10",
     "vue-template-compiler": "^2.6.10"
   },
   "devDependencies": {
+    "@types/babel-core": "^6.25.6",
     "@types/chai": "^4.1.7",
     "@types/fs-extra": "^5.0.5",
     "@types/mocha": "^5.2.5",

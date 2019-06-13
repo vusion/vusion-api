@@ -15,7 +15,6 @@ const File_1 = require("./File");
 class Directory extends FSEntry_1.default {
     constructor(fullPath) {
         super(fullPath, true);
-        this.children = [];
     }
     open() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -35,7 +34,7 @@ class Directory extends FSEntry_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
                 throw new Error(`Cannot find: ${this.fullPath}`);
-            this.children = [];
+            const children = [];
             const fileNames = yield fs.readdir(this.fullPath);
             fileNames.forEach((name) => {
                 if (name === '.DS_Store' || name === '.git')
@@ -43,14 +42,15 @@ class Directory extends FSEntry_1.default {
                 const fullPath = path.join(this.fullPath, name);
                 const isDirectory = fs.statSync(fullPath).isDirectory();
                 const fsEntry = isDirectory ? new Directory(fullPath) : new File_1.default(fullPath);
-                this.children.push(fsEntry);
+                children.push(fsEntry);
             });
-            this.children.sort((a, b) => {
+            children.sort((a, b) => {
                 if (a.isDirectory === b.isDirectory)
                     return a.fileName.localeCompare(b.fileName);
                 else
                     return a.isDirectory ? -1 : 1;
             });
+            return this.children = children;
         });
     }
 }

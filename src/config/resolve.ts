@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import chalk from 'chalk';
 // import chokidar from 'chokidar';
-import defaults from './defaults';
+import getDefaults, { VusionConfig } from './getDefaults';
 
 const TYPES = ['library', 'app', 'html5', 'fullstack'];
 
@@ -26,10 +26,10 @@ function getConfig(cwd: string, configPath: string, packagePath: string) {
 }
 
 // @TODO: 阉割版的 resolve
-export function resolve(cwd: string, configPath: string = 'vusion.config.js', theme?: string) {
+export function resolve(cwd: string, configPath: string = 'vusion.config.js', theme?: string): VusionConfig {
     cwd = cwd || process.cwd();
 
-    const config = defaults;
+    const config = getDefaults();
 
     const packagePath = config.packagePath = path.resolve(cwd, 'package.json');
     configPath = config.configPath = path.resolve(cwd, configPath);
@@ -54,8 +54,8 @@ export function resolve(cwd: string, configPath: string = 'vusion.config.js', th
         // }
     }
 
-    config.srcPath = path.resolve(process.cwd(), config.srcPath);
-    config.libraryPath = path.resolve(process.cwd(), config.libraryPath);
+    config.srcPath = path.resolve(cwd, config.srcPath);
+    config.libraryPath = path.resolve(cwd, config.libraryPath);
 
     if (theme === 'src' || theme === 'default')
         theme = undefined;

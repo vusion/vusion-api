@@ -4,12 +4,12 @@ import FSEntry from './FSEntry';
 import File from './File';
 
 export default class Directory extends FSEntry {
-    children: FSEntry[];
+    // 子文件及文件夹，会先按文件类型再按文件名排序。
+    // 为`undefined`表示未打开过，为数组表示已经打开。
+    children: Array<FSEntry>;
 
     constructor(fullPath: string) {
         super(fullPath, true);
-
-        this.children = [];
     }
 
     async open() {
@@ -25,11 +25,11 @@ export default class Directory extends FSEntry {
         this.isOpen = true;
     }
 
-    async load() {
+    protected async load() {
         if (!fs.existsSync(this.fullPath))
             throw new Error(`Cannot find: ${this.fullPath}`);
 
-        this.children = [];
+        const children: Array<FSEntry> = [];
         const fileNames = await fs.readdir(this.fullPath);
 
         fileNames.forEach((name) => {
@@ -40,14 +40,16 @@ export default class Directory extends FSEntry {
             const isDirectory = fs.statSync(fullPath).isDirectory();
 
             const fsEntry = isDirectory ? new Directory(fullPath) : new File(fullPath);
-            this.children.push(fsEntry);
+            children.push(fsEntry);
         });
 
-        this.children.sort((a, b) => {
+        children.sort((a, b) => {
             if (a.isDirectory === b.isDirectory)
                 return a.fileName.localeCompare(b.fileName);
             else
                 return a.isDirectory ? -1 : 1;
         });
+
+        return this.children = children;
     }
 }

@@ -26,6 +26,10 @@ class VueFile extends FSEntry_1.default {
         super(fullPath, false);
         this.isVue = true;
     }
+    /**
+     * 提前检测 VueFile 文件类型，以及子组件等
+     * 需要异步，否则可能会比较慢
+     */
     preopen() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
@@ -40,14 +44,15 @@ class VueFile extends FSEntry_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
                 throw new Error(`Cannot find: ${this.fullPath}`);
-            this.children = [];
+            const children = [];
             const fileNames = yield fs.readdir(this.fullPath);
             fileNames.forEach((name) => {
                 if (!name.endsWith('.vue'))
                     return;
                 const fullPath = path.join(this.fullPath, name);
-                this.children.push(new VueFile(fullPath));
+                children.push(new VueFile(fullPath));
             });
+            return children;
         });
     }
     open() {
@@ -92,6 +97,7 @@ class VueFile extends FSEntry_1.default {
                 this.script = fetchPartialContent(this.content, 'script');
                 this.style = fetchPartialContent(this.content, 'style');
             }
+            return this;
         });
     }
     save() {

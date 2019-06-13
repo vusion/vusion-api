@@ -4,7 +4,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const chalk_1 = require("chalk");
 // import chokidar from 'chokidar';
-const defaults_1 = require("./defaults");
+const getDefaults_1 = require("./getDefaults");
 const TYPES = ['library', 'app', 'html5', 'fullstack'];
 function getConfig(cwd, configPath, packagePath) {
     delete require.cache[configPath];
@@ -26,7 +26,7 @@ function getConfig(cwd, configPath, packagePath) {
 // @TODO: 阉割版的 resolve
 function resolve(cwd, configPath = 'vusion.config.js', theme) {
     cwd = cwd || process.cwd();
-    const config = defaults_1.default;
+    const config = getDefaults_1.default();
     const packagePath = config.packagePath = path.resolve(cwd, 'package.json');
     configPath = config.configPath = path.resolve(cwd, configPath);
     Object.assign(config, getConfig(cwd, configPath, packagePath));
@@ -46,8 +46,8 @@ function resolve(cwd, configPath = 'vusion.config.js', theme) {
         //     });
         // }
     }
-    config.srcPath = path.resolve(process.cwd(), config.srcPath);
-    config.libraryPath = path.resolve(process.cwd(), config.libraryPath);
+    config.srcPath = path.resolve(cwd, config.srcPath);
+    config.libraryPath = path.resolve(cwd, config.libraryPath);
     if (theme === 'src' || theme === 'default')
         theme = undefined;
     config.theme = theme;

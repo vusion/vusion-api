@@ -13,7 +13,6 @@ const FSEntry_1 = require("./FSEntry");
 class File extends FSEntry_1.default {
     constructor(fullPath) {
         super(fullPath, false);
-        this.content = undefined;
     }
     open() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +32,7 @@ class File extends FSEntry_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
                 throw new Error(`Cannot find: ${this.fullPath}`);
-            this.content = yield fs.readFile(this.fullPath);
+            return this.content = yield fs.readFile(this.fullPath);
         });
     }
 }

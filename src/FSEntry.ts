@@ -1,14 +1,15 @@
 import * as path from 'path';
 
 export default class FSEntry {
-    fullPath: string;
-    fileName: string;
-    baseName: string;
-    extName: string;
-    title: string;
-    isDirectory: boolean;
-    isVue: boolean;
-    isOpen: boolean;
+    fullPath: string; // 完整路径
+    fileName: string; // 完整的文件名
+    // fileType:
+    baseName: string; // 不带扩展名的文件名
+    extName: string; // 扩展名，带`.`
+    title: string; // 标题，用于显示的名称
+    isDirectory: boolean; // 是否为文件夹。部分子类需要在`preopen`之后才是准确的判断
+    isVue: boolean; //
+    isOpen: boolean; // 是否已经打开
 
     constructor(fullPath: string, isDirectory: boolean) {
         this.fullPath = fullPath;
