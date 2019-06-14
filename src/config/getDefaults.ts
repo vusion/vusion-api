@@ -1,7 +1,14 @@
 export enum ResolvePriority {
-    'cwd',
-    'cli',
-    'current',
+    cwd = 'cwd',
+    cli = 'cli',
+    current = 'current',
+}
+
+export interface MaterialInfo {
+    name: string,
+    group?: string,
+    alias?: string,
+    path?: string
 }
 
 export interface VusionConfig {
@@ -18,7 +25,19 @@ export interface VusionConfig {
     },
     entry: Object,
     clean: boolean,
-    docs: boolean | Object,
+    docs: boolean | {
+        title?: string,
+        logo?: string,
+        mode?: string,
+        base?: string,
+        install?: string,
+        navbar?: Array<{ text: string, to: string }>,
+        components?: Array<MaterialInfo>,
+        directives?: Array<MaterialInfo>,
+        formatters?: Array<MaterialInfo>,
+        blocks?: Array<MaterialInfo>,
+        utils?: Array<MaterialInfo>,
+    },
     open: boolean,
     hot: boolean,
     sourceMap: boolean,

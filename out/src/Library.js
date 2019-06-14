@@ -15,9 +15,9 @@ const VueFile_1 = require("./VueFile");
 const _1 = require(".");
 var LibraryType;
 (function (LibraryType) {
-    LibraryType[LibraryType["internal"] = 0] = "internal";
-    LibraryType[LibraryType["external"] = 1] = "external";
-    LibraryType[LibraryType["other"] = 2] = "other";
+    LibraryType["internal"] = "internal";
+    LibraryType["external"] = "external";
+    LibraryType["other"] = "other";
 })(LibraryType = exports.LibraryType || (exports.LibraryType = {}));
 /**
  * Library
@@ -31,10 +31,6 @@ class Library {
         this.extName = path.extname(this.fileName);
         this.baseName = path.basename(this.fileName, this.extName);
         this.title = this.baseName;
-        if (this.extName === '.vusion')
-            this.libraryType = LibraryType.external;
-        else
-            this.libraryType = LibraryType.internal;
         this.isOpen = false;
     }
     open() {
@@ -61,6 +57,12 @@ class Library {
             this.package = require(packageJSONPath);
             this.config = _1.resolveConfig(this.fullPath);
             this.libraryPath = path.resolve(this.fullPath, this.config.libraryPath);
+            if (typeof this.config.docs === 'object' && this.config.docs.components) {
+                this.docsComponentsInfoMap = new Map();
+                this.config.docs.components.forEach((componentInfo) => {
+                    this.docsComponentsInfoMap.set(componentInfo.name, componentInfo);
+                });
+            }
             /* 在 package.json 中查找 .vusion 或 .vue 的依赖项 */
             const vusionDeps = [];
             const vueDeps = [];

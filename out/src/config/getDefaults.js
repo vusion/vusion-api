@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ResolvePriority;
 (function (ResolvePriority) {
-    ResolvePriority[ResolvePriority["cwd"] = 0] = "cwd";
-    ResolvePriority[ResolvePriority["cli"] = 1] = "cli";
-    ResolvePriority[ResolvePriority["current"] = 2] = "current";
+    ResolvePriority["cwd"] = "cwd";
+    ResolvePriority["cli"] = "cli";
+    ResolvePriority["current"] = "current";
 })(ResolvePriority = exports.ResolvePriority || (exports.ResolvePriority = {}));
 function getDefaults() {
     const defaults = {

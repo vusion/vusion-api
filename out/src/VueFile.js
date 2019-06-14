@@ -8,9 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/// <reference path="../types/line-reader.d.ts" />
 const fs = require("fs-extra");
 const path = require("path");
 const shell = require("shelljs");
+const lineReader = require("line-reader");
 const FSEntry_1 = require("./FSEntry");
 const TemplateHandler_1 = require("./TemplateHandler");
 const ScriptHandler_1 = require("./ScriptHandler");
@@ -38,6 +40,38 @@ class VueFile extends FSEntry_1.default {
             this.isDirectory = stats.isDirectory();
             if (this.isDirectory)
                 yield this.loadDirectory();
+            this.alias = yield this.readTitleInReadme();
+        });
+    }
+    /**
+     * 尝试读取 README.md 的标题行
+     * 在前 10 行中查找
+     */
+    readTitleInReadme() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const readmePath = path.join(this.fullPath, 'README.md');
+            if (!fs.existsSync(readmePath))
+                return;
+            const titleRE = /^#\s+\w+\s*(.*?)$/;
+            let count = 0;
+            let title;
+            return new Promise((resolve, reject) => {
+                lineReader.eachLine(readmePath, { encoding: 'utf8' }, (line, last) => {
+                    line = line.trim();
+                    const cap = titleRE.exec(line);
+                    if (cap) {
+                        title = cap[1];
+                        return false;
+                    }
+                    else {
+                        count++;
+                        if (count > 10)
+                            return false;
+                    }
+                }, (err) => {
+                    err ? reject(err) : resolve(title);
+                });
+            });
         });
     }
     loadDirectory() {

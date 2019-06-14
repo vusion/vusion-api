@@ -4,14 +4,14 @@ import * as semver from 'semver';
 import VueFile from './VueFile';
 import FSEntry from './FSEntry';
 import { resolveConfig, Directory } from '.';
-import { VusionConfig } from './config/getDefaults';
+import { VusionConfig, MaterialInfo } from './config/getDefaults';
 import PackageJSON from './types/PackageJSON';
 
 
 export enum LibraryType {
-    internal,
-    external,
-    other,
+    internal = 'internal',
+    external = 'external',
+    other = 'other',
 }
 
 /**
@@ -35,6 +35,7 @@ export default class Library {
     config: VusionConfig;
     components: Array<VueFile>;
     componentsDirectory: Directory;
+    docsComponentsInfoMap: Map<string, MaterialInfo>;
     blocks: Array<VueFile>;
     directives: Array<FSEntry>;
     filters: Array<FSEntry>;
@@ -53,11 +54,6 @@ export default class Library {
         this.extName = path.extname(this.fileName);
         this.baseName = path.basename(this.fileName, this.extName);
         this.title = this.baseName;
-
-        if (this.extName === '.vusion')
-            this.libraryType = LibraryType.external;
-        else
-            this.libraryType = LibraryType.internal;
 
         this.isOpen = false;
     }
@@ -86,6 +82,12 @@ export default class Library {
         this.package = require(packageJSONPath);
         this.config = resolveConfig(this.fullPath);
         this.libraryPath = path.resolve(this.fullPath, this.config.libraryPath);
+        if (typeof this.config.docs === 'object' && this.config.docs.components) {
+            this.docsComponentsInfoMap = new Map<string, MaterialInfo>();
+            this.config.docs.components.forEach((componentInfo) => {
+                this.docsComponentsInfoMap.set(componentInfo.name, componentInfo);
+            });
+        }
 
         /* 在 package.json 中查找 .vusion 或 .vue 的依赖项 */
         const vusionDeps: Array<string> = [];

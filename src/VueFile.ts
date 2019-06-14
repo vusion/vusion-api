@@ -1,6 +1,8 @@
+/// <reference path="../types/line-reader.d.ts" />
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as shell from 'shelljs';
+import * as lineReader from 'line-reader';
 
 import FSEntry from './FSEntry';
 import TemplateHandler from './TemplateHandler';
@@ -17,6 +19,7 @@ const fetchPartialContent = (content: string, tag: string) => {
 
 export default class VueFile extends FSEntry {
     componentName: string;
+    alias: string;
     // 子组件
     // 为`undefined`表示未打开过，为数组表示已经打开。
     children: VueFile[];
@@ -49,6 +52,38 @@ export default class VueFile extends FSEntry {
         this.isDirectory = stats.isDirectory();
         if (this.isDirectory)
             await this.loadDirectory();
+
+        this.alias = await this.readTitleInReadme();
+    }
+
+    /**
+     * 尝试读取 README.md 的标题行
+     * 在前 10 行中查找
+     */
+    async readTitleInReadme(): Promise<string> {
+        const readmePath = path.join(this.fullPath, 'README.md');
+        if (!fs.existsSync(readmePath))
+            return;
+
+        const titleRE = /^#\s+\w+\s*(.*?)$/;
+        let count = 0;
+        let title: string;
+        return new Promise((resolve, reject) => {
+            lineReader.eachLine(readmePath, { encoding: 'utf8' }, (line, last) => {
+                line = line.trim();
+                const cap = titleRE.exec(line);
+                if (cap) {
+                    title = cap[1];
+                    return false;
+                } else {
+                    count++;
+                    if (count > 10)
+                        return false;
+                }
+            }, (err) => {
+                err? reject(err) : resolve(title);
+            });
+        });
     }
 
     async loadDirectory() {
