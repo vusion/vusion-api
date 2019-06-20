@@ -11,11 +11,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs-extra");
 const path = require("path");
 const utils_1 = require("./utils");
-function handleSame(dirPath, basename = 'u-sample') {
-    let dest = path.resolve(dirPath, `${basename}.vue`);
+function handleSame(dirPath, baseName = 'u-sample') {
+    let dest = path.resolve(dirPath, `${baseName}.vue`);
     let count = 1;
     while (fs.existsSync(dest))
-        dest = path.resolve(dirPath, `${basename}-${count++}.vue`);
+        dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
     return dest;
 }
 function normalizeName(componentName) {

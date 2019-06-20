@@ -2,11 +2,11 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { kebab2Camel, Camel2kebab } from './utils';
 
-function handleSame(dirPath: string, basename: string = 'u-sample') {
-    let dest = path.resolve(dirPath, `${basename}.vue`);
+function handleSame(dirPath: string, baseName: string = 'u-sample') {
+    let dest = path.resolve(dirPath, `${baseName}.vue`);
     let count = 1;
     while (fs.existsSync(dest))
-        dest = path.resolve(dirPath, `${basename}-${count++}.vue`);
+        dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
 
     return dest;
 }
