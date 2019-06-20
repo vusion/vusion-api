@@ -99,7 +99,10 @@ function createMultiFileWithScreenshots(dirPath, componentName) {
         const dest = handleSame(dirPath, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-screenshots.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
-            yield batchReplace(dest, [
+            yield batchReplace([
+                path.join(dest, 'index.js'),
+                path.join(dest, 'README.md'),
+            ], [
                 [/u-sample/g, normalized.baseName],
                 [/USample/g, normalized.componentName],
             ]);

@@ -92,7 +92,10 @@ export async function createMultiFileWithScreenshots(dirPath: string, componentN
     await fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-screenshots.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
-        await batchReplace(dest, [
+        await batchReplace([
+            path.join(dest, 'index.js'),
+            path.join(dest, 'README.md'),
+        ], [
             [/u-sample/g, normalized.baseName],
             [/USample/g, normalized.componentName],
         ]);
