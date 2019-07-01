@@ -23,6 +23,7 @@ export default class VueFile extends FSEntry {
     // 子组件
     // 为`undefined`表示未打开过，为数组表示已经打开。
     children: VueFile[];
+    isChild: boolean;
 
     // 单文件内容
     // 为`undefined`表示未打开过
@@ -51,7 +52,7 @@ export default class VueFile extends FSEntry {
         const stats = fs.statSync(this.fullPath);
         this.isDirectory = stats.isDirectory();
         if (this.isDirectory)
-            await this.loadDirectory();
+            this.children = await this.loadDirectory();
 
         this.alias = await this.readTitleInReadme();
     }
@@ -98,7 +99,9 @@ export default class VueFile extends FSEntry {
                 return;
 
             const fullPath = path.join(this.fullPath, name);
-            children.push(new VueFile(fullPath));
+            const vueFile = new VueFile(fullPath);
+            vueFile.isChild = true;
+            children.push(vueFile);
         });
 
         return children;

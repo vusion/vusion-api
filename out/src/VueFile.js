@@ -39,7 +39,7 @@ class VueFile extends FSEntry_1.default {
             const stats = fs.statSync(this.fullPath);
             this.isDirectory = stats.isDirectory();
             if (this.isDirectory)
-                yield this.loadDirectory();
+                this.children = yield this.loadDirectory();
             this.alias = yield this.readTitleInReadme();
         });
     }
@@ -84,7 +84,9 @@ class VueFile extends FSEntry_1.default {
                 if (!name.endsWith('.vue'))
                     return;
                 const fullPath = path.join(this.fullPath, name);
-                children.push(new VueFile(fullPath));
+                const vueFile = new VueFile(fullPath);
+                vueFile.isChild = true;
+                children.push(vueFile);
             });
             return children;
         });
