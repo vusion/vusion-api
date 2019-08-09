@@ -1,4 +1,4 @@
-import VueFile from '../../src/VueFile';
+import VueFile from '../../src/fs/VueFile';
 import { expect } from 'chai';
 import * as path from 'path';
 import * as shell from 'shelljs';

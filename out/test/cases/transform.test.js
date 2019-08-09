@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const VueFile_1 = require("../../src/VueFile");
+const VueFile_1 = require("../../src/fs/VueFile");
 const chai_1 = require("chai");
 const path = require("path");
 const shell = require("shelljs");

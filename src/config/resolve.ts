@@ -26,7 +26,7 @@ function getConfig(cwd: string, configPath: string, packagePath: string) {
 }
 
 // @TODO: 阉割版的 resolve
-export function resolve(cwd: string, configPath: string = 'vusion.config.js', theme?: string): VusionConfig {
+export default function resolve(cwd: string, configPath: string = 'vusion.config.js', theme?: string): VusionConfig {
     cwd = cwd || process.cwd();
 
     const config = getDefaults();

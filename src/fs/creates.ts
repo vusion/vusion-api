@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { kebab2Camel, Camel2kebab } from './utils';
+import { kebab2Camel, Camel2kebab } from '../utils';
 
 function handleSame(dirPath: string, baseName: string = 'u-sample') {
     let dest = path.resolve(dirPath, `${baseName}.vue`);

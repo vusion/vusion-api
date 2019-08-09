@@ -67,6 +67,6 @@ function resolve(cwd, configPath = 'vusion.config.js', theme) {
     }
     return config;
 }
-exports.resolve = resolve;
+exports.default = resolve;
 ;
 //# sourceMappingURL=resolve.js.map

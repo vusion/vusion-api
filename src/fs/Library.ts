@@ -3,9 +3,9 @@ import * as path from 'path';
 import * as semver from 'semver';
 import VueFile from './VueFile';
 import FSEntry from './FSEntry';
-import { resolveConfig, Directory } from '.';
-import { VusionConfig, MaterialInfo } from './config/getDefaults';
-import PackageJSON from './types/PackageJSON';
+import { config, Directory } from '..';
+import { VusionConfig, MaterialInfo } from '../config/getDefaults';
+import PackageJSON from '../types/PackageJSON';
 
 
 export enum LibraryType {
@@ -80,7 +80,7 @@ export default class Library {
             return;
 
         this.package = require(packageJSONPath);
-        this.config = resolveConfig(this.fullPath);
+        this.config = config.resolve(this.fullPath);
         this.libraryPath = path.resolve(this.fullPath, this.config.libraryPath);
         if (typeof this.config.docs === 'object' && this.config.docs.components) {
             this.docsComponentsInfoMap = new Map<string, MaterialInfo>();

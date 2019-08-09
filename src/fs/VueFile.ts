@@ -1,4 +1,4 @@
-/// <reference path="../types/line-reader.d.ts" />
+/// <reference path="../../types/line-reader.d.ts" />
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as shell from 'shelljs';
