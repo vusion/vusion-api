@@ -13,6 +13,8 @@ export interface VusionConfig {
     configPath?: string;
     packagePath?: string;
 
+    outputPath: string;
+    publicPath: string;
     staticPath: string;
     srcPath: string;
     libraryPath: string;
@@ -48,6 +50,8 @@ export default function getDefaults() {
         configPath: '',
         packagePath: '',
 
+        outputPath: 'public',
+        publicPath: '',
         staticPath: '',                        // Path of static files, which will be copied into destination directory. It accepts a String or Array.
         srcPath: './src',                      // To be `./src` by default
         libraryPath: '',                       // [Required] Library directory path. To be srcPath by default

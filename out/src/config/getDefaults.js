@@ -5,6 +5,8 @@ function getDefaults() {
         type: '',
         configPath: '',
         packagePath: '',
+        outputPath: 'public',
+        publicPath: '',
         staticPath: '',
         srcPath: './src',
         libraryPath: '',
