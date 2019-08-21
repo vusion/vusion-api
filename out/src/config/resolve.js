@@ -24,7 +24,7 @@ function getConfig(cwd, configPath, packagePath) {
     }
 }
 // @TODO: 阉割版的 resolve
-function resolve(cwd, configPath = 'vusion.config.js', theme) {
+function resolve(cwd, configPath = 'vusion.config.js', args) {
     cwd = cwd || process.cwd();
     const config = getDefaults_1.default();
     const packagePath = config.packagePath = path.resolve(cwd, 'package.json');
@@ -33,8 +33,25 @@ function resolve(cwd, configPath = 'vusion.config.js', theme) {
     if (!TYPES.includes(config.type)) {
         throw new Error(chalk_1.default.bgRed(' ERROR ') + ' Unknown project type!');
     }
-    config.srcPath = config.srcPath || './src';
-    config.libraryPath = config.libraryPath || config.srcPath;
+    /**
+     * CLI Arguments
+     */
+    if (args) {
+        if (args.theme)
+            config.theme = args.theme;
+        if (args['vusion-mode'])
+            config.mode = args['vusion-mode'];
+        if (args['base-css'])
+            config.baseCSSPath = path.resolve(process.cwd(), args['base-css']);
+        if (args['global-css'])
+            config.globalCSSPath = path.resolve(process.cwd(), args['global-css']);
+        if (args['src-path'])
+            config.srcPath = path.resolve(process.cwd(), args['src-path']);
+        if (args['library-path'])
+            config.libraryPath = path.resolve(process.cwd(), args['library-path']);
+    }
+    config.srcPath = path.resolve(config.srcPath || './src');
+    config.libraryPath = path.resolve(config.libraryPath || config.srcPath);
     if (config.type === 'library') {
         config.docs = config.docs || {};
         // @TODO
@@ -46,25 +63,11 @@ function resolve(cwd, configPath = 'vusion.config.js', theme) {
         //     });
         // }
     }
-    config.srcPath = path.resolve(cwd, config.srcPath);
-    config.libraryPath = path.resolve(cwd, config.libraryPath);
-    if (theme === 'src' || theme === 'default')
-        theme = undefined;
-    config.theme = theme;
-    if (!config.globalCSSPath) {
-        config.globalCSSPath = path.resolve(config.libraryPath, theme ? `../theme-${theme}/base/global.css` : './base/global.css');
-        if (!fs.existsSync(config.globalCSSPath))
-            config.globalCSSPath = path.resolve(config.srcPath, theme ? `../theme-${theme}/base/global.css` : './base/global.css');
-        // if (!fs.existsSync(config.globalCSSPath))
-        // config.globalCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/global.css');
-    }
-    if (!config.baseCSSPath) {
+    // 自动根据主题查找 globalCSSPath 和 baseCSSPath
+    if (!config.globalCSSPath)
+        config.globalCSSPath = path.resolve(config.libraryPath, config.theme ? `../theme-${config.theme}/base/global.css` : './base/global.css');
+    if (!config.baseCSSPath)
         config.baseCSSPath = path.resolve(config.libraryPath, './base/base.css');
-        if (!fs.existsSync(config.baseCSSPath))
-            config.baseCSSPath = path.resolve(config.srcPath, './base/base.css');
-        // if (!fs.existsSync(config.baseCSSPath))
-        // config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/base.css');
-    }
     return config;
 }
 exports.default = resolve;

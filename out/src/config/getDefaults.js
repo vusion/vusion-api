@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function getDefaults() {
     const defaults = {
         type: '',
+        mode: '',
         configPath: '',
         packagePath: '',
         outputPath: 'public',
@@ -23,7 +24,6 @@ function getDefaults() {
         docs: false,
         forceShaking: false,
         experimental: false,
-        options: {},
     };
     return defaults;
 }

@@ -9,6 +9,7 @@ export interface MaterialInfo {
 
 export interface VusionConfig {
     type: string;
+    mode?: string;
 
     configPath?: string;
     packagePath?: string;
@@ -39,13 +40,12 @@ export interface VusionConfig {
 
     forceShaking: boolean;
     experimental: boolean;
-
-    options: Object;
 }
 
 export default function getDefaults() {
     const defaults: VusionConfig = {
         type: '',                              // [Required] Vusion project type. 'library', 'app'
+        mode: '',
 
         configPath: '',
         packagePath: '',
@@ -71,9 +71,6 @@ export default function getDefaults() {
 
         forceShaking: false,                   // Force to enable tree shaking under this path without care of side effects. It's different from default tree shaking of webpack.
         experimental: false,                   // Enable some experimental loaders or plugins, like ModuleConcatenationPlugin
-
-        options: {},                           // Extra options for loaders or plugins,
-        // such as IconFontPlugin, CSSSpritePlugin, ExtractTextWebpackPlugin, UglifyjsWebpackPlugin, EnvironmentPlugin, BabelMinifyWebpackPlugin, CopyWebpackPlugin, ForceShakingPlugin
     };
 
     return defaults;
