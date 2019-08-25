@@ -17,7 +17,7 @@ const FSEntry_1 = require("./FSEntry");
 const TemplateHandler_1 = require("./TemplateHandler");
 const ScriptHandler_1 = require("./ScriptHandler");
 const StyleHandler_1 = require("./StyleHandler");
-const babel_traverse_1 = require("babel-traverse");
+const traverse_1 = require("@babel/traverse");
 const fetchPartialContent = (content, tag) => {
     const reg = new RegExp(`<${tag}.*?>([\\s\\S]+)<\\/${tag}>`);
     const m = content.match(reg);
@@ -215,7 +215,7 @@ class VueFile extends FSEntry_1.default {
             else
                 return filePath;
         }
-        babel_traverse_1.default(this.scriptHandler.ast, {
+        traverse_1.default(this.scriptHandler.ast, {
             ImportDeclaration(nodePath) {
                 if (nodePath.node.source)
                     nodePath.node.source.value = isDirectory ? shortenPath(nodePath.node.source.value) : lengthenPath(nodePath.node.source.value);

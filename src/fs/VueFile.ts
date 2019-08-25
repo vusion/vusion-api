@@ -9,7 +9,7 @@ import TemplateHandler from './TemplateHandler';
 import ScriptHandler from './ScriptHandler';
 import StyleHandler from './StyleHandler';
 
-import traverse from 'babel-traverse';
+import traverse from '@babel/traverse';
 
 const fetchPartialContent = (content: string, tag: string) => {
     const reg = new RegExp(`<${tag}.*?>([\\s\\S]+)<\\/${tag}>`);

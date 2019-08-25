@@ -23,7 +23,6 @@ export interface VusionConfig {
     globalCSSPath: string;
     theme: string;
 
-    entry: Object,
     docs: boolean | {
         title?: string,
         logo?: string,
@@ -58,14 +57,6 @@ export default function getDefaults() {
         baseCSSPath: '',                       // Path of base CSS. If not set, it will be `library/base/base.css`
         globalCSSPath: '',                     // Path of global CSS. If not set, it will be `library/base/global.css`
         theme: undefined,                      // Project theme
-
-        entry: {                               // Generate entry and HTMLWebpackPlugin automatically
-            pages: undefined,
-            prepend: [],
-            append: [],
-            commons: false,
-            template: undefined,
-        },
 
         docs: false,                           // Generate docs of common components in library. Always be true if project type is `library`
 

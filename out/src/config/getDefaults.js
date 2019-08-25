@@ -14,13 +14,6 @@ function getDefaults() {
         baseCSSPath: '',
         globalCSSPath: '',
         theme: undefined,
-        entry: {
-            pages: undefined,
-            prepend: [],
-            append: [],
-            commons: false,
-            template: undefined,
-        },
         docs: false,
         forceShaking: false,
         experimental: false,

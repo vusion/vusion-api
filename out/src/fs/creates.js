@@ -45,7 +45,7 @@ function createSingleFile(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = normalizeName(componentName);
         const dest = handleSame(dirPath, normalized.baseName);
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-single-file.vue'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-single-file.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
             yield batchReplace(dest, [
                 [/u-sample/g, normalized.baseName],
@@ -60,7 +60,7 @@ function createMultiFile(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = normalizeName(componentName);
         const dest = handleSame(dirPath, normalized.baseName);
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file.vue'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
             yield batchReplace([
                 path.join(dest, 'index.js'),
@@ -78,7 +78,7 @@ function createMultiFileWithSubdocs(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = normalizeName(componentName);
         const dest = handleSame(dirPath, normalized.baseName);
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
             yield batchReplace([
                 path.join(dest, 'index.js'),
@@ -97,7 +97,7 @@ function createMultiFileWithScreenshots(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = normalizeName(componentName);
         const dest = handleSame(dirPath, normalized.baseName);
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-screenshots.vue'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-screenshots.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
             yield batchReplace([
                 path.join(dest, 'index.js'),
@@ -114,7 +114,7 @@ exports.createMultiFileWithScreenshots = createMultiFileWithScreenshots;
 function createPage(dirPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = handleSame(dirPath, 'page');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/page.vue'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/page.vue'), dest);
         return dest;
     });
 }
@@ -122,7 +122,7 @@ exports.createPage = createPage;
 function createListPage(dirPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = handleSame(dirPath, 'list');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue'), dest);
         return dest;
     });
 }
@@ -130,7 +130,7 @@ exports.createListPage = createListPage;
 function createFormPage(dirPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = handleSame(dirPath, 'form');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/page.vue'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/page.vue'), dest);
         return dest;
     });
 }
@@ -138,7 +138,7 @@ exports.createFormPage = createFormPage;
 function createDetailPage(dirPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = handleSame(dirPath, 'detail');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/page.vue'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/page.vue'), dest);
         return dest;
     });
 }
@@ -150,7 +150,7 @@ function addDoc(vuePath) {
         const dest = path.resolve(vuePath, 'README.md');
         if (fs.existsSync(dest))
             throw new Error('File README.md exists!');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file.vue/README.md'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file.vue/README.md'), dest);
         const baseName = path.basename(vuePath, path.extname(vuePath));
         const componentName = utils_1.kebab2Camel(baseName);
         yield batchReplace(dest, [
@@ -170,7 +170,7 @@ function addDocWithSubs(vuePath) {
         const dest = path.resolve(vuePath, 'README.md');
         if (fs.existsSync(dest))
             throw new Error('File "README.md" exists!');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue/README.md'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue/README.md'), dest);
         yield batchReplace(dest, [
             [/u-sample/g, baseName],
             [/USample/g, componentName],
@@ -178,7 +178,7 @@ function addDocWithSubs(vuePath) {
         const dest2 = path.resolve(vuePath, 'docs');
         if (fs.existsSync(dest2))
             throw new Error('Directory "docs/" exists!');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-subdocs.vue/docs'), dest2);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue/docs'), dest2);
         yield batchReplace([
             path.join(dest, 'api.md'),
             path.join(dest, 'examples.md'),
@@ -197,7 +197,7 @@ function addDocWithScreenshots(vuePath) {
         const dest = path.resolve(vuePath, 'README.md');
         if (fs.existsSync(dest))
             throw new Error('File README.md exists!');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-screenshots.vue/README.md'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-screenshots.vue/README.md'), dest);
         const baseName = path.basename(vuePath, path.extname(vuePath));
         const componentName = utils_1.kebab2Camel(baseName);
         yield batchReplace(dest, [
@@ -207,7 +207,7 @@ function addDocWithScreenshots(vuePath) {
         const dest2 = path.resolve(vuePath, 'screenshots');
         if (fs.existsSync(dest2))
             throw new Error('Directory "screenshots/" exists!');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file-with-screenshots.vue/screenshots'), dest2);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-screenshots.vue/screenshots'), dest2);
         return dest;
     });
 }
@@ -219,7 +219,7 @@ function addModuleCSS(vuePath) {
         const dest = path.resolve(vuePath, 'module.css');
         if (fs.existsSync(dest))
             throw new Error('File module.css exists!');
-        yield fs.copy(path.resolve(__dirname, '../', '../templates/u-multi-file.vue/module.css'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file.vue/module.css'), dest);
         return dest;
     });
 }
