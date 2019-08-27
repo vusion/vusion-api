@@ -50,8 +50,8 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         if (args['library-path'])
             config.libraryPath = path.resolve(process.cwd(), args['library-path']);
     }
-    config.srcPath = path.resolve(config.srcPath || './src');
-    config.libraryPath = path.resolve(config.libraryPath || config.srcPath);
+    config.srcPath = path.resolve(cwd, config.srcPath || './src');
+    config.libraryPath = path.resolve(cwd, config.libraryPath || config.srcPath);
     if (config.type === 'library') {
         config.docs = config.docs || {};
         // @TODO

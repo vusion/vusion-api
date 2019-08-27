@@ -4,9 +4,11 @@ import { kebab2Camel, Camel2kebab } from '../utils';
 
 function handleSame(dirPath: string, baseName: string = 'u-sample') {
     let dest = path.resolve(dirPath, `${baseName}.vue`);
-    let count = 1;
-    while (fs.existsSync(dest))
-        dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
+    // let count = 1;
+    if (fs.existsSync(dest))
+        throw new Error('File exists: ' + dest);
+    // while (fs.existsSync(dest))
+    //     dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
 
     return dest;
 }
@@ -36,6 +38,32 @@ async function batchReplace(src: string | Array<string>, replacers: Array<Replac
 }
 
 /* 以下代码复制粘贴写得冗余了一点，不过之后可能各部分功能会有差异，所以先不整合 */
+
+export async function createDirectory(dirPath: string, dirName: string) {
+    const dest = path.resolve(dirPath, dirName);
+    if (fs.existsSync(dest))
+        throw new Error('Directory exists: ' + dest);
+
+    await fs.mkdir(dest);
+    return dest;
+}
+
+export async function moveFileToTrash(fullPath: string) {
+    // @TODO: Windows, Linux
+    const fileName = path.basename(fullPath);
+    let dest = path.resolve(process.env.HOME, '.Trash', fileName);
+    if (fs.existsSync(dest)) {
+        const date = new Date();
+        dest = dest.replace(/(\.[a-zA-Z]+$|$)/, `.${date.toTimeString().split(' ')[0].replace(/:/g, '-')}-${date.getMilliseconds()}$1`);
+    }
+    await fs.move(fullPath, dest);
+    return dest;
+}
+
+export async function deleteFile(fullPath: string) {
+    // @TODO: Windows, Linux
+    await fs.remove(fullPath);
+}
 
 export async function createSingleFile(dirPath: string, componentName?: string) {
     const normalized = normalizeName(componentName);

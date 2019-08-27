@@ -13,9 +13,11 @@ const path = require("path");
 const utils_1 = require("../utils");
 function handleSame(dirPath, baseName = 'u-sample') {
     let dest = path.resolve(dirPath, `${baseName}.vue`);
-    let count = 1;
-    while (fs.existsSync(dest))
-        dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
+    // let count = 1;
+    if (fs.existsSync(dest))
+        throw new Error('File exists: ' + dest);
+    // while (fs.existsSync(dest))
+    //     dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
     return dest;
 }
 function normalizeName(componentName) {
@@ -44,6 +46,8 @@ function batchReplace(src, replacers) {
 function createDirectory(dirPath, dirName) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = path.resolve(dirPath, dirName);
+        if (fs.existsSync(dest))
+            throw new Error('Directory exists: ' + dest);
         yield fs.mkdir(dest);
         return dest;
     });
@@ -253,4 +257,4 @@ function addModuleCSS(vuePath) {
     });
 }
 exports.addModuleCSS = addModuleCSS;
-//# sourceMappingURL=creates.js.map
+//# sourceMappingURL=service.js.map

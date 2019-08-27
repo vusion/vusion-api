@@ -14,5 +14,5 @@ exports.VueFile = VueFile_1.default;
 var Library_1 = require("./Library");
 exports.Library = Library_1.default;
 exports.LibraryType = Library_1.LibraryType;
-__export(require("./creates"));
+__export(require("./service"));
 //# sourceMappingURL=index.js.map
