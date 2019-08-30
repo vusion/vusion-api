@@ -4,6 +4,7 @@ function getDefaults() {
     const defaults = {
         type: '',
         mode: '',
+        overwrite: true,
         configPath: '',
         packagePath: '',
         outputPath: 'public',

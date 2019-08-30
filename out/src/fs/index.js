@@ -11,6 +11,7 @@ var Directory_1 = require("./Directory");
 exports.Directory = Directory_1.default;
 var VueFile_1 = require("./VueFile");
 exports.VueFile = VueFile_1.default;
+exports.VueFileExtendMode = VueFile_1.VueFileExtendMode;
 var Library_1 = require("./Library");
 exports.Library = Library_1.default;
 exports.LibraryType = Library_1.LibraryType;

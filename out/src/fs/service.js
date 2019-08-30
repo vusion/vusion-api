@@ -11,11 +11,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs-extra");
 const path = require("path");
 const utils_1 = require("../utils");
+class FileExistsError extends Error {
+    constructor(fullPath) {
+        super(fullPath);
+        this.name = 'FileExistsError';
+    }
+}
+exports.FileExistsError = FileExistsError;
 function handleSame(dirPath, baseName = 'u-sample') {
     let dest = path.resolve(dirPath, `${baseName}.vue`);
     // let count = 1;
     if (fs.existsSync(dest))
-        throw new Error('File exists: ' + dest);
+        throw new FileExistsError(dest);
     // while (fs.existsSync(dest))
     //     dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
     return dest;
@@ -47,7 +54,7 @@ function createDirectory(dirPath, dirName) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = path.resolve(dirPath, dirName);
         if (fs.existsSync(dest))
-            throw new Error('Directory exists: ' + dest);
+            throw new FileExistsError(dest);
         yield fs.mkdir(dest);
         return dest;
     });
@@ -74,6 +81,18 @@ function deleteFile(fullPath) {
     });
 }
 exports.deleteFile = deleteFile;
+function rename(fullPath, newName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const dest = path.join(path.dirname(fullPath), newName);
+        if (dest === fullPath)
+            return dest;
+        if (fs.existsSync(dest))
+            throw new FileExistsError(dest);
+        yield fs.move(fullPath, dest);
+        return dest;
+    });
+}
+exports.rename = rename;
 function createSingleFile(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = normalizeName(componentName);
@@ -182,7 +201,7 @@ function addDoc(vuePath) {
             throw new Error('Unsupport adding blocks in single vue file!');
         const dest = path.resolve(vuePath, 'README.md');
         if (fs.existsSync(dest))
-            throw new Error('File README.md exists!');
+            throw new FileExistsError('File README.md exists!');
         yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file.vue/README.md'), dest);
         const baseName = path.basename(vuePath, path.extname(vuePath));
         const componentName = utils_1.kebab2Camel(baseName);
@@ -202,7 +221,7 @@ function addDocWithSubs(vuePath) {
         const componentName = utils_1.kebab2Camel(baseName);
         const dest = path.resolve(vuePath, 'README.md');
         if (fs.existsSync(dest))
-            throw new Error('File "README.md" exists!');
+            throw new FileExistsError('File "README.md" exists!');
         yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue/README.md'), dest);
         yield batchReplace(dest, [
             [/u-sample/g, baseName],
@@ -210,7 +229,7 @@ function addDocWithSubs(vuePath) {
         ]);
         const dest2 = path.resolve(vuePath, 'docs');
         if (fs.existsSync(dest2))
-            throw new Error('Directory "docs/" exists!');
+            throw new FileExistsError('Directory "docs/" exists!');
         yield fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue/docs'), dest2);
         yield batchReplace([
             path.join(dest, 'api.md'),

@@ -13,6 +13,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const shell = require("shelljs");
 const lineReader = require("line-reader");
+const utils_1 = require("../utils");
 const FSEntry_1 = require("./FSEntry");
 const TemplateHandler_1 = require("./TemplateHandler");
 const ScriptHandler_1 = require("./ScriptHandler");
@@ -23,10 +24,19 @@ const fetchPartialContent = (content, tag) => {
     const m = content.match(reg);
     return m ? m[1].trim() + '\n' : '';
 };
+var VueFileExtendMode;
+(function (VueFileExtendMode) {
+    VueFileExtendMode["style"] = "style";
+    VueFileExtendMode["script"] = "script";
+    VueFileExtendMode["template"] = "template";
+    VueFileExtendMode["all"] = "all";
+})(VueFileExtendMode = exports.VueFileExtendMode || (exports.VueFileExtendMode = {}));
+;
 class VueFile extends FSEntry_1.default {
     constructor(fullPath) {
         super(fullPath, false);
         this.isVue = true;
+        this.componentName = utils_1.kebab2Camel(this.baseName);
     }
     /**
      * 提前检测 VueFile 文件类型，以及子组件等
@@ -95,6 +105,8 @@ class VueFile extends FSEntry_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.isOpen)
                 return;
+            if (this.isDirectory === undefined)
+                yield this.preopen();
             yield this.load();
             this.isOpen = true;
         });
@@ -246,6 +258,28 @@ class VueFile extends FSEntry_1.default {
             }
         });
         this.isDirectory = !this.isDirectory;
+    }
+    extend(mode, fullPath, from) {
+        const vueFile = new VueFile(fullPath);
+        vueFile.isDirectory = true;
+        // JS
+        const tempComponentName = this.componentName.replace(/^[A-Z]/, 'O');
+        vueFile.script = from.endsWith('.vue')
+            ? `import ${this.componentName === vueFile.componentName ? tempComponentName : this.componentName} from '${from}';`
+            : `import { ${this.componentName}${this.componentName === vueFile.componentName ? ' as ' + tempComponentName : ''} } from '${from}';`;
+        vueFile.script += `\n
+export const ${vueFile.componentName} = {
+    name: '${vueFile.baseName}',
+    extends: ${this.componentName === vueFile.componentName ? tempComponentName : this.componentName},
+};
+
+export default ${vueFile.componentName};
+`;
+        if (mode === VueFileExtendMode.style || mode === VueFileExtendMode.all)
+            vueFile.style = `@extend;\n`;
+        if (mode === VueFileExtendMode.template || mode === VueFileExtendMode.all)
+            vueFile.template = this.template;
+        return vueFile;
     }
 }
 exports.default = VueFile;

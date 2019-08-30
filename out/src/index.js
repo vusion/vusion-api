@@ -11,6 +11,7 @@ exports.FSEntry = fs_1.FSEntry;
 exports.File = fs_1.File;
 exports.Directory = fs_1.Directory;
 exports.VueFile = fs_1.VueFile;
+exports.VueFileExtendMode = fs_1.VueFileExtendMode;
 exports.Library = fs_1.Library;
 exports.LibraryType = fs_1.LibraryType;
 //# sourceMappingURL=index.js.map

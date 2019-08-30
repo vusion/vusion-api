@@ -3,4 +3,8 @@ import * as config from './config';
 import * as utils from './utils';
 
 export { fs, config, utils };
-export { FSEntry, File, Directory, VueFile, Library, LibraryType } from './fs';
+export {
+    FSEntry, File, Directory,
+    VueFile, VueFileExtendMode,
+    Library, LibraryType,
+} from './fs';

@@ -10,6 +10,7 @@ export interface MaterialInfo {
 export interface VusionConfig {
     type: string;
     mode?: string;
+    overwrite: boolean;
 
     configPath?: string;
     packagePath?: string;
@@ -45,6 +46,7 @@ export default function getDefaults() {
     const defaults: VusionConfig = {
         type: '',                              // [Required] Vusion project type. 'library', 'app'
         mode: '',
+        overwrite: true,
 
         configPath: '',
         packagePath: '',

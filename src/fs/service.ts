@@ -2,11 +2,18 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { kebab2Camel, Camel2kebab } from '../utils';
 
+export class FileExistsError extends Error {
+    constructor(fullPath: string) {
+        super(fullPath);
+        this.name = 'FileExistsError';
+    }
+}
+
 function handleSame(dirPath: string, baseName: string = 'u-sample') {
     let dest = path.resolve(dirPath, `${baseName}.vue`);
     // let count = 1;
     if (fs.existsSync(dest))
-        throw new Error('File exists: ' + dest);
+        throw new FileExistsError(dest);
     // while (fs.existsSync(dest))
     //     dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
 
@@ -42,7 +49,7 @@ async function batchReplace(src: string | Array<string>, replacers: Array<Replac
 export async function createDirectory(dirPath: string, dirName: string) {
     const dest = path.resolve(dirPath, dirName);
     if (fs.existsSync(dest))
-        throw new Error('Directory exists: ' + dest);
+        throw new FileExistsError(dest);
 
     await fs.mkdir(dest);
     return dest;
@@ -63,6 +70,18 @@ export async function moveFileToTrash(fullPath: string) {
 export async function deleteFile(fullPath: string) {
     // @TODO: Windows, Linux
     await fs.remove(fullPath);
+}
+
+export async function rename(fullPath: string, newName: string) {
+    const dest = path.join(path.dirname(fullPath), newName);
+    if (dest === fullPath)
+        return dest;
+
+    if (fs.existsSync(dest))
+        throw new FileExistsError(dest);
+
+    await fs.move(fullPath, dest);
+    return dest;
 }
 
 export async function createSingleFile(dirPath: string, componentName?: string) {
@@ -161,7 +180,7 @@ export async function addDoc(vuePath: string) {
 
     const dest = path.resolve(vuePath, 'README.md');
     if (fs.existsSync(dest))
-        throw new Error('File README.md exists!');
+        throw new FileExistsError('File README.md exists!');
 
     await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file.vue/README.md'), dest);
 
@@ -182,7 +201,7 @@ export async function addDocWithSubs(vuePath: string) {
 
     const dest = path.resolve(vuePath, 'README.md');
     if (fs.existsSync(dest))
-        throw new Error('File "README.md" exists!');
+        throw new FileExistsError('File "README.md" exists!');
 
     await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue/README.md'), dest);
     await batchReplace(dest, [
@@ -192,7 +211,7 @@ export async function addDocWithSubs(vuePath: string) {
 
     const dest2 = path.resolve(vuePath, 'docs');
     if (fs.existsSync(dest2))
-        throw new Error('Directory "docs/" exists!');
+        throw new FileExistsError('Directory "docs/" exists!');
 
     await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue/docs'), dest2);
     await batchReplace([
