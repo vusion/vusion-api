@@ -16,7 +16,7 @@ const prettierConfig = {
 
 class ScriptHandler {
     code: string;
-    ast: babel.Node;
+    ast: babel.types.File;
     dirty: boolean = false;
 
     constructor(code: string = '', options?: Object) {
@@ -28,7 +28,7 @@ class ScriptHandler {
         return babel.parseSync(code, {
             // Must require manually in VSCode
             plugins: [require('@babel/plugin-syntax-dynamic-import')],
-        });
+        }) as babel.types.File;
     }
 
     generate() {

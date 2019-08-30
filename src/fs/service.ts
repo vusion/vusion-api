@@ -1,6 +1,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as babel from '@babel/core';
 import { kebab2Camel, Camel2kebab } from '../utils';
+import { VueFile, Library, VueFileExtendMode } from '.';
 
 export class FileExistsError extends Error {
     constructor(fullPath: string) {
@@ -261,4 +263,58 @@ export async function addModuleCSS(vuePath: string) {
 
     await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file.vue/module.css'), dest);
     return dest;
+}
+
+/**
+ * 扩展到新的库中
+ * @param vueFile - 原组件库需要扩展的组件
+ * @param library - 扩展到的组件库，比如 internalLibrary
+ */
+export async function extendToLibrary(vueFile: VueFile, from: Library | string, to: Library, mode: VueFileExtendMode, subDir?: string) {
+    let fromPath: string;
+    if (from instanceof Library) {
+        if (subDir === undefined)
+            subDir = to.config.type !== 'library' ? from.baseName : ''; // @example 'cloud-ui';
+        fromPath = from.fileName;
+    } else {
+        if (subDir === undefined)
+            subDir = to.config.type !== 'library' ? 'other' : '';
+        fromPath = from;
+    }
+
+    const relativePath = `./${subDir}/${vueFile.fileName}`;
+    const toPath = to.componentsDirectory.fullPath;
+
+    const destDir = path.resolve(toPath, subDir);
+    const dest = path.resolve(toPath, relativePath);
+
+    if (!fs.existsSync(destDir))
+        fs.mkdirSync(destDir);
+
+    const newVueFile = vueFile.extend(mode, dest, fromPath);
+    await newVueFile.save();
+
+    // 在 index.js 中添加
+    if (to.componentsIndexFile) {
+        const indexFile = to.componentsIndexFile;
+        await indexFile.open();
+        indexFile.parse();
+
+        const body = indexFile.handler.ast.program.body;
+        let i = 0;
+        for (; i < body.length; i++) {
+            const node = body[i];
+            if (node.type !== 'ExportAllDeclaration' || relativePath < node.source.value)
+                break;
+        }
+
+        const exportAllDeclaration = babel.types.exportAllDeclaration(babel.types.stringLiteral(relativePath));
+        // 要逃避 typescript
+        Object.assign(exportAllDeclaration.source, { raw: `'${relativePath}'` });
+
+        body.splice(i, 0, exportAllDeclaration);
+        await indexFile.save();
+    }
+
+    return newVueFile;
 }

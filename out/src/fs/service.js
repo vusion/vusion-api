@@ -10,7 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs-extra");
 const path = require("path");
+const babel = require("@babel/core");
 const utils_1 = require("../utils");
+const _1 = require(".");
 class FileExistsError extends Error {
     constructor(fullPath) {
         super(fullPath);
@@ -276,4 +278,52 @@ function addModuleCSS(vuePath) {
     });
 }
 exports.addModuleCSS = addModuleCSS;
+/**
+ * 扩展到新的库中
+ * @param vueFile - 原组件库需要扩展的组件
+ * @param library - 扩展到的组件库，比如 internalLibrary
+ */
+function extendToLibrary(vueFile, from, to, mode, subDir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let fromPath;
+        if (from instanceof _1.Library) {
+            if (subDir === undefined)
+                subDir = to.config.type !== 'library' ? from.baseName : ''; // @example 'cloud-ui';
+            fromPath = from.fileName;
+        }
+        else {
+            if (subDir === undefined)
+                subDir = to.config.type !== 'library' ? 'other' : '';
+            fromPath = from;
+        }
+        const relativePath = `./${subDir}/${vueFile.fileName}`;
+        const toPath = to.componentsDirectory.fullPath;
+        const destDir = path.resolve(toPath, subDir);
+        const dest = path.resolve(toPath, relativePath);
+        if (!fs.existsSync(destDir))
+            fs.mkdirSync(destDir);
+        const newVueFile = vueFile.extend(mode, dest, fromPath);
+        yield newVueFile.save();
+        // 在 index.js 中添加
+        if (to.componentsIndexFile) {
+            const indexFile = to.componentsIndexFile;
+            yield indexFile.open();
+            indexFile.parse();
+            const body = indexFile.handler.ast.program.body;
+            let i = 0;
+            for (; i < body.length; i++) {
+                const node = body[i];
+                if (node.type !== 'ExportAllDeclaration' || relativePath < node.source.value)
+                    break;
+            }
+            const exportAllDeclaration = babel.types.exportAllDeclaration(babel.types.stringLiteral(relativePath));
+            // 要逃避 typescript
+            Object.assign(exportAllDeclaration.source, { raw: `'${relativePath}'` });
+            body.splice(i, 0, exportAllDeclaration);
+            yield indexFile.save();
+        }
+        return newVueFile;
+    });
+}
+exports.extendToLibrary = extendToLibrary;
 //# sourceMappingURL=service.js.map

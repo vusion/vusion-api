@@ -259,14 +259,14 @@ class VueFile extends FSEntry_1.default {
         });
         this.isDirectory = !this.isDirectory;
     }
-    extend(mode, fullPath, from) {
+    extend(mode, fullPath, fromPath) {
         const vueFile = new VueFile(fullPath);
         vueFile.isDirectory = true;
         // JS
         const tempComponentName = this.componentName.replace(/^[A-Z]/, 'O');
-        vueFile.script = from.endsWith('.vue')
-            ? `import ${this.componentName === vueFile.componentName ? tempComponentName : this.componentName} from '${from}';`
-            : `import { ${this.componentName}${this.componentName === vueFile.componentName ? ' as ' + tempComponentName : ''} } from '${from}';`;
+        vueFile.script = fromPath.endsWith('.vue')
+            ? `import ${this.componentName === vueFile.componentName ? tempComponentName : this.componentName} from '${fromPath}';`
+            : `import { ${this.componentName}${this.componentName === vueFile.componentName ? ' as ' + tempComponentName : ''} } from '${fromPath}';`;
         vueFile.script += `\n
 export const ${vueFile.componentName} = {
     name: '${vueFile.baseName}',

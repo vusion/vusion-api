@@ -12,6 +12,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const semver = require("semver");
 const VueFile_1 = require("./VueFile");
+const JSFile_1 = require("./JSFile");
 const __1 = require("..");
 var LibraryType;
 (function (LibraryType) {
@@ -85,6 +86,9 @@ class Library {
                 this.componentsDirectory = new __1.Directory(path.resolve(this.libraryPath));
             else
                 this.componentsDirectory = new __1.Directory(path.resolve(this.libraryPath, 'components'));
+            const componentsIndexPath = path.resolve(this.componentsDirectory.fullPath, 'index.js');
+            if (fs.existsSync(componentsIndexPath))
+                this.componentsIndexFile = new JSFile_1.default(componentsIndexPath);
         });
     }
 }

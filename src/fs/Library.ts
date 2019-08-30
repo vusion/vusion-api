@@ -2,6 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as semver from 'semver';
 import VueFile from './VueFile';
+import JSFile from './JSFile';
 import FSEntry from './FSEntry';
 import { config, Directory } from '..';
 import { VusionConfig, MaterialInfo } from '../config/getDefaults';
@@ -35,6 +36,7 @@ export default class Library {
     config: VusionConfig;
     components: Array<VueFile>;
     componentsDirectory: Directory;
+    componentsIndexFile: JSFile;
     docsComponentsInfoMap: Map<string, MaterialInfo>;
     blocks: Array<VueFile>;
     directives: Array<FSEntry>;
@@ -115,5 +117,9 @@ export default class Library {
             this.componentsDirectory = new Directory(path.resolve(this.libraryPath));
         else
             this.componentsDirectory = new Directory(path.resolve(this.libraryPath, 'components'));
+
+        const componentsIndexPath = path.resolve(this.componentsDirectory.fullPath, 'index.js');
+        if (fs.existsSync(componentsIndexPath))
+            this.componentsIndexFile = new JSFile(componentsIndexPath);
     }
 }

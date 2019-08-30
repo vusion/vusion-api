@@ -4,7 +4,7 @@ import FSEntry from './FSEntry';
 export default class File extends FSEntry {
     // 原文件内容
     // 为`undefined`表示未打开过
-    content: Buffer;
+    content: Buffer | string;
 
     constructor(fullPath: string) {
         super(fullPath, false);
@@ -28,5 +28,9 @@ export default class File extends FSEntry {
             throw new Error(`Cannot find: ${this.fullPath}`);
 
         return this.content = await fs.readFile(this.fullPath);
+    }
+
+    async save() {
+        return fs.writeFile(this.fullPath, this.content);
     }
 }

@@ -4,7 +4,7 @@ import * as utils from './utils';
 
 export { fs, config, utils };
 export {
-    FSEntry, File, Directory,
+    FSEntry, File, Directory, JSFile,
     VueFile, VueFileExtendMode,
     Library, LibraryType,
 } from './fs';

@@ -35,6 +35,11 @@ class File extends FSEntry_1.default {
             return this.content = yield fs.readFile(this.fullPath);
         });
     }
+    save() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return fs.writeFile(this.fullPath, this.content);
+        });
+    }
 }
 exports.default = File;
 //# sourceMappingURL=File.js.map
