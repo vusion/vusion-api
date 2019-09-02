@@ -89,7 +89,7 @@ export async function rename(fullPath: string, newName: string) {
 export async function createSingleFile(dirPath: string, componentName?: string) {
     const normalized = normalizeName(componentName);
     const dest = handleSame(dirPath, normalized.baseName);
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-single-file.vue'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-single-file.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
         await batchReplace(dest, [
@@ -103,7 +103,7 @@ export async function createSingleFile(dirPath: string, componentName?: string) 
 export async function createMultiFile(dirPath: string, componentName?: string) {
     const normalized = normalizeName(componentName);
     const dest = handleSame(dirPath, normalized.baseName);
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file.vue'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
         await batchReplace([
@@ -120,7 +120,7 @@ export async function createMultiFile(dirPath: string, componentName?: string) {
 export async function createMultiFileWithSubdocs(dirPath: string, componentName?: string) {
     const normalized = normalizeName(componentName);
     const dest = handleSame(dirPath, normalized.baseName);
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
         await batchReplace([
@@ -138,7 +138,7 @@ export async function createMultiFileWithSubdocs(dirPath: string, componentName?
 export async function createMultiFileWithScreenshots(dirPath: string, componentName?: string) {
     const normalized = normalizeName(componentName);
     const dest = handleSame(dirPath, normalized.baseName);
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-screenshots.vue'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-screenshots.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
         await batchReplace([
@@ -154,25 +154,25 @@ export async function createMultiFileWithScreenshots(dirPath: string, componentN
 
 export async function createPage(dirPath: string) {
     const dest = handleSame(dirPath, 'page');
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/page.vue'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
     return dest;
 }
 
 export async function createListPage(dirPath: string) {
     const dest = handleSame(dirPath, 'list');
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue'), dest);
     return dest;
 }
 
 export async function createFormPage(dirPath: string) {
     const dest = handleSame(dirPath, 'form');
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/page.vue'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
     return dest;
 }
 
 export async function createDetailPage(dirPath: string) {
     const dest = handleSame(dirPath, 'detail');
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/page.vue'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
     return dest;
 }
 
@@ -184,7 +184,7 @@ export async function addDoc(vuePath: string) {
     if (fs.existsSync(dest))
         throw new FileExistsError('File README.md exists!');
 
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file.vue/README.md'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file.vue/README.md'), dest);
 
     const baseName = path.basename(vuePath, path.extname(vuePath));
     const componentName = kebab2Camel(baseName);
@@ -205,7 +205,7 @@ export async function addDocWithSubs(vuePath: string) {
     if (fs.existsSync(dest))
         throw new FileExistsError('File "README.md" exists!');
 
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue/README.md'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue/README.md'), dest);
     await batchReplace(dest, [
         [/u-sample/g, baseName],
         [/USample/g, componentName],
@@ -215,7 +215,7 @@ export async function addDocWithSubs(vuePath: string) {
     if (fs.existsSync(dest2))
         throw new FileExistsError('Directory "docs/" exists!');
 
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-subdocs.vue/docs'), dest2);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue/docs'), dest2);
     await batchReplace([
         path.join(dest, 'api.md'),
         path.join(dest, 'examples.md'),
@@ -235,7 +235,7 @@ export async function addDocWithScreenshots(vuePath: string) {
     if (fs.existsSync(dest))
         throw new Error('File README.md exists!');
 
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-screenshots.vue/README.md'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-screenshots.vue/README.md'), dest);
 
     const baseName = path.basename(vuePath, path.extname(vuePath));
     const componentName = kebab2Camel(baseName);
@@ -248,7 +248,7 @@ export async function addDocWithScreenshots(vuePath: string) {
     if (fs.existsSync(dest2))
         throw new Error('Directory "screenshots/" exists!');
 
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file-with-screenshots.vue/screenshots'), dest2);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-screenshots.vue/screenshots'), dest2);
 
     return dest;
 }
@@ -261,7 +261,7 @@ export async function addModuleCSS(vuePath: string) {
     if (fs.existsSync(dest))
         throw new Error('File module.css exists!');
 
-    await fs.copy(path.resolve(__dirname, '../../', '../templates/u-multi-file.vue/module.css'), dest);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file.vue/module.css'), dest);
     return dest;
 }
 
