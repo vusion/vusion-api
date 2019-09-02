@@ -30,6 +30,9 @@ interface CLIArgs {
     'vusion-mode'?: string,
     'base-css'?: string,
     'global-css'?: string,
+    'output-path'?: string,
+    'public-path'?: string,
+    'static-path'?: string,
     'src-path'?: string,
     'library-path'?: string,
 }
@@ -60,6 +63,10 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
             config.baseCSSPath = path.resolve(process.cwd(), args['base-css']);
         if (args['global-css'])
             config.globalCSSPath = path.resolve(process.cwd(), args['global-css']);
+        if (args['output-path'])
+            config.outputPath = path.resolve(process.cwd(), args['output-path']);
+        if (args['public-path'])
+            config.publicPath = path.resolve(process.cwd(), args['public-path']);
         if (args['src-path'])
             config.srcPath = path.resolve(process.cwd(), args['src-path']);
         if (args['library-path'])
@@ -82,10 +89,24 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
     }
 
     // 自动根据主题查找 globalCSSPath 和 baseCSSPath
-    if (!config.globalCSSPath)
+    if (!config.globalCSSPath) {
         config.globalCSSPath = path.resolve(config.libraryPath, config.theme ? `../theme-${config.theme}/base/global.css` : './base/global.css');
-    if (!config.baseCSSPath)
+        try {
+            if (!fs.existsSync(config.globalCSSPath))
+                config.globalCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/global.css');
+        } catch (e) {
+            throw new Error(`Please set globalCSSPath!`);
+        }
+    }
+    if (!config.baseCSSPath) {
         config.baseCSSPath = path.resolve(config.libraryPath, './base/base.css');
+        try {
+            if (!fs.existsSync(config.baseCSSPath))
+                config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/base.css');
+        } catch (e) {
+            throw new Error(`Please set baseCSSPath!`);
+        }
+    }
 
     return config;
 };
