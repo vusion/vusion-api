@@ -23,13 +23,16 @@ function getConfig(cwd, configPath, packagePath) {
         }
     }
 }
-// @TODO: 阉割版的 resolve
 function resolve(cwd, configPath = 'vusion.config.js', args) {
     cwd = cwd || process.cwd();
     const config = getDefaults_1.default();
     const packagePath = config.packagePath = path.resolve(cwd, 'package.json');
     configPath = config.configPath = path.resolve(cwd, configPath);
-    Object.assign(config, getConfig(cwd, configPath, packagePath));
+    const userConfig = getConfig(cwd, configPath, packagePath);
+    // 覆盖一些默认配置
+    if (userConfig.type === 'library')
+        config.outputPath = 'dist';
+    Object.assign(config, userConfig);
     if (!TYPES.includes(config.type)) {
         throw new Error(chalk_1.default.bgRed(' ERROR ') + ' Unknown project type!');
     }
@@ -45,6 +48,10 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
             config.baseCSSPath = path.resolve(process.cwd(), args['base-css']);
         if (args['global-css'])
             config.globalCSSPath = path.resolve(process.cwd(), args['global-css']);
+        if (args['output-path'])
+            config.outputPath = path.resolve(process.cwd(), args['output-path']);
+        if (args['public-path'])
+            config.publicPath = path.resolve(process.cwd(), args['public-path']);
         if (args['src-path'])
             config.srcPath = path.resolve(process.cwd(), args['src-path']);
         if (args['library-path'])
@@ -64,10 +71,38 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         // }
     }
     // 自动根据主题查找 globalCSSPath 和 baseCSSPath
-    if (!config.globalCSSPath)
-        config.globalCSSPath = path.resolve(config.libraryPath, config.theme ? `../theme-${config.theme}/base/global.css` : './base/global.css');
-    if (!config.baseCSSPath)
-        config.baseCSSPath = path.resolve(config.libraryPath, './base/base.css');
+    let globalCSSPath;
+    if (!config.globalCSSPath) {
+        globalCSSPath = config.globalCSSPath = path.resolve(config.libraryPath, config.theme ? `../theme-${config.theme}/base/global.css` : './base/global.css');
+        if (!fs.existsSync(config.globalCSSPath)) {
+            try {
+                config.globalCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/global.css');
+            }
+            catch (e) {
+                throw new Error('Please set globalCSSPath!');
+            }
+        }
+    }
+    else
+        globalCSSPath = config.globalCSSPath;
+    if (!fs.existsSync(config.globalCSSPath))
+        throw new Error(`Cannot find globalCSSPath: ${globalCSSPath}`);
+    let baseCSSPath;
+    if (!config.baseCSSPath) {
+        baseCSSPath = config.baseCSSPath = path.resolve(config.libraryPath, './base/base.css');
+        if (!fs.existsSync(config.baseCSSPath)) {
+            try {
+                config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/base.css');
+            }
+            catch (e) {
+                throw new Error('Please set baseCSSPath!');
+            }
+        }
+    }
+    else
+        baseCSSPath = config.baseCSSPath;
+    if (!fs.existsSync(config.baseCSSPath))
+        throw new Error(`Cannot find baseCSSPath: ${baseCSSPath}`);
     return config;
 }
 exports.default = resolve;
