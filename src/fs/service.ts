@@ -267,52 +267,152 @@ export async function addModuleCSS(vuePath: string) {
 
 /**
  * 扩展到新的库中
- * @param vueFile - 原组件库需要扩展的组件
- * @param library - 扩展到的组件库，比如 internalLibrary
+ * @param vueFile 原组件库需要扩展的组件，一级、二级组件均可
+ * @param from 原来的库，或者 VueFile 本身的路径
+ * @param to 需要扩展到的组件库，比如 internalLibrary
  */
 export async function extendToLibrary(vueFile: VueFile, from: Library | string, to: Library, mode: VueFileExtendMode, subDir?: string) {
-    let fromPath: string;
+    let importFrom: string;
     if (from instanceof Library) {
         if (subDir === undefined)
             subDir = to.config.type !== 'library' ? from.baseName : ''; // @example 'cloud-ui';
-        fromPath = from.fileName;
+        importFrom = from.fileName;
     } else {
         if (subDir === undefined)
             subDir = to.config.type !== 'library' ? 'other' : '';
-        fromPath = from;
+        importFrom = from;
     }
 
-    const relativePath = `./${subDir}/${vueFile.fileName}`;
+    const arr = vueFile.fullPath.split(path.sep);
+    let pos = arr.length - 1; // root Vue 的位置
+    while(arr[pos] && arr[pos].endsWith('.vue'))
+        pos--;
+    pos++;
+    const basePath = arr.slice(0, pos).join(path.sep);
+    const fromRelativePath = path.relative(basePath, vueFile.fullPath);
+    const toRelativePath = `./${subDir}/${fromRelativePath}`;
     const toPath = to.componentsDirectory.fullPath;
 
     const destDir = path.resolve(toPath, subDir);
-    const dest = path.resolve(toPath, relativePath);
+    const dest = path.resolve(toPath, toRelativePath);
+    const parentDest = path.dirname(dest);
 
+    // 如果为子组件，且父组件不存在的话，先创建父组件
+    if (vueFile.isChild && !fs.existsSync(parentDest))
+        await extendToLibrary(vueFile.parent, from, to, VueFileExtendMode.script, subDir);
+
+    if (fs.existsSync(dest))
+        throw new FileExistsError(dest);
     if (!fs.existsSync(destDir))
         fs.mkdirSync(destDir);
 
-    const newVueFile = vueFile.extend(mode, dest, fromPath);
+    const newVueFile = vueFile.extend(mode, dest, importFrom);
     await newVueFile.save();
 
-    // 在 index.js 中添加
-    if (to.componentsIndexFile) {
+    // 子组件在父组件中添加，根组件在 index.js 中添加
+    if (vueFile.isChild) {
+        const parentFile = new VueFile(parentDest);
+        await parentFile.open();
+        parentFile.parseScript();
+
+        await vueFile.open();
+        vueFile.parseScript();
+
+        const relativePath = './' + vueFile.fileName;
+
+        // const getExportSpecifiers = () => {
+        const exportNames: Array<string> = [];
+        babel.traverse(vueFile.scriptHandler.ast, {
+            ExportNamedDeclaration(nodePath) {
+                (nodePath.node.declaration as babel.types.VariableDeclaration).declarations.forEach((declaration) => {
+                    exportNames.push((declaration.id as babel.types.Identifier).name);
+                });
+                nodePath.node.specifiers.forEach((specifier) => {
+                    exportNames.push(specifier.exported.name);
+                });
+            },
+        });
+        // }
+
+        const createExportNamed = () => {
+            const exportNamedDeclaration = babel.template(`export { ${exportNames.join(', ')} } from "${relativePath}"`)() as babel.types.ExportNamedDeclaration;
+            // 要逃避 typescript
+            // Object.assign(exportNamedDeclaration.source, { raw: `'${relativePath}'` });
+            return exportNamedDeclaration;
+        }
+
+        let exportNamed: babel.types.ExportNamedDeclaration;
+        babel.traverse(parentFile.scriptHandler.ast, {
+            enter(nodePath) {
+                // 只遍历顶级节点
+                if (nodePath.parentPath && nodePath.parentPath.isProgram())
+                    nodePath.skip();
+
+                if (nodePath.isExportAllDeclaration() || nodePath.isExportNamedDeclaration()) {
+                    if (!nodePath.node.source) {
+                        // 有可能是 declarations
+                    } else if (relativePath === nodePath.node.source.value) {
+                        if (nodePath.isExportAllDeclaration) {
+                            exportNamed = createExportNamed();
+                            nodePath.replaceWith(exportNamed);
+                        } else {
+                            // exportNamed = nodePath.node;
+                        }
+                        nodePath.stop();
+                    } else if (relativePath < nodePath.node.source.value) {
+                        exportNamed = createExportNamed();
+                        nodePath.insertBefore(exportNamed);
+                        nodePath.stop();
+                    }
+                } else if (nodePath.isExportDefaultDeclaration() && !exportNamed) {
+                    exportNamed = createExportNamed();
+                    nodePath.insertBefore(exportNamed);
+                    nodePath.stop();
+                }
+            },
+        });
+
+        await parentFile.save();
+    } else if (to.componentsIndexFile) {
         const indexFile = to.componentsIndexFile;
         await indexFile.open();
         indexFile.parse();
 
-        const body = indexFile.handler.ast.program.body;
-        let i = 0;
-        for (; i < body.length; i++) {
-            const node = body[i];
-            if (node.type !== 'ExportAllDeclaration' || relativePath < node.source.value)
-                break;
+        const createExportAll = () => {
+            const exportAllDeclaration = babel.types.exportAllDeclaration(babel.types.stringLiteral(toRelativePath));
+            // 要逃避 typescript
+            Object.assign(exportAllDeclaration.source, { raw: `'${toRelativePath}'` });
+            return exportAllDeclaration;
         }
 
-        const exportAllDeclaration = babel.types.exportAllDeclaration(babel.types.stringLiteral(relativePath));
-        // 要逃避 typescript
-        Object.assign(exportAllDeclaration.source, { raw: `'${relativePath}'` });
+        let exportAll: babel.types.ExportAllDeclaration;
+        babel.traverse(indexFile.handler.ast, {
+            enter(nodePath) {
+                // 只遍历顶级节点
+                if (nodePath.parentPath && nodePath.parentPath.isProgram())
+                    nodePath.skip();
 
-        body.splice(i, 0, exportAllDeclaration);
+                if (nodePath.isExportAllDeclaration()) {
+                    if (!nodePath.node.source) {
+                        // 有可能是 declarations
+                    } else if (toRelativePath === nodePath.node.source.value) {
+                        exportAll = nodePath.node;
+                        nodePath.stop();
+                    } else if (toRelativePath < nodePath.node.source.value) {
+                        exportAll = createExportAll();
+                        nodePath.insertBefore(exportAll);
+                        nodePath.stop();
+                    }
+                }
+            },
+            exit(nodePath) {
+                if (nodePath.isProgram() && !exportAll) {
+                    exportAll = createExportAll();
+                    nodePath.node.body.push(exportAll);
+                }
+            },
+        });
+
         await indexFile.save();
     }
 

@@ -3,6 +3,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as shell from 'shelljs';
 import * as lineReader from 'line-reader';
+import * as pluralize from 'pluralize';
 import { kebab2Camel, Camel2kebab } from '../utils';
 
 import FSEntry from './FSEntry';
@@ -26,10 +27,12 @@ export enum VueFileExtendMode {
 };
 
 export default class VueFile extends FSEntry {
+    tagName: string; // 中划线名称
     componentName: string; // 驼峰名称
     alias: string;
     // 子组件
     // 为`undefined`表示未打开过，为数组表示已经打开。
+    parent: VueFile;
     children: VueFile[];
     isChild: boolean;
 
@@ -46,9 +49,10 @@ export default class VueFile extends FSEntry {
     styleHandler: StyleHandler; // 为`undefined`表示还未解析
 
     constructor(fullPath: string) {
-        super(fullPath, false);
+        super(fullPath, undefined);
         this.isVue = true;
-        this.componentName = kebab2Camel(this.baseName);
+        this.tagName = VueFile.resolveTagName(fullPath);
+        this.componentName = kebab2Camel(this.tagName);
     }
 
     /**
@@ -109,6 +113,7 @@ export default class VueFile extends FSEntry {
 
             const fullPath = path.join(this.fullPath, name);
             const vueFile = new VueFile(fullPath);
+            vueFile.parent = this;
             vueFile.isChild = true;
             children.push(vueFile);
         });
@@ -310,7 +315,7 @@ export default class VueFile extends FSEntry {
 
         vueFile.script += `\n
 export const ${vueFile.componentName} = {
-    name: '${vueFile.baseName}',
+    name: '${vueFile.tagName}',
     extends: ${this.componentName === vueFile.componentName ? tempComponentName : this.componentName},
 };
 
@@ -324,5 +329,42 @@ export default ${vueFile.componentName};
             vueFile.template = this.template;
 
         return vueFile;
+    }
+
+    private static _splitPath(fullPath: string) {
+        const arr = fullPath.split(path.sep);
+        let pos = arr.length - 1; // root Vue 的位置
+        while(arr[pos] && arr[pos].endsWith('.vue'))
+            pos--;
+        pos++;
+
+        return { arr, pos };
+    }
+
+    /**
+     * 计算根组件所在的目录
+     * @param fullPath 完整路径
+     */
+    static resolveRootVueDir(fullPath: string) {
+        const { arr, pos } = VueFile._splitPath(fullPath);
+        return arr.slice(0, pos).join(path.sep);
+    }
+
+    static resolveTagName(fullPath: string) {
+        const { arr, pos } = VueFile._splitPath(fullPath);
+        const vueNames = arr.slice(pos);
+
+        let result: Array<string> = [];
+        vueNames.forEach((vueName) => {
+            const baseName = path.basename(vueName, '.vue');
+            const arr = baseName.split('-');
+            if (arr[0].length === 1) // u-navbar
+                result = arr;
+            else if (pluralize(baseName) === result[result.length - 1]) // 如果是前一个的单数形式，u-actions -> action，u-checkboxes -> checkbox
+                result[result.length - 1] = baseName;
+            else
+                result.push(baseName);
+        });
+        return result.join('-');
     }
 }

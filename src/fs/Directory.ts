@@ -52,4 +52,29 @@ export default class Directory extends FSEntry {
 
         return this.children = children;
     }
+
+    async find(relativePath: string, openIfNotLoaded: boolean = false): Promise<FSEntry> {
+        if (!this.children) {
+            if (openIfNotLoaded)
+                await this.open();
+            else
+                return;
+        }
+
+        relativePath = path.normalize(relativePath);
+        const arr = relativePath.split(path.sep);
+        const next = arr[0];
+        if (!next)
+            throw new Error('Starting root / is not allowed!');
+
+        const nextEntry = this.children.find((fsEntry) => fsEntry.fileName === next);
+        if (arr.length === 0)
+            throw new Error('Error path: ' + relativePath);
+        else if (arr.length === 1)
+            return nextEntry;
+        else if (!nextEntry.isDirectory)
+            throw new Error('Not a directory: ' + nextEntry.fullPath);
+        else
+            return (nextEntry as Directory).find(arr.slice(1).join(path.sep), openIfNotLoaded);
+    }
 }

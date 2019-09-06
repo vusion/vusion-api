@@ -53,6 +53,30 @@ class Directory extends FSEntry_1.default {
             return this.children = children;
         });
     }
+    find(relativePath, openIfNotLoaded = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.children) {
+                if (openIfNotLoaded)
+                    yield this.open();
+                else
+                    return;
+            }
+            relativePath = path.normalize(relativePath);
+            const arr = relativePath.split(path.sep);
+            const next = arr[0];
+            if (!next)
+                throw new Error('Starting root / is not allowed!');
+            const nextEntry = this.children.find((fsEntry) => fsEntry.fileName === next);
+            if (arr.length === 0)
+                throw new Error('Error path: ' + relativePath);
+            else if (arr.length === 1)
+                return nextEntry;
+            else if (!nextEntry.isDirectory)
+                throw new Error('Not a directory: ' + nextEntry.fullPath);
+            else
+                return nextEntry.find(arr.slice(1).join(path.sep), openIfNotLoaded);
+        });
+    }
 }
 exports.default = Directory;
 //# sourceMappingURL=Directory.js.map
