@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as babel from '@babel/core';
 import { kebab2Camel, Camel2kebab } from '../utils';
-import { VueFile, Library, VueFileExtendMode } from '.';
+import { VueFile, Library, VueFileExtendMode, JSFile } from '.';
 
 export class FileExistsError extends Error {
     constructor(fullPath: string) {
@@ -311,9 +311,13 @@ export async function extendToLibrary(vueFile: VueFile, from: Library | string, 
 
     // 子组件在父组件中添加，根组件在 index.js 中添加
     if (vueFile.isChild) {
-        const parentFile = new VueFile(parentDest);
-        await parentFile.open();
-        parentFile.parseScript();
+        // VueFile.save() 会清掉子组件
+        // const parentFile = new VueFile(parentDest);
+        // await parentFile.open();
+        // parentFile.parseScript();
+        const parentIndexFile = new JSFile(path.join(parentDest, 'index.js'));
+        await parentIndexFile.open();
+        parentIndexFile.parse();
 
         await vueFile.open();
         vueFile.parseScript();
@@ -324,12 +328,17 @@ export async function extendToLibrary(vueFile: VueFile, from: Library | string, 
         const exportNames: Array<string> = [];
         babel.traverse(vueFile.scriptHandler.ast, {
             ExportNamedDeclaration(nodePath) {
-                (nodePath.node.declaration as babel.types.VariableDeclaration).declarations.forEach((declaration) => {
-                    exportNames.push((declaration.id as babel.types.Identifier).name);
-                });
-                nodePath.node.specifiers.forEach((specifier) => {
-                    exportNames.push(specifier.exported.name);
-                });
+                if (nodePath.node.declaration) {
+                    (nodePath.node.declaration as babel.types.VariableDeclaration).declarations.forEach((declaration) => {
+                        exportNames.push((declaration.id as babel.types.Identifier).name);
+                    });
+                }
+
+                if (nodePath.node.specifiers) {
+                    nodePath.node.specifiers.forEach((specifier) => {
+                        exportNames.push(specifier.exported.name);
+                    });
+                }
             },
         });
         // }
@@ -342,7 +351,7 @@ export async function extendToLibrary(vueFile: VueFile, from: Library | string, 
         }
 
         let exportNamed: babel.types.ExportNamedDeclaration;
-        babel.traverse(parentFile.scriptHandler.ast, {
+        babel.traverse(parentIndexFile.handler.ast, {
             enter(nodePath) {
                 // 只遍历顶级节点
                 if (nodePath.parentPath && nodePath.parentPath.isProgram())
@@ -372,7 +381,7 @@ export async function extendToLibrary(vueFile: VueFile, from: Library | string, 
             },
         });
 
-        await parentFile.save();
+        await parentIndexFile.save();
     } else if (to.componentsIndexFile) {
         const indexFile = to.componentsIndexFile;
         await indexFile.open();
