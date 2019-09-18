@@ -21,8 +21,10 @@ export interface VusionConfig {
     srcPath: string;
     libraryPath: string;
     baseCSSPath: string;
-    globalCSSPath: string;
-    theme: string;
+    globalCSSPath: string | {
+        [propName: string]: string;
+    };
+    theme: string[];
 
     docs: boolean | {
         title?: string,
