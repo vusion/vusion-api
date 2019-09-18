@@ -14,7 +14,7 @@ function getDefaults() {
         libraryPath: '',
         baseCSSPath: '',
         globalCSSPath: '',
-        theme: undefined,
+        themes: undefined,
         docs: false,
         forceShaking: false,
         experimental: false,

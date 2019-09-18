@@ -305,7 +305,7 @@ function extendToLibrary(vueFile, from, to, mode, subDir) {
         pos++;
         const basePath = arr.slice(0, pos).join(path.sep);
         const fromRelativePath = path.relative(basePath, vueFile.fullPath);
-        const toRelativePath = `./${subDir}/${fromRelativePath}`;
+        const toRelativePath = subDir ? `./${subDir}/${fromRelativePath}` : `./${fromRelativePath}`;
         const toPath = to.componentsDirectory.fullPath;
         const destDir = path.resolve(toPath, subDir);
         const dest = path.resolve(toPath, toRelativePath);
