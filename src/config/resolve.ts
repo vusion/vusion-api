@@ -61,7 +61,7 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
      */
     if (args) {
         if (args.theme)
-            config.theme = args.theme ? args.theme.split(',') : undefined;
+            config.themes = args.theme ? args.theme.split(',') : undefined;
         if (args['vusion-mode'])
             config.mode = args['vusion-mode'];
         if (args['base-css'])
@@ -95,19 +95,19 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
 
     // 自动根据主题查找 globalCSSPath 和 baseCSSPath
     // 如果config中包含有主题列表，globalCSSPath为主题名与路径的map
-    let globalCSSPath:string | { [propName: string]: string;};
+    let globalCSSPath: string | { [propName: string]: string };
     if (!config.globalCSSPath) {
-        if (config.theme) {
-            // 主题样式处理
+        if (config.themes && config.themes.length) { // 主题样式处理
             config.globalCSSPath = globalCSSPath = {
                 default: path.resolve(config.libraryPath, './base/global.css'),
             };
-            for(const theme of config.theme) {
+            for (const theme of config.themes) {
                 globalCSSPath[theme] = path.resolve(config.libraryPath, `../theme-${theme}/base/global.css`);
             }
         } else
             globalCSSPath = config.globalCSSPath = path.resolve(config.libraryPath, './base/global.css');
-        if (typeof config.globalCSSPath==='string' && !fs.existsSync(config.globalCSSPath)) {
+
+        if (typeof config.globalCSSPath === 'string' && !fs.existsSync(config.globalCSSPath)) {
             try {
                 config.globalCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/global.css');
             } catch(e) {
@@ -117,18 +117,18 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
     } else
         globalCSSPath = config.globalCSSPath;
     if (config.globalCSSPath && config.globalCSSPath instanceof Object) {
-        // 检查主题的globalCss是否存在
+        // 检查主题的 globalCSS 是否存在
         for (const theme of Object.keys(config.globalCSSPath)) {
             const cssPath = config.globalCSSPath[theme];
             if (!fs.existsSync(cssPath))
                 throw new Error(`Cannot find ${theme} globalCSSPath: ${cssPath}`);
         }
-    } else if(typeof config.globalCSSPath==='string') {
+    } else if (typeof config.globalCSSPath === 'string') {
         if (!fs.existsSync(config.globalCSSPath))
             throw new Error(`Cannot find globalCSSPath: ${globalCSSPath}`);
     } else
         throw new Error(`globalCSSPath only accepted string or array`);
-    
+
     let baseCSSPath;
     if (!config.baseCSSPath) {
         baseCSSPath = config.baseCSSPath = path.resolve(config.libraryPath, './base/base.css');
