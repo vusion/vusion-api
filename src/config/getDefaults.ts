@@ -21,8 +21,8 @@ export interface VusionConfig {
     srcPath: string;
     libraryPath: string;
     baseCSSPath: string;
-    globalCSSPath: string;
-    theme: string;
+    globalCSSPath: string | { [propName: string]: string };
+    themes: string[];
 
     docs: boolean | {
         title?: string,
@@ -58,7 +58,7 @@ export default function getDefaults() {
         libraryPath: '',                       // [Required] Library directory path. To be srcPath by default
         baseCSSPath: '',                       // Path of base CSS. If not set, it will be `library/base/base.css`
         globalCSSPath: '',                     // Path of global CSS. If not set, it will be `library/base/global.css`
-        theme: undefined,                      // Project theme
+        themes: undefined,                      // Project theme
 
         docs: false,                           // Generate docs of common components in library. Always be true if project type is `library`
 
