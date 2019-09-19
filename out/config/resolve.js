@@ -76,7 +76,7 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         globalCSSPath = config.globalCSSPath = path.resolve(config.libraryPath, config.theme ? `../theme-${config.theme}/base/global.css` : './base/global.css');
         if (!fs.existsSync(config.globalCSSPath)) {
             try {
-                config.globalCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/global.css');
+                config.globalCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/base/global.css');
             }
             catch (e) {
                 throw new Error('Please set globalCSSPath!');
@@ -92,7 +92,7 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         baseCSSPath = config.baseCSSPath = path.resolve(config.libraryPath, './base/base.css');
         if (!fs.existsSync(config.baseCSSPath)) {
             try {
-                config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/base.css');
+                config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/base/base.css');
             }
             catch (e) {
                 throw new Error('Please set baseCSSPath!');
