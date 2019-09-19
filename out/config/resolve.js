@@ -71,8 +71,8 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         // }
     }
     // 自动根据主题查找 globalCSSPath 和 baseCSSPath
-    // 如果config中包含有主题列表，globalCSSPath为主题名与路径的map
-    let globalCSSPath;
+    // 如果 config 中包含有主题列表，globalCSSPath 为主题名与路径的 Map
+    let globalCSSPath; // 用于保存非文档的 globalCSS 路径
     if (!config.globalCSSPath) {
         if (config.themes && config.themes.length) { // 主题样式处理
             config.globalCSSPath = globalCSSPath = {
@@ -86,7 +86,7 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
             globalCSSPath = config.globalCSSPath = path.resolve(config.libraryPath, './base/global.css');
         if (typeof config.globalCSSPath === 'string' && !fs.existsSync(config.globalCSSPath)) {
             try {
-                config.globalCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/global.css');
+                config.globalCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/base/global.css');
             }
             catch (e) {
                 throw new Error('Please set globalCSSPath!');
@@ -109,12 +109,12 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
     }
     else
         throw new Error(`globalCSSPath only accepted string or array`);
-    let baseCSSPath;
+    let baseCSSPath; // 用于保存非文档的 baseCSSPath 路径
     if (!config.baseCSSPath) {
         baseCSSPath = config.baseCSSPath = path.resolve(config.libraryPath, './base/base.css');
         if (!fs.existsSync(config.baseCSSPath)) {
             try {
-                config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), 'node_modules/proto-ui.vusion/components/base/base.css');
+                config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/base/base.css');
             }
             catch (e) {
                 throw new Error('Please set baseCSSPath!');
