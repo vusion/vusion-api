@@ -433,4 +433,44 @@ function extendToLibrary(vueFile, from, to, mode, subDir) {
     });
 }
 exports.extendToLibrary = extendToLibrary;
+/**
+ * 扩展到自定义的路径下
+ * @param vueFile 原组件库需要扩展的组件，一级、二级组件均可
+ * @param from 原来的库，或者 VueFile 本身的路径
+ * @param toStr 需要扩展到的路径，是字符串
+ */
+function extendToCustom(vueFile, from, toStr, mode) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let importFrom;
+        let targetStr = toStr;
+        let targetArr = targetStr.split('/').filter(item => item);
+        const targetFileName = targetArr[targetArr.length - 1];
+        targetStr = targetArr.join(path.sep);
+        if (from instanceof _1.Library) {
+            importFrom = from.fileName;
+        }
+        else {
+            importFrom = from;
+        }
+        const arr = vueFile.fullPath.split(path.sep);
+        let pos = arr.length - 1; // root Vue 的位置
+        while (arr[pos] && arr[pos].endsWith('.vue'))
+            pos--;
+        pos++;
+        const basePath = arr.slice(0, pos).join(path.sep);
+        const fromRelativePath = path.relative(basePath, vueFile.fullPath);
+        const targetRelativeArr = fromRelativePath.split(path.sep);
+        targetRelativeArr.pop();
+        targetRelativeArr.push(targetFileName);
+        const targetRelativePath = `.${path.sep}${targetRelativeArr[targetRelativeArr.length - 1]}`;
+        const targetBasePath = targetArr.slice(0, targetArr.length - 1).join(path.sep);
+        const targetDest = path.resolve(targetBasePath, targetRelativePath);
+        if (fs.existsSync(targetDest))
+            throw new FileExistsError(targetDest);
+        const newVueFile = vueFile.extend(mode, targetDest, importFrom);
+        yield newVueFile.save();
+        return newVueFile;
+    });
+}
+exports.extendToCustom = extendToCustom;
 //# sourceMappingURL=service.js.map
