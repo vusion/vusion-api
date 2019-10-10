@@ -23,24 +23,9 @@ class FileExistsError extends Error {
 exports.FileExistsError = FileExistsError;
 function handleSame(dirPath, baseName = 'u-sample') {
     let dest = path.resolve(dirPath, `${baseName}.vue`);
-    // let count = 1;
     if (fs.existsSync(dest))
         throw new FileExistsError(dest);
-    // while (fs.existsSync(dest))
-    //     dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
     return dest;
-}
-function normalizeName(componentName) {
-    let baseName = componentName;
-    if (componentName) {
-        if (componentName.includes('-'))
-            componentName = utils_1.kebab2Camel(baseName);
-        else
-            baseName = utils_1.Camel2kebab(componentName);
-        return { baseName, componentName };
-    }
-    else
-        return { baseName: 'u-sample', componentName: 'USample' };
 }
 function batchReplace(src, replacers) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -98,7 +83,7 @@ function rename(fullPath, newName) {
 exports.rename = rename;
 function createSingleFile(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
-        const normalized = normalizeName(componentName);
+        const normalized = utils_1.normalizeName(componentName);
         const dest = handleSame(dirPath, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../../templates/u-single-file.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
@@ -113,7 +98,7 @@ function createSingleFile(dirPath, componentName) {
 exports.createSingleFile = createSingleFile;
 function createMultiFile(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
-        const normalized = normalizeName(componentName);
+        const normalized = utils_1.normalizeName(componentName);
         const dest = handleSame(dirPath, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
@@ -131,7 +116,7 @@ function createMultiFile(dirPath, componentName) {
 exports.createMultiFile = createMultiFile;
 function createMultiFileWithSubdocs(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
-        const normalized = normalizeName(componentName);
+        const normalized = utils_1.normalizeName(componentName);
         const dest = handleSame(dirPath, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
@@ -150,7 +135,7 @@ function createMultiFileWithSubdocs(dirPath, componentName) {
 exports.createMultiFileWithSubdocs = createMultiFileWithSubdocs;
 function createMultiFileWithScreenshots(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
-        const normalized = normalizeName(componentName);
+        const normalized = utils_1.normalizeName(componentName);
         const dest = handleSame(dirPath, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-screenshots.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
@@ -280,6 +265,33 @@ function addModuleCSS(vuePath) {
 }
 exports.addModuleCSS = addModuleCSS;
 /**
+ * 扩展到新的路径中
+ * @param vueFile 原组件库需要扩展的组件，一级、二级组件均可
+ * @param from 原来的库，或者 VueFile 本身的路径
+ * @param to 新的路径
+ */
+function extendToPath(vueFile, from, to, mode) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let importFrom;
+        if (from instanceof _1.Library) {
+            importFrom = from.fileName;
+        }
+        else {
+            importFrom = from;
+        }
+        const dest = to;
+        const destDir = path.dirname(dest);
+        if (fs.existsSync(dest))
+            throw new FileExistsError(dest);
+        if (!fs.existsSync(destDir))
+            fs.mkdirSync(destDir);
+        const newVueFile = vueFile.extend(mode, dest, importFrom);
+        yield newVueFile.save();
+        return newVueFile;
+    });
+}
+exports.extendToPath = extendToPath;
+/**
  * 扩展到新的库中
  * @param vueFile 原组件库需要扩展的组件，一级、二级组件均可
  * @param from 原来的库，或者 VueFile 本身的路径
@@ -325,7 +337,7 @@ function extendToLibrary(vueFile, from, to, mode, subDir) {
             // const parentFile = new VueFile(parentDest);
             // await parentFile.open();
             // parentFile.parseScript();
-            const parentIndexFile = new _1.JSFile(path.join(parentDest, 'index.js'));
+            const parentIndexFile = _1.JSFile.fetch(path.join(parentDest, 'index.js'));
             yield parentIndexFile.open();
             parentIndexFile.parse();
             yield vueFile.open();
@@ -433,44 +445,4 @@ function extendToLibrary(vueFile, from, to, mode, subDir) {
     });
 }
 exports.extendToLibrary = extendToLibrary;
-/**
- * 扩展到自定义的路径下
- * @param vueFile 原组件库需要扩展的组件，一级、二级组件均可
- * @param from 原来的库，或者 VueFile 本身的路径
- * @param toStr 需要扩展到的路径，是字符串
- */
-function extendToCustom(vueFile, from, toStr, mode) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let importFrom;
-        let targetStr = toStr;
-        let targetArr = targetStr.split('/').filter(item => item);
-        const targetFileName = targetArr[targetArr.length - 1];
-        targetStr = targetArr.join(path.sep);
-        if (from instanceof _1.Library) {
-            importFrom = from.fileName;
-        }
-        else {
-            importFrom = from;
-        }
-        const arr = vueFile.fullPath.split(path.sep);
-        let pos = arr.length - 1; // root Vue 的位置
-        while (arr[pos] && arr[pos].endsWith('.vue'))
-            pos--;
-        pos++;
-        const basePath = arr.slice(0, pos).join(path.sep);
-        const fromRelativePath = path.relative(basePath, vueFile.fullPath);
-        const targetRelativeArr = fromRelativePath.split(path.sep);
-        targetRelativeArr.pop();
-        targetRelativeArr.push(targetFileName);
-        const targetRelativePath = `.${path.sep}${targetRelativeArr[targetRelativeArr.length - 1]}`;
-        const targetBasePath = targetArr.slice(0, targetArr.length - 1).join(path.sep);
-        const targetDest = path.resolve(targetBasePath, targetRelativePath);
-        if (fs.existsSync(targetDest))
-            throw new FileExistsError(targetDest);
-        const newVueFile = vueFile.extend(mode, targetDest, importFrom);
-        yield newVueFile.save();
-        return newVueFile;
-    });
-}
-exports.extendToCustom = extendToCustom;
 //# sourceMappingURL=service.js.map

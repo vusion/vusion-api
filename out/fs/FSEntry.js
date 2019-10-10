@@ -23,8 +23,10 @@ class FSEntry {
         this.isDirectory = isDirectory;
         this.isVue = false;
         this.isOpen = false;
+        // this.isParsed = false;
         this.isSaving = false;
-        this._listeners = [];
+        this._changeListeners = [];
+        this._miniChangeListeners = [];
     }
     open() {
         if (this.isOpen)
@@ -42,20 +44,38 @@ class FSEntry {
         this.isSaving = true;
         setTimeout(() => this.isSaving = false, 1200); // 避免自身保存引发 watch
     }
-    onChange(event, filePath, key, hash) {
+    onMiniChange(event, filePath, key, hash) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('[vusion-api] onChange:', event, filePath, key, hash);
+            console.log('[vusion-api] onMiniChange:', event, filePath, key, hash);
             if (this.isOpen && fs.existsSync(this.fullPath))
                 yield this.forceOpen();
-            this._listeners.forEach((listener) => listener(event, filePath, this));
+            // @TODO: if (this.isParsed)
+            this._miniChangeListeners.forEach((listener) => listener(event, filePath, this));
         });
     }
-    addChangedListener(listener) {
-        this._listeners.push(listener);
+    onChange(event, filePath, key, hash) {
+        this._changeListeners.forEach((listener) => listener(event, filePath, this));
     }
-    removeChangedListener(listener) {
-        const index = this._listeners.indexOf(listener);
-        ~index && this._listeners.splice(index, 1);
+    addEventListener(eventName, listener) {
+        let listeners;
+        if (eventName === 'change')
+            listeners = this._changeListeners;
+        else if (eventName === 'mini-change')
+            listeners = this._miniChangeListeners;
+        else
+            throw new TypeError('Unknown eventName ' + eventName);
+        listeners.push(listener);
+    }
+    removeEventListener(eventName, listener) {
+        let listeners;
+        if (eventName === 'change')
+            listeners = this._changeListeners;
+        else if (eventName === 'mini-change')
+            listeners = this._miniChangeListeners;
+        else
+            throw new TypeError('Unknown eventName ' + eventName);
+        const index = listeners.indexOf(listener);
+        ~index && listeners.splice(index, 1);
     }
     /**
      * 缓存获取
@@ -74,33 +94,34 @@ class FSEntry {
             const fsWatch = chokidar.watch(fullPath, {
                 ignoreInitial: true,
                 followSymlinks: false,
-                depth: fsEntry.isVue ? 2 : 1,
-            }).on('all', (event, filePath) => {
+            }).on('all', (event, filePath) => __awaiter(this, void 0, void 0, function* () {
                 if (fsEntry.isSaving)
                     return;
                 if (!_caches.has(key))
                     fsWatch.unwatch(fullPath);
-                // Remove directory or file
+                // 触发 forceOpen 的 miniChange
                 if (filePath === fullPath) {
+                    // Remove directory or file
                     if (event === 'unlink' || event === 'unlinkDir') {
                         _caches.delete(key);
                         fsWatch.unwatch(fullPath);
                     }
                     else
-                        fsEntry.onChange(event, filePath, key, hash);
+                        yield fsEntry.onMiniChange(event, filePath, key, hash);
                 }
                 else {
                     if (fsEntry.isVue)
-                        fsEntry.onChange(event, filePath, key, hash);
+                        yield fsEntry.onMiniChange(event, filePath, key, hash);
                     else {
                         const relativePath = path.relative(fullPath, filePath);
                         if (relativePath.includes('/'))
-                            return;
+                            return fsEntry.onChange(event, filePath, key, hash);
                         else if (event !== 'change')
-                            fsEntry.onChange(event, filePath, key, hash);
+                            yield fsEntry.onMiniChange(event, filePath, key, hash);
                     }
                 }
-            });
+                return fsEntry.onChange(event, filePath, key, hash);
+            }));
             return fsEntry;
         }
     }

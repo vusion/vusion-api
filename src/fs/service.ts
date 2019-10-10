@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as babel from '@babel/core';
-import { kebab2Camel, Camel2kebab } from '../utils';
+import { kebab2Camel, Camel2kebab, normalizeName } from '../utils';
 import { VueFile, Library, VueFileExtendMode, JSFile } from '.';
 
 export class FileExistsError extends Error {
@@ -13,25 +13,11 @@ export class FileExistsError extends Error {
 
 function handleSame(dirPath: string, baseName: string = 'u-sample') {
     let dest = path.resolve(dirPath, `${baseName}.vue`);
-    // let count = 1;
+
     if (fs.existsSync(dest))
         throw new FileExistsError(dest);
-    // while (fs.existsSync(dest))
-    //     dest = path.resolve(dirPath, `${baseName}-${count++}.vue`);
 
     return dest;
-}
-
-function normalizeName(componentName?: string) {
-    let baseName = componentName;
-    if (componentName) {
-        if (componentName.includes('-'))
-            componentName = kebab2Camel(baseName);
-        else
-            baseName = Camel2kebab(componentName);
-        return { baseName, componentName };
-    } else
-        return { baseName: 'u-sample', componentName: 'USample' };
 }
 
 type Replacer = [RegExp, string];
@@ -266,6 +252,34 @@ export async function addModuleCSS(vuePath: string) {
 }
 
 /**
+ * 扩展到新的路径中
+ * @param vueFile 原组件库需要扩展的组件，一级、二级组件均可
+ * @param from 原来的库，或者 VueFile 本身的路径
+ * @param to 新的路径
+ */
+export async function extendToPath(vueFile: VueFile, from: Library | string, to: string, mode: VueFileExtendMode) {
+    let importFrom: string;
+    if (from instanceof Library) {
+        importFrom = from.fileName;
+    } else {
+        importFrom = from;
+    }
+
+    const dest = to;
+    const destDir = path.dirname(dest);
+
+    if (fs.existsSync(dest))
+        throw new FileExistsError(dest);
+    if (!fs.existsSync(destDir))
+        fs.mkdirSync(destDir);
+
+    const newVueFile = vueFile.extend(mode, dest, importFrom);
+    await newVueFile.save();
+
+    return newVueFile;
+}
+
+/**
  * 扩展到新的库中
  * @param vueFile 原组件库需要扩展的组件，一级、二级组件均可
  * @param from 原来的库，或者 VueFile 本身的路径
@@ -424,50 +438,6 @@ export async function extendToLibrary(vueFile: VueFile, from: Library | string, 
 
         await indexFile.save();
     }
-
-    return newVueFile;
-}
-
-/**
- * 扩展到自定义的路径下
- * @param vueFile 原组件库需要扩展的组件，一级、二级组件均可
- * @param from 原来的库，或者 VueFile 本身的路径
- * @param toStr 需要扩展到的路径，是字符串
- */
-export async function extendToCustom(vueFile: VueFile, from: Library | string, toStr: string, mode: VueFileExtendMode) {
-    let importFrom: string;
-    let targetStr = toStr;
-    let targetArr = targetStr.split('/').filter(item => item);
-    const targetFileName = targetArr[targetArr.length - 1];
-    targetStr = targetArr.join(path.sep);
-    if (from instanceof Library) {
-        importFrom = from.fileName;
-    } else {
-        importFrom = from;
-    }
-
-    const arr = vueFile.fullPath.split(path.sep);
-    let pos = arr.length - 1; // root Vue 的位置
-    while(arr[pos] && arr[pos].endsWith('.vue'))
-        pos--;
-    pos++;
-    const basePath = arr.slice(0, pos).join(path.sep);
-    const fromRelativePath = path.relative(basePath, vueFile.fullPath);
-    const targetRelativeArr = fromRelativePath.split(path.sep);
-
-    targetRelativeArr.pop();
-    targetRelativeArr.push(targetFileName);
-
-    const targetRelativePath = `.${path.sep}${targetRelativeArr[targetRelativeArr.length - 1]}`;
-    const targetBasePath = targetArr.slice(0, targetArr.length - 1).join(path.sep);
-    const targetDest = path.resolve(targetBasePath, targetRelativePath);
-
-
-    if (fs.existsSync(targetDest))
-        throw new FileExistsError(targetDest);
-
-    const newVueFile = vueFile.extend(mode, targetDest, importFrom);
-    await newVueFile.save();
 
     return newVueFile;
 }
