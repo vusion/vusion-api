@@ -15,19 +15,16 @@ class File extends FSEntry_1.default {
     constructor(fullPath) {
         super(fullPath, false);
     }
-    open() {
+    forceOpen() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.isOpen)
-                return;
+            this.close();
             yield this.load();
             this.isOpen = true;
         });
     }
-    reopen() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.load();
-            this.isOpen = true;
-        });
+    close() {
+        this.content = undefined;
+        this.isOpen = false;
     }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -37,9 +34,18 @@ class File extends FSEntry_1.default {
         });
     }
     save() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return fs.writeFile(this.fullPath, this.content);
+        const _super = Object.create(null, {
+            save: { get: () => super.save }
         });
+        return __awaiter(this, void 0, void 0, function* () {
+            this.isSaving = true;
+            const result = yield fs.writeFile(this.fullPath, this.content !== undefined ? this.content : '');
+            _super.save.call(this);
+            return result;
+        });
+    }
+    static fetch(fullPath) {
+        return super.fetch(fullPath);
     }
 }
 exports.default = File;

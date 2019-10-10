@@ -12,17 +12,15 @@ export default class Directory extends FSEntry {
         super(fullPath, true);
     }
 
-    async open() {
-        if (this.isOpen)
-            return;
-
+    async forceOpen() {
+        this.close();
         await this.load();
         this.isOpen = true;
     }
 
-    async reopen() {
-        await this.load();
-        this.isOpen = true;
+    close() {
+        this.children = undefined;
+        this.isOpen = false;
     }
 
     protected async load() {
@@ -39,7 +37,11 @@ export default class Directory extends FSEntry {
             const fullPath = path.join(this.fullPath, name);
             const isDirectory = fs.statSync(fullPath).isDirectory();
 
-            const fsEntry = isDirectory ? new Directory(fullPath) : new File(fullPath);
+            let fsEntry: FSEntry;
+            if (this.isWatched)
+                fsEntry = isDirectory ? Directory.fetch(fullPath) : File.fetch(fullPath);
+            else
+                fsEntry = isDirectory ? new Directory(fullPath) : new File(fullPath);
             children.push(fsEntry);
         });
 
@@ -76,5 +78,9 @@ export default class Directory extends FSEntry {
             throw new Error('Not a directory: ' + nextEntry.fullPath);
         else
             return (nextEntry as Directory).find(arr.slice(1).join(path.sep), openIfNotLoaded);
+    }
+
+    static fetch(fullPath: string) {
+        return super.fetch(fullPath) as Directory;
     }
 }

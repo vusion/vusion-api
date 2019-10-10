@@ -45,7 +45,7 @@ class VueFile extends FSEntry_1.default {
      * 提前检测 VueFile 文件类型，以及子组件等
      * 需要异步，否则可能会比较慢
      */
-    preopen() {
+    preOpen() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
                 return;
@@ -97,7 +97,11 @@ class VueFile extends FSEntry_1.default {
                 if (!name.endsWith('.vue'))
                     return;
                 const fullPath = path.join(this.fullPath, name);
-                const vueFile = new VueFile(fullPath);
+                let vueFile;
+                if (this.isWatched)
+                    vueFile = VueFile.fetch(fullPath);
+                else
+                    vueFile = new VueFile(fullPath);
                 vueFile.parent = this;
                 vueFile.isChild = true;
                 children.push(vueFile);
@@ -105,21 +109,28 @@ class VueFile extends FSEntry_1.default {
             return children;
         });
     }
-    open() {
+    forceOpen() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.isOpen)
-                return;
-            if (this.isDirectory === undefined)
-                yield this.preopen();
+            this.close();
+            yield this.preOpen();
             yield this.load();
             this.isOpen = true;
         });
     }
-    reopen() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.load();
-            this.isOpen = true;
-        });
+    close() {
+        this.isDirectory = undefined;
+        this.alias = undefined;
+        this.children = undefined;
+        // 单文件内容
+        this.content = undefined;
+        this.template = undefined;
+        this.script = undefined;
+        this.style = undefined;
+        this.sample = undefined;
+        this.templateHandler = undefined;
+        this.scriptHandler = undefined;
+        this.styleHandler = undefined;
+        this.isOpen = false;
     }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -153,7 +164,11 @@ class VueFile extends FSEntry_1.default {
         });
     }
     save() {
+        const _super = Object.create(null, {
+            save: { get: () => super.save }
+        });
         return __awaiter(this, void 0, void 0, function* () {
+            this.isSaving = true;
             shell.rm('-rf', this.fullPath);
             let template = this.template;
             let script = this.script;
@@ -164,21 +179,24 @@ class VueFile extends FSEntry_1.default {
                 script = this.scriptHandler.generate();
             if (this.styleHandler)
                 style = this.styleHandler.generate();
+            let result;
             if (this.isDirectory) {
                 shell.mkdir(this.fullPath);
                 const promises = [];
                 template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), template));
                 script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), script));
                 style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), style));
-                return Promise.all(promises);
+                result = yield Promise.all(promises);
             }
             else {
                 const contents = [];
                 template && contents.push(`<template>\n${template}</template>`);
                 script && contents.push(`<script>\n${script}</script>`);
                 style && contents.push(`<style module>\n${style}</style>`);
-                return fs.writeFile(this.fullPath, contents.join('\n\n') + '\n');
+                result = yield fs.writeFile(this.fullPath, contents.join('\n\n') + '\n');
             }
+            _super.save.call(this);
+            return result;
         });
     }
     parseTemplate() {
@@ -316,6 +334,9 @@ export default ${vueFile.componentName};
                 result.push(baseName);
         });
         return result.join('-');
+    }
+    static fetch(fullPath) {
+        return super.fetch(fullPath);
     }
 }
 exports.default = VueFile;

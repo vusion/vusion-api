@@ -63,12 +63,10 @@ export default class Library {
     async open() {
         if (this.isOpen)
             return;
-
-        await this.load();
-        this.isOpen = true;
+        this.forceOpen();
     }
 
-    async reopen() {
+    async forceOpen() {
         await this.load();
         this.isOpen = true;
     }
@@ -111,15 +109,15 @@ export default class Library {
         this.superLibraries = vusionDeps.map((dep) => new Library(path.resolve(this.fullPath, 'node_modules', dep), LibraryType.external));
         this.superLibrary = this.superLibraries.find((library) => library.fileName === superLibraryName);
 
-        this.otherComponents = vueDeps.map((dep) => new VueFile(path.resolve(this.fullPath, 'node_modules', dep)));
+        this.otherComponents = vueDeps.map((dep) => VueFile.fetch(path.resolve(this.fullPath, 'node_modules', dep)));
 
         if (this.libraryType === LibraryType.external && semver.lt(this.package.version, '0.4.0-alpha'))
-            this.componentsDirectory = new Directory(path.resolve(this.libraryPath));
+            this.componentsDirectory = Directory.fetch(path.resolve(this.libraryPath));
         else
-            this.componentsDirectory = new Directory(path.resolve(this.libraryPath, 'components'));
+            this.componentsDirectory = Directory.fetch(path.resolve(this.libraryPath, 'components'));
 
         const componentsIndexPath = path.resolve(this.componentsDirectory.fullPath, 'index.js');
         if (fs.existsSync(componentsIndexPath))
-            this.componentsIndexFile = new JSFile(componentsIndexPath);
+            this.componentsIndexFile = JSFile.fetch(componentsIndexPath);
     }
 }

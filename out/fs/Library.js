@@ -39,11 +39,10 @@ class Library {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.isOpen)
                 return;
-            yield this.load();
-            this.isOpen = true;
+            this.forceOpen();
         });
     }
-    reopen() {
+    forceOpen() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.load();
             this.isOpen = true;
@@ -82,14 +81,14 @@ class Library {
                 superLibraryName = 'cloud-ui.vusion';
             this.superLibraries = vusionDeps.map((dep) => new Library(path.resolve(this.fullPath, 'node_modules', dep), LibraryType.external));
             this.superLibrary = this.superLibraries.find((library) => library.fileName === superLibraryName);
-            this.otherComponents = vueDeps.map((dep) => new VueFile_1.default(path.resolve(this.fullPath, 'node_modules', dep)));
+            this.otherComponents = vueDeps.map((dep) => VueFile_1.default.fetch(path.resolve(this.fullPath, 'node_modules', dep)));
             if (this.libraryType === LibraryType.external && semver.lt(this.package.version, '0.4.0-alpha'))
-                this.componentsDirectory = new __1.Directory(path.resolve(this.libraryPath));
+                this.componentsDirectory = __1.Directory.fetch(path.resolve(this.libraryPath));
             else
-                this.componentsDirectory = new __1.Directory(path.resolve(this.libraryPath, 'components'));
+                this.componentsDirectory = __1.Directory.fetch(path.resolve(this.libraryPath, 'components'));
             const componentsIndexPath = path.resolve(this.componentsDirectory.fullPath, 'index.js');
             if (fs.existsSync(componentsIndexPath))
-                this.componentsIndexFile = new JSFile_1.default(componentsIndexPath);
+                this.componentsIndexFile = JSFile_1.default.fetch(componentsIndexPath);
         });
     }
 }

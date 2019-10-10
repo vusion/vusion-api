@@ -315,7 +315,7 @@ export async function extendToLibrary(vueFile: VueFile, from: Library | string, 
         // const parentFile = new VueFile(parentDest);
         // await parentFile.open();
         // parentFile.parseScript();
-        const parentIndexFile = new JSFile(path.join(parentDest, 'index.js'));
+        const parentIndexFile = JSFile.fetch(path.join(parentDest, 'index.js'));
         await parentIndexFile.open();
         parentIndexFile.parse();
 

@@ -17,19 +17,16 @@ class Directory extends FSEntry_1.default {
     constructor(fullPath) {
         super(fullPath, true);
     }
-    open() {
+    forceOpen() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.isOpen)
-                return;
+            this.close();
             yield this.load();
             this.isOpen = true;
         });
     }
-    reopen() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.load();
-            this.isOpen = true;
-        });
+    close() {
+        this.children = undefined;
+        this.isOpen = false;
     }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -42,7 +39,11 @@ class Directory extends FSEntry_1.default {
                     return;
                 const fullPath = path.join(this.fullPath, name);
                 const isDirectory = fs.statSync(fullPath).isDirectory();
-                const fsEntry = isDirectory ? new Directory(fullPath) : new File_1.default(fullPath);
+                let fsEntry;
+                if (this.isWatched)
+                    fsEntry = isDirectory ? Directory.fetch(fullPath) : File_1.default.fetch(fullPath);
+                else
+                    fsEntry = isDirectory ? new Directory(fullPath) : new File_1.default(fullPath);
                 children.push(fsEntry);
             });
             children.sort((a, b) => {
@@ -77,6 +78,9 @@ class Directory extends FSEntry_1.default {
             else
                 return nextEntry.find(arr.slice(1).join(path.sep), openIfNotLoaded);
         });
+    }
+    static fetch(fullPath) {
+        return super.fetch(fullPath);
     }
 }
 exports.default = Directory;

@@ -17,6 +17,10 @@ class JSFile extends File_1.default {
             return;
         this.handler = new ScriptHandler_1.default(String(this.content));
     }
+    close() {
+        this.handler = undefined;
+        this.isOpen = false;
+    }
     save() {
         const _super = Object.create(null, {
             save: { get: () => super.save }
@@ -26,6 +30,9 @@ class JSFile extends File_1.default {
                 this.content = this.handler.generate();
             return _super.save.call(this);
         });
+    }
+    static fetch(fullPath) {
+        return super.fetch(fullPath);
     }
 }
 exports.default = JSFile;
