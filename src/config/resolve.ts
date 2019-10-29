@@ -4,7 +4,7 @@ import chalk from 'chalk';
 // import chokidar from 'chokidar';
 import getDefaults, { VusionConfig } from './getDefaults';
 
-const TYPES = ['library', 'app', 'html5', 'fullstack'];
+const TYPES = ['library', 'app', 'html5', 'fullstack', 'component', 'block'];
 
 function getConfig(cwd: string, configPath: string, packagePath: string) {
     delete require.cache[configPath];
@@ -91,6 +91,9 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
         //         config.docs = newConfig.docs || {};
         //     });
         // }
+    } else if (config.type === 'component' || config.type === 'block') {
+        const libraryName = Object.keys(require(packagePath).peerDependencies).find((key) => key.endsWith('.vusion'));
+        config.libraryPath = path.resolve(cwd, `node_modules/${libraryName}/src`);
     }
 
     // 自动根据主题查找 globalCSSPath 和 baseCSSPath

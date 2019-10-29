@@ -151,6 +151,25 @@ function createMultiFileWithScreenshots(dirPath, componentName) {
     });
 }
 exports.createMultiFileWithScreenshots = createMultiFileWithScreenshots;
+function createMultiFilePackage(dirPath, componentName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const normalized = utils_1.normalizeName(componentName);
+        const dest = handleSame(dirPath, normalized.baseName);
+        yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-package.vue'), dest);
+        if (normalized.baseName !== 'u-sample') {
+            yield batchReplace([
+                path.join(dest, 'index.js'),
+                path.join(dest, 'README.md'),
+                path.join(dest, 'package.json'),
+            ], [
+                [/u-sample/g, normalized.baseName],
+                [/USample/g, normalized.componentName],
+            ]);
+        }
+        return dest;
+    });
+}
+exports.createMultiFilePackage = createMultiFilePackage;
 function createPage(dirPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = handleSame(dirPath, 'page');

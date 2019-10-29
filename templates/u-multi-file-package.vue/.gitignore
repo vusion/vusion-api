@@ -1,0 +1,14 @@
+.DS_Store
+node_modules
+npm-debug.log
+lerna-debug.log
+
+/public/
+/test-reports/
+
+yarn.lock
+package-lock.json
+
+# editors
+.vscode
+.idea

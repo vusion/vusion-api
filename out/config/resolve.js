@@ -5,7 +5,7 @@ const path = require("path");
 const chalk_1 = require("chalk");
 // import chokidar from 'chokidar';
 const getDefaults_1 = require("./getDefaults");
-const TYPES = ['library', 'app', 'html5', 'fullstack'];
+const TYPES = ['library', 'app', 'html5', 'fullstack', 'component', 'block'];
 function getConfig(cwd, configPath, packagePath) {
     delete require.cache[configPath];
     delete require.cache[packagePath];
@@ -69,6 +69,10 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         //         config.docs = newConfig.docs || {};
         //     });
         // }
+    }
+    else if (config.type === 'component' || config.type === 'block') {
+        const libraryName = Object.keys(require(packagePath).peerDependencies).find((key) => key.endsWith('.vusion'));
+        config.libraryPath = path.resolve(cwd, `node_modules/${libraryName}/src`);
     }
     // 自动根据主题查找 globalCSSPath 和 baseCSSPath
     // 如果 config 中包含有主题列表，globalCSSPath 为主题名与路径的 Map

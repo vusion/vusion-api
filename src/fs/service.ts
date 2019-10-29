@@ -138,6 +138,24 @@ export async function createMultiFileWithScreenshots(dirPath: string, componentN
     return dest;
 }
 
+export async function createMultiFilePackage(dirPath: string, componentName?: string) {
+    const normalized = normalizeName(componentName);
+    const dest = handleSame(dirPath, normalized.baseName);
+    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-package.vue'), dest);
+
+    if (normalized.baseName !== 'u-sample') {
+        await batchReplace([
+            path.join(dest, 'index.js'),
+            path.join(dest, 'README.md'),
+            path.join(dest, 'package.json'),
+        ], [
+            [/u-sample/g, normalized.baseName],
+            [/USample/g, normalized.componentName],
+        ]);
+    }
+    return dest;
+}
+
 export async function createPage(dirPath: string) {
     const dest = handleSame(dirPath, 'page');
     await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
