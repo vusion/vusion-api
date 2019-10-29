@@ -71,6 +71,7 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         // }
     }
     else if (config.type === 'component' || config.type === 'block') {
+        config.srcPath = cwd;
         const libraryName = Object.keys(require(packagePath).peerDependencies).find((key) => key.endsWith('.vusion'));
         config.libraryPath = path.resolve(cwd, `node_modules/${libraryName}/src`);
     }
