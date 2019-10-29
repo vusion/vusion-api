@@ -1,13 +1,14 @@
 {
   "name": "vusion-api",
   "description": "Vusion Node.js API",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "author": "Rainfore <rainforest92@126.com>",
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "test": "npm run compile && mocha out/test/**/*.test.js",
-    "lint": "eslint ./src --fix"
+    "lint": "eslint ./src --fix",
+    "prepublishOnly": "npm run compile && git add ."
   },
   "main": "./out/index.js",
   "repository": "vusion/vusion-api",

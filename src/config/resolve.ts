@@ -105,7 +105,10 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
                 default: path.resolve(config.libraryPath, './base/global.css'),
             };
             for (const theme of config.themes) {
-                globalCSSPath[theme] = path.resolve(config.libraryPath, `../theme-${theme}/base/global.css`);
+                if (theme === 'default')
+                    globalCSSPath[theme] = path.resolve(config.libraryPath, './base/global.css');
+                else
+                    globalCSSPath[theme] = path.resolve(config.libraryPath, `../theme-${theme}/base/global.css`);
             }
         } else
             globalCSSPath = config.globalCSSPath = path.resolve(config.libraryPath, './base/global.css');
