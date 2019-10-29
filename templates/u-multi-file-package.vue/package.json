@@ -23,7 +23,7 @@
     "scripts": {
         "doc": "vue-cli-service doc --port 9090",
         "doc-build": "vue-cli-service doc-build",
-        "prepublishOnly": "doc-build"
+        "prepublishOnly": "npm run doc-build"
     },
     "dependencies": {},
     "devDependencies": {
