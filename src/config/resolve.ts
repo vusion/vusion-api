@@ -92,6 +92,7 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
         //     });
         // }
     } else if (config.type === 'component' || config.type === 'block') {
+        config.srcPath = cwd;
         const libraryName = Object.keys(require(packagePath).peerDependencies).find((key) => key.endsWith('.vusion'));
         config.libraryPath = path.resolve(cwd, `node_modules/${libraryName}/src`);
     }

@@ -7,19 +7,13 @@
 
 基本形式是这样的，Balabala。
 
-![](screenshots/1.png)
-
-<!-- 这里用`htm`，防止生成 demo -->
-``` htm
+``` html
 <u-sample some-prop></u-sample>
 ```
 
 ### 复杂示例
 
-![](screenshots/2.png)
-
-<!-- 这里用`htm`，防止生成 demo -->
-``` htm
+``` vue
 <template>
 <u-sample v-model="value">
     <div>Something</div>
