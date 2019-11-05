@@ -1,6 +1,6 @@
 {
-  "name": "@cloud-ui/u-sample.vue",
-  "description": "Cloud UI - USample",
+  "name": "@cloud-ui/s-block.vue",
+  "description": "Cloud UI - SBlock",
   "version": "0.1.0",
   "author": "Rainfore <rainforest92@126.com>",
   "main": "./index.js",

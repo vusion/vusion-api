@@ -61,7 +61,7 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
      */
     if (args) {
         if (args.theme)
-            config.themes = args.theme ? args.theme.split(',') : undefined;
+            config.themes = args.theme && args.theme !== 'default' ? args.theme.split(',') : undefined;
         if (args['vusion-mode'])
             config.mode = args['vusion-mode'];
         if (args['base-css'])
@@ -101,7 +101,7 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
     // 如果 config 中包含有主题列表，globalCSSPath 为主题名与路径的 Map
     let globalCSSPath: string | { [theme: string]: string }; // 用于保存非文档的 globalCSS 路径
     if (!config.globalCSSPath) {
-        if (config.themes && config.themes.length) { // 主题样式处理
+        if (config.themes) { // 主题样式处理
             config.globalCSSPath = globalCSSPath = {
                 default: path.resolve(config.libraryPath, './base/global.css'),
             };
@@ -121,8 +121,16 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
                 throw new Error('Please set globalCSSPath!');
             }
         }
-    } else
-        globalCSSPath = config.globalCSSPath;
+    } else {
+        if (config.themes) {
+            const cssPath = config.globalCSSPath as string;
+            config.globalCSSPath = globalCSSPath = {};
+            for (const theme of config.themes)
+                globalCSSPath[theme] = cssPath;
+        } else
+            globalCSSPath = config.globalCSSPath;
+    }
+
     if (config.globalCSSPath && config.globalCSSPath instanceof Object) {
         // 检查主题的 globalCSS 是否存在
         for (const theme of Object.keys(config.globalCSSPath)) {
