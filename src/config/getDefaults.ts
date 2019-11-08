@@ -7,6 +7,8 @@ export interface MaterialInfo {
     target?: string,
 }
 
+export type Theme = { [name: string]: string };
+
 export interface VusionConfig {
     type: string;
     mode?: string;
@@ -21,8 +23,8 @@ export interface VusionConfig {
     srcPath: string;
     libraryPath: string;
     baseCSSPath: string;
-    globalCSSPath: string | { [theme: string]: string };
-    themes: string[];
+    theme: string | Array<string> | Theme;
+    themeAssigned: boolean;
 
     docs: boolean | {
         title?: string,
@@ -57,8 +59,8 @@ export default function getDefaults() {
         srcPath: './src',                      // To be `./src` by default
         libraryPath: '',                       // [Required] Library directory path. To be srcPath by default
         baseCSSPath: '',                       // Path of base CSS. If not set, it will be `library/base/base.css`
-        globalCSSPath: '',                     // Path of global CSS. If not set, it will be `library/base/global.css`
-        themes: undefined,                      // Project theme
+        theme: undefined,                      // Project theme
+        themeAssigned: false,
 
         docs: false,                           // Generate docs of common components in library. Always be true if project type is `library`
 

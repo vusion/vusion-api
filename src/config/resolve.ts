@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import chalk from 'chalk';
 // import chokidar from 'chokidar';
-import getDefaults, { VusionConfig } from './getDefaults';
+import getDefaults, { VusionConfig, Theme } from './getDefaults';
 
 const TYPES = ['library', 'app', 'html5', 'fullstack', 'component', 'block'];
 
@@ -26,10 +26,9 @@ function getConfig(cwd: string, configPath: string, packagePath: string) {
 }
 
 interface CLIArgs {
-    theme?: string,
     'vusion-mode'?: string,
     'base-css'?: string,
-    'global-css'?: string,
+    theme?: string,
     'output-path'?: string,
     'public-path'?: string,
     'static-path'?: string,
@@ -60,14 +59,12 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
      * CLI Arguments
      */
     if (args) {
-        if (args.theme)
-            config.themes = args.theme && args.theme !== 'default' ? args.theme.split(',') : undefined;
         if (args['vusion-mode'])
             config.mode = args['vusion-mode'];
         if (args['base-css'])
             config.baseCSSPath = path.resolve(process.cwd(), args['base-css']);
-        if (args['global-css'])
-            config.globalCSSPath = path.resolve(process.cwd(), args['global-css']);
+        if (args.theme)
+            config.theme = args.theme ? args.theme.split(',') : undefined;
         if (args['output-path'])
             config.outputPath = path.resolve(process.cwd(), args['output-path']);
         if (args['public-path'])
@@ -97,52 +94,39 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
         config.libraryPath = path.resolve(cwd, `node_modules/${libraryName}/src`);
     }
 
-    // 自动根据主题查找 globalCSSPath 和 baseCSSPath
-    // 如果 config 中包含有主题列表，globalCSSPath 为主题名与路径的 Map
-    let globalCSSPath: string | { [theme: string]: string }; // 用于保存非文档的 globalCSS 路径
-    if (!config.globalCSSPath) {
-        if (config.themes) { // 主题样式处理
-            config.globalCSSPath = globalCSSPath = {
-                default: path.resolve(config.libraryPath, './base/global.css'),
-            };
-            for (const theme of config.themes) {
-                if (theme === 'default')
-                    globalCSSPath[theme] = path.resolve(config.libraryPath, './base/global.css');
-                else
-                    globalCSSPath[theme] = path.resolve(config.libraryPath, `../theme-${theme}/base/global.css`);
-            }
-        } else
-            globalCSSPath = config.globalCSSPath = path.resolve(config.libraryPath, './base/global.css');
+    let themeAutoDetected = false;
+    if (!config.theme) {
+        themeAutoDetected = true;
+        config.theme = {
+            default: path.resolve(config.libraryPath, './base/theme.css'),
+        };
+    } else if (typeof config.theme === 'string') {
+        const theme: Theme = {};
 
-        if (typeof config.globalCSSPath === 'string' && !fs.existsSync(config.globalCSSPath)) {
-            try {
-                config.globalCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/base/global.css');
-            } catch(e) {
-                throw new Error('Please set globalCSSPath!');
-            }
-        }
-    } else {
-        if (config.themes) {
-            const cssPath = config.globalCSSPath as string;
-            config.globalCSSPath = globalCSSPath = {};
-            for (const theme of config.themes)
-                globalCSSPath[theme] = cssPath;
-        } else
-            globalCSSPath = config.globalCSSPath;
+        const _theme = config.theme;
+        let name = path.basename(_theme, '.css');
+        if (name === 'theme')
+            name = 'default';
+        theme[name] = _theme;
+
+        config.theme = theme;
+    } else if (Array.isArray(config.theme)) {
+        const theme: Theme = {};
+
+        config.theme.forEach((_theme) => {
+            let name = path.basename(_theme, '.css');
+            if (name === 'theme')
+                name = 'default';
+            theme[name] = _theme;
+        });
+
+        config.theme = theme;
+    } // else
+
+    if (themeAutoDetected) {
+        if (!fs.existsSync((config.theme as Theme).default))
+            (config.theme as Theme).default = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/base/theme.css');
     }
-
-    if (config.globalCSSPath && config.globalCSSPath instanceof Object) {
-        // 检查主题的 globalCSS 是否存在
-        for (const theme of Object.keys(config.globalCSSPath)) {
-            const cssPath = config.globalCSSPath[theme];
-            if (!fs.existsSync(cssPath))
-                throw new Error(`Cannot find ${theme} globalCSSPath: ${cssPath}`);
-        }
-    } else if (typeof config.globalCSSPath === 'string') {
-        if (!fs.existsSync(config.globalCSSPath))
-            throw new Error(`Cannot find globalCSSPath: ${globalCSSPath}`);
-    } else
-        throw new Error(`globalCSSPath only accepted string or array`);
 
     let baseCSSPath; // 用于保存非文档的 baseCSSPath 路径
     if (!config.baseCSSPath) {
