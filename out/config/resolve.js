@@ -44,6 +44,8 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
             config.mode = args['vusion-mode'];
         if (args.theme)
             config.theme = args.theme ? args.theme.split(',') : undefined;
+        if (args['apply-theme'] !== undefined)
+            config.applyTheme = !!args['apply-theme'];
         if (args['base-css'])
             config.baseCSSPath = path.resolve(process.cwd(), args['base-css']);
         if (args['output-path'])
