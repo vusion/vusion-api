@@ -29,6 +29,7 @@ interface CLIArgs {
     'vusion-mode'?: string,
     'base-css'?: string,
     theme?: string,
+    'apply-theme'?: boolean,
     'output-path'?: string,
     'public-path'?: string,
     'static-path'?: string,
@@ -63,6 +64,8 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
             config.mode = args['vusion-mode'];
         if (args.theme)
             config.theme = args.theme ? args.theme.split(',') : undefined;
+        if (args['apply-theme'] !== undefined)
+            config.applyTheme = !!args['apply-theme'];
         if (args['base-css'])
             config.baseCSSPath = path.resolve(process.cwd(), args['base-css']);
         if (args['output-path'])
