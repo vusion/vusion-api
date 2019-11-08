@@ -12,7 +12,6 @@ export type Theme = { [name: string]: string };
 export interface VusionConfig {
     type: string;
     mode?: string;
-    overwrite: boolean;
 
     configPath?: string;
     packagePath?: string;
@@ -24,7 +23,7 @@ export interface VusionConfig {
     libraryPath: string;
     baseCSSPath: string;
     theme: string | Array<string> | Theme;
-    themeAssigned: boolean;
+    applyTheme: boolean;
 
     docs: boolean | {
         title?: string,
@@ -48,19 +47,18 @@ export default function getDefaults() {
     const defaults: VusionConfig = {
         type: '',                              // [Required] Vusion project type. 'library', 'app'
         mode: '',
-        overwrite: true,
 
         configPath: '',
         packagePath: '',
 
-        outputPath: 'public',
+        outputPath: '',
         publicPath: '',
         staticPath: '',                        // Path of static files, which will be copied into destination directory. It accepts a String or Array.
         srcPath: './src',                      // To be `./src` by default
         libraryPath: '',                       // [Required] Library directory path. To be srcPath by default
         baseCSSPath: '',                       // Path of base CSS. If not set, it will be `library/base/base.css`
         theme: undefined,                      // Project theme
-        themeAssigned: false,
+        applyTheme: false,
 
         docs: false,                           // Generate docs of common components in library. Always be true if project type is `library`
 

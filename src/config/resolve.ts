@@ -61,10 +61,10 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
     if (args) {
         if (args['vusion-mode'])
             config.mode = args['vusion-mode'];
-        if (args['base-css'])
-            config.baseCSSPath = path.resolve(process.cwd(), args['base-css']);
         if (args.theme)
             config.theme = args.theme ? args.theme.split(',') : undefined;
+        if (args['base-css'])
+            config.baseCSSPath = path.resolve(process.cwd(), args['base-css']);
         if (args['output-path'])
             config.outputPath = path.resolve(process.cwd(), args['output-path']);
         if (args['public-path'])
