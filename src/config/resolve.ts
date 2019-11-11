@@ -63,7 +63,7 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
         if (args['vusion-mode'])
             config.mode = args['vusion-mode'];
         if (args.theme)
-            config.theme = args.theme ? args.theme.split(',') : undefined;
+            config.theme = args.theme;
         if (args['apply-theme'] !== undefined)
             config.applyTheme = !!args['apply-theme'];
         if (args['base-css'])
@@ -103,28 +103,30 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
         config.theme = {
             default: path.resolve(config.libraryPath, './base/theme.css'),
         };
-    } else if (typeof config.theme === 'string') {
-        const theme: Theme = {};
-
-        const _theme = config.theme;
-        let name = path.basename(_theme, '.css');
-        if (name === 'theme')
-            name = 'default';
-        theme[name] = _theme;
-
-        config.theme = theme;
-    } else if (Array.isArray(config.theme)) {
+    }
+    if (typeof config.theme === 'string') {
+        config.theme = config.theme.split(',');
+    }
+    if (Array.isArray(config.theme)) {
         const theme: Theme = {};
 
         config.theme.forEach((_theme) => {
-            let name = path.basename(_theme, '.css');
-            if (name === 'theme')
-                name = 'default';
-            theme[name] = _theme;
+            if (_theme.endsWith('.css')) { // is a path
+                let name = path.basename(_theme, '.css');
+                if (name === 'theme')
+                    name = 'default';
+                theme[name] = path.resolve(cwd, _theme);
+            } else { // is a name
+                if (_theme === 'default' || _theme === 'theme')
+                    theme['default'] = path.resolve(config.libraryPath, './base/theme.css');
+                else
+                    theme[_theme] = path.resolve(cwd, `./themes/${_theme}.css`);
+            }
         });
 
         config.theme = theme;
-    } // else
+    }
+    // else Object
 
     if (themeAutoDetected) {
         if (!fs.existsSync((config.theme as Theme).default))
