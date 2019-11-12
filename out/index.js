@@ -15,4 +15,6 @@ exports.VueFile = fs_1.VueFile;
 exports.VueFileExtendMode = fs_1.VueFileExtendMode;
 exports.Library = fs_1.Library;
 exports.LibraryType = fs_1.LibraryType;
+exports.View = fs_1.View;
+exports.ViewType = fs_1.ViewType;
 //# sourceMappingURL=index.js.map

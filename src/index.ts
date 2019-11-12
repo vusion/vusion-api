@@ -7,4 +7,5 @@ export {
     FSEntry, File, Directory, JSFile,
     VueFile, VueFileExtendMode,
     Library, LibraryType,
+    View, ViewType,
 } from './fs';

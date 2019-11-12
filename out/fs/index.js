@@ -17,5 +17,8 @@ exports.JSFile = JSFile_1.default;
 var Library_1 = require("./Library");
 exports.Library = Library_1.default;
 exports.LibraryType = Library_1.LibraryType;
+var View_1 = require("./View");
+exports.View = View_1.default;
+exports.ViewType = View_1.ViewType;
 __export(require("./service"));
 //# sourceMappingURL=index.js.map

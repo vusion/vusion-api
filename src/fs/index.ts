@@ -4,5 +4,6 @@ export { default as Directory } from './Directory';
 export { default as VueFile, VueFileExtendMode } from './VueFile';
 export { default as JSFile } from './JSFile';
 export { default as Library, LibraryType } from './Library';
+export { default as View, ViewType } from './View';
 
 export * from './service';

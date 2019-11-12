@@ -43,7 +43,7 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         if (args['vusion-mode'])
             config.mode = args['vusion-mode'];
         if (args.theme)
-            config.theme = args.theme ? args.theme.split(',') : undefined;
+            config.theme = args.theme;
         if (args['apply-theme'] !== undefined)
             config.applyTheme = !!args['apply-theme'];
         if (args['base-css'])
@@ -79,38 +79,47 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
     if (!config.theme) {
         themeAutoDetected = true;
         config.theme = {
-            default: path.resolve(config.libraryPath, './base/theme.css'),
+            default: path.resolve(config.libraryPath, './styles/theme.css'),
         };
     }
-    else if (typeof config.theme === 'string') {
-        const theme = {};
-        const _theme = config.theme;
-        let name = path.basename(_theme, '.css');
-        if (name === 'theme')
-            name = 'default';
-        theme[name] = _theme;
-        config.theme = theme;
+    if (typeof config.theme === 'string') {
+        config.theme = config.theme.split(',');
     }
-    else if (Array.isArray(config.theme)) {
+    if (Array.isArray(config.theme)) {
         const theme = {};
         config.theme.forEach((_theme) => {
-            let name = path.basename(_theme, '.css');
-            if (name === 'theme')
-                name = 'default';
-            theme[name] = _theme;
+            if (_theme.endsWith('.css')) { // is a path
+                let name = path.basename(_theme, '.css');
+                if (name === 'theme')
+                    name = 'default';
+                theme[name] = path.resolve(cwd, _theme);
+            }
+            else { // is a name
+                if (_theme === 'default' || _theme === 'theme')
+                    theme['default'] = path.resolve(config.libraryPath, './styles/theme.css');
+                else
+                    theme[_theme] = path.resolve(cwd, `./themes/${_theme}.css`);
+            }
         });
         config.theme = theme;
-    } // else
+    }
+    // else Object
     if (themeAutoDetected) {
+        // @compat old version
         if (!fs.existsSync(config.theme.default))
-            config.theme.default = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/base/theme.css');
+            config.theme.default = path.resolve(config.libraryPath, './base/global.css');
+        if (!fs.existsSync(config.theme.default))
+            config.theme.default = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/styles/theme.css');
     }
     let baseCSSPath; // 用于保存非文档的 baseCSSPath 路径
     if (!config.baseCSSPath) {
-        baseCSSPath = config.baseCSSPath = path.resolve(config.libraryPath, './base/base.css');
+        baseCSSPath = config.baseCSSPath = path.resolve(config.libraryPath, './styles/base.css');
+        // @compat old version
+        if (!fs.existsSync(config.baseCSSPath))
+            baseCSSPath = config.baseCSSPath = path.resolve(config.libraryPath, './base/base.css');
         if (!fs.existsSync(config.baseCSSPath)) {
             try {
-                config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/base/base.css');
+                config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/styles/base.css');
             }
             catch (e) {
                 throw new Error('Please set baseCSSPath!');
@@ -118,7 +127,7 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         }
     }
     else
-        baseCSSPath = config.baseCSSPath;
+        config.baseCSSPath = baseCSSPath = path.resolve(cwd, config.baseCSSPath);
     if (!fs.existsSync(config.baseCSSPath))
         throw new Error(`Cannot find baseCSSPath: ${baseCSSPath}`);
     return config;
