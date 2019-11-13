@@ -30,8 +30,10 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
     configPath = config.configPath = path.resolve(cwd, configPath);
     const userConfig = getConfig(cwd, configPath, packagePath);
     // 覆盖一些默认配置
-    if (userConfig.type === 'library')
+    if (userConfig.type === 'library') {
+        config.publicPath = './';
         config.outputPath = 'dist';
+    }
     Object.assign(config, userConfig);
     if (!TYPES.includes(config.type)) {
         throw new Error(chalk_1.default.bgRed(' ERROR ') + ' Unknown project type!');
@@ -61,14 +63,6 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
     config.libraryPath = path.resolve(cwd, config.libraryPath || config.srcPath);
     if (config.type === 'library') {
         config.docs = config.docs || {};
-        // @TODO
-        // if (process.env.NODE_ENV === 'development') {
-        //     // 更新 docs 对象
-        //     chokidar.watch([configPath, packagePath]).on('change', (path: string) => {
-        //         const newConfig = getConfig(configPath, packagePath);
-        //         config.docs = newConfig.docs || {};
-        //     });
-        // }
     }
     else if (config.type === 'component' || config.type === 'block') {
         config.srcPath = cwd;
