@@ -42,7 +42,6 @@ class View extends FSEntry_1.default {
         });
     }
     close() {
-        this.isDirectory = undefined;
         // this.alias = undefined;
         this.children = undefined;
         this.isOpen = false;
@@ -73,7 +72,7 @@ class View extends FSEntry_1.default {
                     view.viewType = ViewType.vue;
                 else if (this.viewType === ViewType.root)
                     view.viewType = ViewType.page;
-                else if (fs.readdirSync(fullPath).includes('module'))
+                else if (this.viewType === ViewType.page && fileNames.includes('modules.js'))
                     view.viewType = ViewType.module;
                 // view.parent = this;
                 // view.isChild = true;

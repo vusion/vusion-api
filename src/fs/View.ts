@@ -74,7 +74,7 @@ export default class View extends FSEntry {
                 view.viewType = ViewType.vue;
             else if (this.viewType === ViewType.root)
                 view.viewType = ViewType.page;
-            else if (fs.readdirSync(fullPath).includes('module'))
+            else if (this.viewType === ViewType.page && fileNames.includes('modules.js'))
                 view.viewType = ViewType.module;
 
             // view.parent = this;
