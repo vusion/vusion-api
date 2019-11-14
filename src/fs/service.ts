@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as babel from '@babel/core';
+import * as shelljs from 'shelljs';
 import { kebab2Camel, Camel2kebab, normalizeName } from '../utils';
 import { VueFile, Library, VueFileExtendMode, JSFile } from '.';
 
@@ -11,7 +12,7 @@ export class FileExistsError extends Error {
     }
 }
 
-function handleSame(dirPath: string, baseName: string = 'u-sample') {
+export function handleSame(dirPath: string, baseName: string = 'u-sample') {
     let dest = path.resolve(dirPath, `${baseName}.vue`);
 
     if (fs.existsSync(dest))
@@ -20,8 +21,8 @@ function handleSame(dirPath: string, baseName: string = 'u-sample') {
     return dest;
 }
 
-type Replacer = [RegExp, string];
-async function batchReplace(src: string | Array<string>, replacers: Array<Replacer>) {
+export type Replacer = [RegExp, string];
+export async function batchReplace(src: string | Array<string>, replacers: Array<Replacer>) {
     if (typeof src === 'string')
         src = [src];
     return Promise.all(src.map((fullPath) =>
@@ -30,6 +31,61 @@ async function batchReplace(src: string | Array<string>, replacers: Array<Replac
             return fs.writeFile(fullPath, content);
         })
     ));
+}
+
+export interface ListFilesFilters {
+    type?: string, // both, file, directory
+    includes?: string | RegExp | Array<string | RegExp>,
+    excludes?: string | RegExp | Array<string | RegExp>,
+    filters?: ((fullPath: string) => boolean) | Array<(fullPath: string) => boolean>,
+};
+
+export function listFiles(dir: string, filters: ListFilesFilters = {}, recursive: boolean = false) {
+    return shelljs.ls(recursive ? '-RA' : '-A', dir)
+        .stdout.split('\n')
+        .map((filePath) => path.join(dir, filePath))
+        .filter((fullPath) => {
+            if (filters.type) {
+                const stat = fs.statSync(fullPath);
+                if (filters.type === 'file' && !stat.isFile())
+                    return false;
+                if (filters.type === 'directory' && !stat.isDirectory())
+                    return false;
+                if (filters.type === 'link' && !stat.isSymbolicLink())
+                    return false;
+            }
+            if (filters.includes) {
+                if (!Array.isArray(filters.includes))
+                    filters.includes = [filters.includes];
+                if (!filters.includes.every((include) => {
+                    if (typeof include === 'string')
+                        return fullPath.includes(include);
+                    else
+                        return include.test(fullPath);
+                })) return false;
+            }
+            if (filters.excludes) {
+                if (!Array.isArray(filters.excludes))
+                    filters.excludes = [filters.excludes];
+                if (filters.excludes.some((exclude) => {
+                    if (typeof exclude === 'string')
+                        return fullPath.includes(exclude);
+                    else
+                        return exclude.test(fullPath);
+                })) return false;
+            }
+            if (filters.filters) {
+                if (!Array.isArray(filters.filters))
+                    filters.filters = [filters.filters];
+                if (!filters.filters.every((filter) => filter(fullPath)))
+                    return false;
+            }
+            return true;
+        });
+}
+
+export function listAllFiles(dir: string, filters: ListFilesFilters = {}) {
+    return listFiles(dir, filters, true);
 }
 
 /* 以下代码复制粘贴写得冗余了一点，不过之后可能各部分功能会有差异，所以先不整合 */

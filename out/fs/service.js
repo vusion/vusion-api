@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs-extra");
 const path = require("path");
 const babel = require("@babel/core");
+const shelljs = require("shelljs");
 const utils_1 = require("../utils");
 const _1 = require(".");
 class FileExistsError extends Error {
@@ -27,6 +28,7 @@ function handleSame(dirPath, baseName = 'u-sample') {
         throw new FileExistsError(dest);
     return dest;
 }
+exports.handleSame = handleSame;
 function batchReplace(src, replacers) {
     return __awaiter(this, void 0, void 0, function* () {
         if (typeof src === 'string')
@@ -37,6 +39,58 @@ function batchReplace(src, replacers) {
         })));
     });
 }
+exports.batchReplace = batchReplace;
+;
+function listFiles(dir, filters = {}, recursive = false) {
+    return shelljs.ls(recursive ? '-RA' : '-A', dir)
+        .stdout.split('\n')
+        .map((filePath) => path.join(dir, filePath))
+        .filter((fullPath) => {
+        if (filters.type) {
+            const stat = fs.statSync(fullPath);
+            if (filters.type === 'file' && !stat.isFile())
+                return false;
+            if (filters.type === 'directory' && !stat.isDirectory())
+                return false;
+            if (filters.type === 'link' && !stat.isSymbolicLink())
+                return false;
+        }
+        if (filters.includes) {
+            if (!Array.isArray(filters.includes))
+                filters.includes = [filters.includes];
+            if (!filters.includes.every((include) => {
+                if (typeof include === 'string')
+                    return fullPath.includes(include);
+                else
+                    return include.test(fullPath);
+            }))
+                return false;
+        }
+        if (filters.excludes) {
+            if (!Array.isArray(filters.excludes))
+                filters.excludes = [filters.excludes];
+            if (filters.excludes.some((exclude) => {
+                if (typeof exclude === 'string')
+                    return fullPath.includes(exclude);
+                else
+                    return exclude.test(fullPath);
+            }))
+                return false;
+        }
+        if (filters.filters) {
+            if (!Array.isArray(filters.filters))
+                filters.filters = [filters.filters];
+            if (!filters.filters.every((filter) => filter(fullPath)))
+                return false;
+        }
+        return true;
+    });
+}
+exports.listFiles = listFiles;
+function listAllFiles(dir, filters = {}) {
+    return listFiles(dir, filters, true);
+}
+exports.listAllFiles = listAllFiles;
 /* 以下代码复制粘贴写得冗余了一点，不过之后可能各部分功能会有差异，所以先不整合 */
 function createDirectory(dirPath, dirName) {
     return __awaiter(this, void 0, void 0, function* () {

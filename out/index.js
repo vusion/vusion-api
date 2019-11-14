@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("./fs");
 exports.fs = fs;
+const ms = require("./ms");
+exports.ms = ms;
 const config = require("./config");
 exports.config = config;
 const utils = require("./utils");
