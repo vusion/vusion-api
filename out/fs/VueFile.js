@@ -169,7 +169,8 @@ class VueFile extends FSEntry_1.default {
         });
         return __awaiter(this, void 0, void 0, function* () {
             this.isSaving = true;
-            shell.rm('-rf', this.fullPath);
+            if (fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
+                shell.rm('-rf', this.fullPath);
             let template = this.template;
             let script = this.script;
             let style = this.style;
@@ -181,7 +182,7 @@ class VueFile extends FSEntry_1.default {
                 style = this.styleHandler.generate();
             let result;
             if (this.isDirectory) {
-                shell.mkdir(this.fullPath);
+                fs.ensureDirSync(this.fullPath);
                 const promises = [];
                 template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), template));
                 script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), script));

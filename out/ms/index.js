@@ -15,6 +15,14 @@ const fs = require("fs-extra");
 const os = require("os");
 const vfs = require("../fs");
 const utils = require("../utils");
+const compressing = require("compressing");
+const axios_1 = require("axios");
+const platformAxios = axios_1.default.create({
+    baseURL: 'http://akos.test.netease.com:7001/internal',
+    headers: {
+        'access_token': 'f2224e629a7e24423e6b1bf6f7a08ea0a549fb975bbd86b2111a9f74f2fa8bc3b66530a79a4cf910429595ba56a7bbbf34baacf843446f0f6ca2cc6ab961f360',
+    }
+});
 function getCacheDir(subPath = '') {
     const cacheDir = path.join(os.homedir(), '.vusion', subPath);
     if (!fs.existsSync(cacheDir))
@@ -28,31 +36,36 @@ function getRunControl() {
 }
 exports.getRunControl = getRunControl;
 ;
-var MaterialSourceType;
-(function (MaterialSourceType) {
-    MaterialSourceType["local"] = "local";
-    MaterialSourceType["github"] = "github";
-})(MaterialSourceType = exports.MaterialSourceType || (exports.MaterialSourceType = {}));
+;
 ;
 function processOptions(options) {
     const result = {
         source: {
             type: 'file',
-            repoName: '',
-            path: '',
+            registry: '',
             name: '',
+            path: '',
             version: '',
             commit: '',
+            fileName: '',
+            baseName: '',
         },
         target: options.target,
         name: options.name,
         title: options.title,
     };
     let source = options.source;
+    if (typeof source !== 'string') {
+        result.source = source;
+        const fileName = result.source.fileName = path.basename(result.source.name);
+        result.source.baseName = path.basename(fileName, path.extname(fileName));
+        return result;
+    }
     if (source[0] === '.' || source[0] === '~' || source[0] === '/') {
         result.source.type = 'file';
         result.source.path = source;
-        result.source.name = path.basename(source);
+        const fileName = result.source.fileName = path.basename(source);
+        result.source.baseName = path.basename(fileName, path.extname(fileName));
     }
     else {
         const repoRE = /^\w+:/;
@@ -65,20 +78,22 @@ function processOptions(options) {
             result.source.type = 'npm';
         const arr = source.split(':');
         result.source.path = arr[1];
-        let repoName = arr[0];
-        if (repoName.includes('#')) {
-            const arr2 = repoName.split('#');
-            result.source.repoName = arr2[0];
+        let name = arr[0];
+        if (name.includes('#')) {
+            const arr2 = name.split('#');
+            result.source.name = arr2[0];
             result.source.commit = arr2[1];
         }
-        else if (repoName.includes('@')) {
-            const arr2 = repoName.split('@');
-            result.source.repoName = arr2[0];
+        else if (name.includes('@')) {
+            const arr2 = name.split('@');
+            result.source.name = arr2[0];
             result.source.version = arr2[1];
         }
         else {
-            result.source.repoName = repoName;
+            result.source.name = name;
         }
+        const fileName = result.source.fileName = path.basename(result.source.name);
+        result.source.baseName = path.basename(fileName, path.extname(fileName));
     }
     return result;
 }
@@ -92,7 +107,7 @@ function addModule(options) {
         const moduleCacheDir = getCacheDir('modules');
         yield fs.emptyDir(moduleCacheDir);
         if (opts.source.type === 'file') {
-            const temp = path.resolve(moduleCacheDir, opts.source.name + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
+            const temp = path.resolve(moduleCacheDir, opts.source.fileName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
             const dest = path.resolve(opts.target, opts.name);
             yield fs.copy(path.resolve(opts.source.path), temp);
             yield vfs.batchReplace(vfs.listAllFiles(moduleCacheDir, {
@@ -158,4 +173,58 @@ function removeModule(options) {
     });
 }
 exports.removeModule = removeModule;
+function getBlocks() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return platformAxios.get('block/list')
+            .then((res) => res.data.result.rows);
+    });
+}
+exports.getBlocks = getBlocks;
+function publishBlock(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return platformAxios.post('block/publish', params)
+            .then((res) => res.data);
+    });
+}
+exports.publishBlock = publishBlock;
+function addBlock(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const opts = processOptions(options);
+        // if (opts.source.type === 'npm')
+        const blockCacheDir = getCacheDir('block');
+        const dest = yield downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
+        // if (fs.statSync(opts.target).isFile())
+        const vueFile = new vfs.VueFile(opts.target);
+        yield vueFile.open();
+        if (!vueFile.isDirectory)
+            vueFile.transform();
+        yield vueFile.save();
+        const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
+        yield fs.ensureDir(localBlocksPath);
+        yield fs.move(dest, path.join(localBlocksPath, opts.source.name));
+    });
+}
+exports.addBlock = addBlock;
+/**
+ *
+ * @param registry For example: https://registry.npm.taobao.org
+ * @param packageName For example: lodash
+ * @param saveDir For example: ./blocks
+ */
+function downloadPackage(registry, packageName, saveDir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { data: pkgInfo } = yield axios_1.default.get(`${registry}/${packageName}/latest`);
+        const tgzURL = pkgInfo.dist.tarball;
+        const response = yield axios_1.default.get(tgzURL, {
+            responseType: 'stream',
+        });
+        const temp = path.resolve(os.tmpdir(), packageName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
+        yield compressing.tgz.uncompress(response.data, temp);
+        const dest = path.join(saveDir, pkgInfo.name + '@' + pkgInfo.version);
+        yield fs.move(path.join(temp, 'package'), dest);
+        yield fs.rmdir(temp);
+        return dest;
+    });
+}
+exports.downloadPackage = downloadPackage;
 //# sourceMappingURL=index.js.map

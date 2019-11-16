@@ -1,7 +1,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as babel from '@babel/core';
-import * as shelljs from 'shelljs';
+import * as globby from 'globby';
+
 import { kebab2Camel, Camel2kebab, normalizeName } from '../utils';
 import { VueFile, Library, VueFileExtendMode, JSFile } from '.';
 
@@ -35,15 +36,18 @@ export async function batchReplace(src: string | Array<string>, replacers: Array
 
 export interface ListFilesFilters {
     type?: string, // both, file, directory
+    all?: boolean,
+    patterns?: Array<string>,
     includes?: string | RegExp | Array<string | RegExp>,
     excludes?: string | RegExp | Array<string | RegExp>,
     filters?: ((fullPath: string) => boolean) | Array<(fullPath: string) => boolean>,
 };
 
 export function listFiles(dir: string, filters: ListFilesFilters = {}, recursive: boolean = false) {
-    return shelljs.ls(recursive ? '-RA' : '-A', dir)
-        .stdout.split('\n')
-        .map((filePath) => path.join(dir, filePath))
+    const pattern = recursive ? '**' : '*';
+    return globby.sync([dir ? dir + path.sep + pattern : pattern].concat(filters.patterns || []), {
+        dot: filters.all,
+    }).map((filePath) => path.join(dir, filePath))
         .filter((fullPath) => {
             if (filters.type) {
                 const stat = fs.statSync(fullPath);

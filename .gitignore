@@ -14,6 +14,9 @@ yarn.lock
 .cache
 .npm
 
+# Temp
+tmp/
+
 # Environment
 .env
 

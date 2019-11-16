@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs-extra");
 const path = require("path");
 const babel = require("@babel/core");
-const shelljs = require("shelljs");
+const globby = require("globby");
 const utils_1 = require("../utils");
 const _1 = require(".");
 class FileExistsError extends Error {
@@ -42,9 +42,10 @@ function batchReplace(src, replacers) {
 exports.batchReplace = batchReplace;
 ;
 function listFiles(dir, filters = {}, recursive = false) {
-    return shelljs.ls(recursive ? '-RA' : '-A', dir)
-        .stdout.split('\n')
-        .map((filePath) => path.join(dir, filePath))
+    const pattern = recursive ? '**' : '*';
+    return globby.sync([dir ? dir + path.sep + pattern : pattern].concat(filters.patterns || []), {
+        dot: filters.all,
+    }).map((filePath) => path.join(dir, filePath))
         .filter((fullPath) => {
         if (filters.type) {
             const stat = fs.statSync(fullPath);

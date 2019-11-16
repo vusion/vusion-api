@@ -4,7 +4,16 @@ import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as vfs from '../fs';
 import * as utils from '../utils';
-import { isFile } from '@babel/types';
+import * as compressing from 'compressing';
+
+
+import axios from 'axios';
+const platformAxios = axios.create({
+    baseURL: 'http://akos.test.netease.com:7001/internal',
+    headers: {
+        'access_token': 'f2224e629a7e24423e6b1bf6f7a08ea0a549fb975bbd86b2111a9f74f2fa8bc3b66530a79a4cf910429595ba56a7bbbf34baacf843446f0f6ca2cc6ab961f360',
+    }
+});
 
 export function getCacheDir(subPath: string = '') {
     const cacheDir = path.join(os.homedir(), '.vusion', subPath);
@@ -18,18 +27,37 @@ export function getRunControl() {
     return rcPath;
 }
 
+export interface MaterialSource {
+    type: string,
+    registry: string,
+    name: string, // source.name, npm name, repo name
+    path: string,
+    version?: string,
+    commit?: string,
+    fileName: string,
+    baseName: string,
+};
+
 export interface MaterialOptions {
-    source: string,
+    /**
+     * file: ./templates/moduleA
+     * file: /Users/alice/templates/moduleA
+     * npm: s-basic-form
+     * npm: s-basic-form.vue
+     * npm: s-basic-form.vue@0.3.2
+     * disable: npm: s-basic-form.vue@0.3.2:some/directory
+     * npm: @cloud-ui/s-basic-form.vue
+     * npm: @cloud-ui/s-basic-form.vue:some/directory
+     * cnpm: cnpm:@cloud-ui/s-basic-form.vue
+     * nnpm: nnpm:@cloud-ui/s-basic-form.vue
+     * github: github:user/repo
+     * disable: gitlab: gitlab:user/repo#master:some/directory
+     */
+    source: string | MaterialSource,
     target: string,
     name: string,
     title?: string,
 };
-
-export enum MaterialSourceType {
-    local = 'local',
-    github = 'github',
-
-}
 
 export interface ProcessedMaterialOptions {
     /**
@@ -46,16 +74,7 @@ export interface ProcessedMaterialOptions {
      * github: github:user/repo
      * disable: gitlab: gitlab:user/repo#master:some/directory
      */
-    source: {
-        type: string,
-        // url: string,
-        // registry: string,
-        repoName: string,
-        path: string,
-        name: string,
-        version?: string,
-        commit?: string,
-    },
+    source: MaterialSource,
     target: string,
     name: string,
     title?: string,
@@ -65,23 +84,32 @@ export function processOptions(options: MaterialOptions): ProcessedMaterialOptio
     const result: ProcessedMaterialOptions = {
         source: {
             type: 'file',
-            repoName: '',
-            path: '',
+            registry: '',
             name: '',
+            path: '',
             version: '',
             commit: '',
+            fileName: '',
+            baseName: '',
         },
         target: options.target,
         name: options.name,
         title: options.title,
-    }
+    };
 
     let source = options.source;
+    if (typeof source !== 'string') {
+        result.source = source;
+        const fileName = result.source.fileName = path.basename(result.source.name);
+        result.source.baseName = path.basename(fileName, path.extname(fileName));
+        return result;
+    }
 
     if (source[0] === '.' || source[0] === '~' || source[0] === '/') {
         result.source.type = 'file';
         result.source.path = source;
-        result.source.name = path.basename(source);
+        const fileName = result.source.fileName = path.basename(source);
+        result.source.baseName = path.basename(fileName, path.extname(fileName));
     } else {
         const repoRE = /^\w+:/;
         const cap = repoRE.exec(source);
@@ -93,18 +121,21 @@ export function processOptions(options: MaterialOptions): ProcessedMaterialOptio
 
         const arr = source.split(':');
         result.source.path = arr[1];
-        let repoName = arr[0];
-        if (repoName.includes('#')) {
-            const arr2 = repoName.split('#');
-            result.source.repoName = arr2[0];
+        let name = arr[0];
+        if (name.includes('#')) {
+            const arr2 = name.split('#');
+            result.source.name = arr2[0];
             result.source.commit = arr2[1];
-        } else if (repoName.includes('@')) {
-            const arr2 = repoName.split('@');
-            result.source.repoName = arr2[0];
+        } else if (name.includes('@')) {
+            const arr2 = name.split('@');
+            result.source.name = arr2[0];
             result.source.version = arr2[1];
         } else {
-            result.source.repoName = repoName;
+            result.source.name = name;
         }
+
+        const fileName = result.source.fileName = path.basename(result.source.name);
+        result.source.baseName = path.basename(fileName, path.extname(fileName));
     }
 
     return result;
@@ -119,7 +150,7 @@ export async function addModule(options: MaterialOptions) {
     const moduleCacheDir = getCacheDir('modules');
     await fs.emptyDir(moduleCacheDir);
     if (opts.source.type === 'file') {
-        const temp = path.resolve(moduleCacheDir, opts.source.name + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
+        const temp = path.resolve(moduleCacheDir, opts.source.fileName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
         const dest = path.resolve(opts.target, opts.name);
 
         await fs.copy(path.resolve(opts.source.path), temp);
@@ -190,4 +221,57 @@ export async function removeModule(options: MaterialOptions) {
 
         await jsFile.save();
     }
+}
+
+export async function getBlocks() {
+    return platformAxios.get('block/list')
+        .then((res) => res.data.result.rows);
+}
+
+export async function publishBlock(params: object) {
+    return platformAxios.post('block/publish', params)
+        .then((res) => res.data);
+}
+
+export async function addBlock(options: MaterialOptions) {
+    const opts = processOptions(options);
+
+    // if (opts.source.type === 'npm')
+    const blockCacheDir = getCacheDir('block');
+
+    const dest = await downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
+    // if (fs.statSync(opts.target).isFile())
+    const vueFile = new vfs.VueFile(opts.target);
+    await vueFile.open();
+    if (!vueFile.isDirectory)
+        vueFile.transform();
+    await vueFile.save();
+
+    const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
+    await fs.ensureDir(localBlocksPath);
+    await fs.move(dest, path.join(localBlocksPath, opts.source.name));
+}
+
+/**
+ *
+ * @param registry For example: https://registry.npm.taobao.org
+ * @param packageName For example: lodash
+ * @param saveDir For example: ./blocks
+ */
+export async function downloadPackage(registry: string, packageName: string, saveDir: string) {
+    const { data: pkgInfo } = await axios.get(`${registry}/${packageName}/latest`);
+    const tgzURL = pkgInfo.dist.tarball;
+
+    const response = await axios.get(tgzURL, {
+        responseType: 'stream',
+    });
+
+    const temp = path.resolve(os.tmpdir(), packageName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
+    await compressing.tgz.uncompress(response.data, temp);
+
+    const dest = path.join(saveDir, pkgInfo.name + '@' + pkgInfo.version);
+    await fs.move(path.join(temp, 'package'), dest);
+    await fs.rmdir(temp);
+
+    return dest;
 }

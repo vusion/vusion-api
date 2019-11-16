@@ -187,7 +187,8 @@ export default class VueFile extends FSEntry {
     async save() {
         this.isSaving = true;
 
-        shell.rm('-rf', this.fullPath);
+        if (fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
+            shell.rm('-rf', this.fullPath);
 
         let template = this.template;
         let script = this.script;
@@ -202,7 +203,7 @@ export default class VueFile extends FSEntry {
 
         let result;
         if (this.isDirectory) {
-            shell.mkdir(this.fullPath);
+            fs.ensureDirSync(this.fullPath);
 
             const promises = [];
             template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), template));
