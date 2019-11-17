@@ -187,6 +187,38 @@ function publishBlock(params) {
     });
 }
 exports.publishBlock = publishBlock;
+function createBlock(dir, name, title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const normalized = utils.normalizeName(name);
+        const dest = vfs.handleSame(dir, normalized.baseName);
+        yield fs.copy(path.resolve(__dirname, '../../templates/s-block.vue'), dest);
+        yield vfs.batchReplace(vfs.listAllFiles(dest, {
+            type: 'file',
+        }), [
+            [/s-block/g, normalized.baseName],
+            [/SBlock/g, normalized.componentName],
+            [/区块/g, title || '区块'],
+        ]);
+        return dest;
+    });
+}
+exports.createBlock = createBlock;
+function createBlockInLibrary(dir, name, title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const normalized = utils.normalizeName(name);
+        const dest = vfs.handleSame(dir, normalized.baseName);
+        yield fs.copy(path.resolve(__dirname, '../../templates/s-library-block.vue'), dest);
+        yield vfs.batchReplace(vfs.listAllFiles(dest, {
+            type: 'file',
+        }), [
+            [/s-block/g, normalized.baseName],
+            [/SBlock/g, normalized.componentName],
+            [/区块/g, title || '区块'],
+        ]);
+        return dest;
+    });
+}
+exports.createBlockInLibrary = createBlockInLibrary;
 function addBlock(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = processOptions(options);

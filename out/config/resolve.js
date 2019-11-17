@@ -23,7 +23,7 @@ function getConfig(cwd, configPath, packagePath) {
         }
     }
 }
-function resolve(cwd, configPath = 'vusion.config.js', args) {
+function resolve(cwd, configPath = 'vusion.config.js', args, throwErrors) {
     cwd = cwd || process.cwd();
     const config = getDefaults_1.default();
     const packagePath = config.packagePath = path.resolve(cwd, 'package.json');
@@ -67,7 +67,8 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
     else if (config.type === 'component' || config.type === 'block') {
         config.srcPath = cwd;
         const libraryName = Object.keys(require(packagePath).peerDependencies).find((key) => key.endsWith('.vusion'));
-        config.libraryPath = path.resolve(cwd, `node_modules/${libraryName}/src`);
+        if (libraryName)
+            config.libraryPath = path.dirname(require.resolve(`${libraryName}/src`));
     }
     let themeAutoDetected = false;
     if (!config.theme) {
@@ -102,8 +103,12 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
         // @compat old version
         if (!fs.existsSync(config.theme.default))
             config.theme.default = path.resolve(config.libraryPath, './base/global.css');
-        if (!fs.existsSync(config.theme.default))
-            config.theme.default = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/styles/theme.css');
+        if (!fs.existsSync(config.theme.default)) {
+            try {
+                config.theme.default = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/styles/theme.css');
+            }
+            catch (e) { }
+        }
     }
     let baseCSSPath; // 用于保存非文档的 baseCSSPath 路径
     if (!config.baseCSSPath) {
@@ -115,14 +120,12 @@ function resolve(cwd, configPath = 'vusion.config.js', args) {
             try {
                 config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/styles/base.css');
             }
-            catch (e) {
-                throw new Error('Please set baseCSSPath!');
-            }
+            catch (e) { }
         }
     }
     else
         config.baseCSSPath = baseCSSPath = path.resolve(cwd, config.baseCSSPath);
-    if (!fs.existsSync(config.baseCSSPath))
+    if (!fs.existsSync(config.baseCSSPath) && throwErrors)
         throw new Error(`Cannot find baseCSSPath: ${baseCSSPath}`);
     return config;
 }

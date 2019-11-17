@@ -43,52 +43,51 @@ export interface ListFilesFilters {
     filters?: ((fullPath: string) => boolean) | Array<(fullPath: string) => boolean>,
 };
 
-export function listFiles(dir: string, filters: ListFilesFilters = {}, recursive: boolean = false) {
+export function listFiles(dir?: string, filters: ListFilesFilters = {}, recursive: boolean = false) {
     const pattern = recursive ? '**' : '*';
     return globby.sync([dir ? dir + path.sep + pattern : pattern].concat(filters.patterns || []), {
         dot: filters.all,
-    }).map((filePath) => path.join(dir, filePath))
-        .filter((fullPath) => {
-            if (filters.type) {
-                const stat = fs.statSync(fullPath);
-                if (filters.type === 'file' && !stat.isFile())
-                    return false;
-                if (filters.type === 'directory' && !stat.isDirectory())
-                    return false;
-                if (filters.type === 'link' && !stat.isSymbolicLink())
-                    return false;
-            }
-            if (filters.includes) {
-                if (!Array.isArray(filters.includes))
-                    filters.includes = [filters.includes];
-                if (!filters.includes.every((include) => {
-                    if (typeof include === 'string')
-                        return fullPath.includes(include);
-                    else
-                        return include.test(fullPath);
-                })) return false;
-            }
-            if (filters.excludes) {
-                if (!Array.isArray(filters.excludes))
-                    filters.excludes = [filters.excludes];
-                if (filters.excludes.some((exclude) => {
-                    if (typeof exclude === 'string')
-                        return fullPath.includes(exclude);
-                    else
-                        return exclude.test(fullPath);
-                })) return false;
-            }
-            if (filters.filters) {
-                if (!Array.isArray(filters.filters))
-                    filters.filters = [filters.filters];
-                if (!filters.filters.every((filter) => filter(fullPath)))
-                    return false;
-            }
-            return true;
-        });
+    }).filter((filePath) => {
+        if (filters.type) {
+            const stat = fs.statSync(filePath);
+            if (filters.type === 'file' && !stat.isFile())
+                return false;
+            if (filters.type === 'directory' && !stat.isDirectory())
+                return false;
+            if (filters.type === 'link' && !stat.isSymbolicLink())
+                return false;
+        }
+        if (filters.includes) {
+            if (!Array.isArray(filters.includes))
+                filters.includes = [filters.includes];
+            if (!filters.includes.every((include) => {
+                if (typeof include === 'string')
+                    return filePath.includes(include);
+                else
+                    return include.test(filePath);
+            })) return false;
+        }
+        if (filters.excludes) {
+            if (!Array.isArray(filters.excludes))
+                filters.excludes = [filters.excludes];
+            if (filters.excludes.some((exclude) => {
+                if (typeof exclude === 'string')
+                    return filePath.includes(exclude);
+                else
+                    return exclude.test(filePath);
+            })) return false;
+        }
+        if (filters.filters) {
+            if (!Array.isArray(filters.filters))
+                filters.filters = [filters.filters];
+            if (!filters.filters.every((filter) => filter(filePath)))
+                return false;
+        }
+        return true;
+    });
 }
 
-export function listAllFiles(dir: string, filters: ListFilesFilters = {}) {
+export function listAllFiles(dir?: string, filters: ListFilesFilters = {}) {
     return listFiles(dir, filters, true);
 }
 

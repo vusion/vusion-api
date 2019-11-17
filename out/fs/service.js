@@ -45,10 +45,9 @@ function listFiles(dir, filters = {}, recursive = false) {
     const pattern = recursive ? '**' : '*';
     return globby.sync([dir ? dir + path.sep + pattern : pattern].concat(filters.patterns || []), {
         dot: filters.all,
-    }).map((filePath) => path.join(dir, filePath))
-        .filter((fullPath) => {
+    }).filter((filePath) => {
         if (filters.type) {
-            const stat = fs.statSync(fullPath);
+            const stat = fs.statSync(filePath);
             if (filters.type === 'file' && !stat.isFile())
                 return false;
             if (filters.type === 'directory' && !stat.isDirectory())
@@ -61,9 +60,9 @@ function listFiles(dir, filters = {}, recursive = false) {
                 filters.includes = [filters.includes];
             if (!filters.includes.every((include) => {
                 if (typeof include === 'string')
-                    return fullPath.includes(include);
+                    return filePath.includes(include);
                 else
-                    return include.test(fullPath);
+                    return include.test(filePath);
             }))
                 return false;
         }
@@ -72,16 +71,16 @@ function listFiles(dir, filters = {}, recursive = false) {
                 filters.excludes = [filters.excludes];
             if (filters.excludes.some((exclude) => {
                 if (typeof exclude === 'string')
-                    return fullPath.includes(exclude);
+                    return filePath.includes(exclude);
                 else
-                    return exclude.test(fullPath);
+                    return exclude.test(filePath);
             }))
                 return false;
         }
         if (filters.filters) {
             if (!Array.isArray(filters.filters))
                 filters.filters = [filters.filters];
-            if (!filters.filters.every((filter) => filter(fullPath)))
+            if (!filters.filters.every((filter) => filter(filePath)))
                 return false;
         }
         return true;

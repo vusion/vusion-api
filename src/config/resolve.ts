@@ -37,7 +37,7 @@ interface CLIArgs {
     'library-path'?: string,
 }
 
-export default function resolve(cwd: string, configPath: string = 'vusion.config.js', args?: CLIArgs): VusionConfig {
+export default function resolve(cwd: string, configPath: string = 'vusion.config.js', args?: CLIArgs, throwErrors?: boolean): VusionConfig {
     cwd = cwd || process.cwd();
 
     const config = getDefaults();
@@ -87,7 +87,8 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
     } else if (config.type === 'component' || config.type === 'block') {
         config.srcPath = cwd;
         const libraryName = Object.keys(require(packagePath).peerDependencies).find((key) => key.endsWith('.vusion'));
-        config.libraryPath = path.resolve(cwd, `node_modules/${libraryName}/src`);
+        if (libraryName)
+            config.libraryPath = path.dirname(require.resolve(`${libraryName}/src`));
     }
 
     let themeAutoDetected = false;
@@ -126,8 +127,12 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
         if (!fs.existsSync((config.theme as Theme).default))
             (config.theme as Theme).default = path.resolve(config.libraryPath, './base/global.css');
 
-        if (!fs.existsSync((config.theme as Theme).default))
-            (config.theme as Theme).default = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/styles/theme.css');
+        if (!fs.existsSync((config.theme as Theme).default)) {
+            try {
+                (config.theme as Theme).default = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/styles/theme.css');
+            } catch(e) {}
+
+        }
     }
 
     let baseCSSPath; // 用于保存非文档的 baseCSSPath 路径
@@ -141,13 +146,11 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
         if (!fs.existsSync(config.baseCSSPath)) {
             try {
                 config.baseCSSPath = path.resolve(require.resolve('@vusion/doc-loader'), '../node_modules/proto-ui.vusion/src/styles/base.css');
-            } catch(e) {
-                throw new Error('Please set baseCSSPath!');
-            }
+            } catch(e) {}
         }
     } else
        config.baseCSSPath = baseCSSPath = path.resolve(cwd, config.baseCSSPath);
-    if (!fs.existsSync(config.baseCSSPath))
+    if (!fs.existsSync(config.baseCSSPath) && throwErrors)
         throw new Error(`Cannot find baseCSSPath: ${baseCSSPath}`);
 
     return config;
