@@ -47,6 +47,7 @@ export function listFiles(dir?: string, filters: ListFilesFilters = {}, recursiv
     const pattern = recursive ? '**' : '*';
     return globby.sync([dir ? dir + path.sep + pattern : pattern].concat(filters.patterns || []), {
         dot: filters.all,
+        onlyFiles: false,
     }).filter((filePath) => {
         if (filters.type) {
             const stat = fs.statSync(filePath);

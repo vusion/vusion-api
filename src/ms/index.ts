@@ -267,19 +267,69 @@ export async function addBlock(options: MaterialOptions) {
     const opts = processOptions(options);
 
     // if (opts.source.type === 'npm')
-    const blockCacheDir = getCacheDir('block');
+    const blockCacheDir = getCacheDir('blocks');
 
     const dest = await downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
     // if (fs.statSync(opts.target).isFile())
     const vueFile = new vfs.VueFile(opts.target);
     await vueFile.open();
-    if (!vueFile.isDirectory)
+    if (!vueFile.isDirectory) {
         vueFile.transform();
-    await vueFile.save();
+        await vueFile.save();
+    }
+
 
     const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
     await fs.ensureDir(localBlocksPath);
-    await fs.move(dest, path.join(localBlocksPath, opts.source.name));
+    await fs.move(dest, path.join(localBlocksPath, opts.source.fileName));
+
+    vueFile.parseScript();
+    vueFile.parseTemplate();
+
+    const relativePath = './blocks/' + opts.source.fileName;
+    const { componentName } = utils.normalizeName(opts.source.baseName);
+
+    const body = vueFile.scriptHandler.ast.program.body;
+    for (let i = 0; i < body.length; i++) {
+        const node = body[i];
+        if (node.type !== 'ImportDeclaration') {
+            const importDeclaration = babel.template(`import ${componentName} from '${relativePath}'`)() as babel.types.ImportDeclaration;
+            body.splice(i, 0, importDeclaration);
+            break;
+        }
+    }
+    babel.traverse(vueFile.scriptHandler.ast, {
+        ExportDefaultDeclaration(nodePath) {
+            const declaration = nodePath.node.declaration;
+            if (declaration && declaration.type === 'ObjectExpression') {
+                let pos = 0;
+                const propertiesBefore = [
+                    'el',
+                    'name',
+                    'parent',
+                    'functional',
+                    'delimiters',
+                    'comments',
+                ]
+                let componentsProperty = declaration.properties.find((property, index) => {
+                    if (property.type === 'ObjectProperty' && propertiesBefore.includes(property.key.name))
+                        pos = index;
+                    return property.type === 'ObjectProperty' && property.key.name === 'components';
+                }) as babel.types.ObjectProperty;
+
+                const blockProperty = babel.types.objectProperty(babel.types.identifier(componentName), babel.types.identifier(componentName));
+
+                if (!componentsProperty) {
+                    componentsProperty = babel.types.objectProperty(babel.types.identifier('components'), babel.types.objectExpression([]));
+                    declaration.properties.splice(pos, 0, componentsProperty);
+                }
+
+                (componentsProperty.value as babel.types.ObjectExpression).properties.push(blockProperty);
+            }
+        },
+    });
+
+    await vueFile.save();
 }
 
 /**
@@ -299,7 +349,7 @@ export async function downloadPackage(registry: string, packageName: string, sav
     const temp = path.resolve(os.tmpdir(), packageName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
     await compressing.tgz.uncompress(response.data, temp);
 
-    const dest = path.join(saveDir, pkgInfo.name + '@' + pkgInfo.version);
+    const dest = path.join(saveDir, pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version);
     await fs.move(path.join(temp, 'package'), dest);
     await fs.rmdir(temp);
 

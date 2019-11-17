@@ -223,17 +223,59 @@ function addBlock(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = processOptions(options);
         // if (opts.source.type === 'npm')
-        const blockCacheDir = getCacheDir('block');
+        const blockCacheDir = getCacheDir('blocks');
         const dest = yield downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
         // if (fs.statSync(opts.target).isFile())
         const vueFile = new vfs.VueFile(opts.target);
         yield vueFile.open();
-        if (!vueFile.isDirectory)
+        if (!vueFile.isDirectory) {
             vueFile.transform();
-        yield vueFile.save();
+            yield vueFile.save();
+        }
         const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
         yield fs.ensureDir(localBlocksPath);
-        yield fs.move(dest, path.join(localBlocksPath, opts.source.name));
+        yield fs.move(dest, path.join(localBlocksPath, opts.source.fileName));
+        vueFile.parseScript();
+        vueFile.parseTemplate();
+        const relativePath = './blocks/' + opts.source.fileName;
+        const { componentName } = utils.normalizeName(opts.source.baseName);
+        const body = vueFile.scriptHandler.ast.program.body;
+        for (let i = 0; i < body.length; i++) {
+            const node = body[i];
+            if (node.type !== 'ImportDeclaration') {
+                const importDeclaration = babel.template(`import ${componentName} from '${relativePath}'`)();
+                body.splice(i, 0, importDeclaration);
+                break;
+            }
+        }
+        babel.traverse(vueFile.scriptHandler.ast, {
+            ExportDefaultDeclaration(nodePath) {
+                const declaration = nodePath.node.declaration;
+                if (declaration && declaration.type === 'ObjectExpression') {
+                    let pos = 0;
+                    const propertiesBefore = [
+                        'el',
+                        'name',
+                        'parent',
+                        'functional',
+                        'delimiters',
+                        'comments',
+                    ];
+                    let componentsProperty = declaration.properties.find((property, index) => {
+                        if (property.type === 'ObjectProperty' && propertiesBefore.includes(property.key.name))
+                            pos = index;
+                        return property.type === 'ObjectProperty' && property.key.name === 'components';
+                    });
+                    const blockProperty = babel.types.objectProperty(babel.types.identifier(componentName), babel.types.identifier(componentName));
+                    if (!componentsProperty) {
+                        componentsProperty = babel.types.objectProperty(babel.types.identifier('components'), babel.types.objectExpression([]));
+                        declaration.properties.splice(pos, 0, componentsProperty);
+                    }
+                    componentsProperty.value.properties.push(blockProperty);
+                }
+            },
+        });
+        yield vueFile.save();
     });
 }
 exports.addBlock = addBlock;
@@ -252,7 +294,7 @@ function downloadPackage(registry, packageName, saveDir) {
         });
         const temp = path.resolve(os.tmpdir(), packageName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
         yield compressing.tgz.uncompress(response.data, temp);
-        const dest = path.join(saveDir, pkgInfo.name + '@' + pkgInfo.version);
+        const dest = path.join(saveDir, pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version);
         yield fs.move(path.join(temp, 'package'), dest);
         yield fs.rmdir(temp);
         return dest;

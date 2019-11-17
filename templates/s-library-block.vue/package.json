@@ -16,12 +16,6 @@
     "material",
     "block"
   ],
-  "tags": [
-    "cloud",
-    "ui",
-    "material",
-    "block"
-  ],
   "scripts": {
     "doc": "../../../node_modules/.bin/vue-cli-service doc --port 9090",
     "doc-build": "../../../node_modules/.bin/vue-cli-service doc-build",
@@ -38,7 +32,7 @@
   },
   "vusion": {
     "type": "block",
-    "title": "基础表单",
+    "title": "区块",
     "screenshots": ["./screenshots/0.png"],
     "team": "necfe",
     "access": "public"

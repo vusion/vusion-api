@@ -16,12 +16,6 @@
     "material",
     "block"
   ],
-  "tags": [
-    "cloud",
-    "ui",
-    "material",
-    "block"
-  ],
   "scripts": {
       "doc": "vue-cli-service doc --port 9090",
       "doc-build": "vue-cli-service doc-build",
