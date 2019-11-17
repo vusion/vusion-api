@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as babel from '@babel/core';
+import * as compiler from 'vue-template-compiler';
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as vfs from '../fs';
@@ -100,8 +101,8 @@ export function processOptions(options: MaterialOptions): ProcessedMaterialOptio
     let source = options.source;
     if (typeof source !== 'string') {
         result.source = source;
-        const fileName = result.source.fileName = path.basename(result.source.name);
-        result.source.baseName = path.basename(fileName, path.extname(fileName));
+        // const fileName = result.source.fileName = path.basename(result.source.name);
+        // result.source.baseName = path.basename(fileName, path.extname(fileName));
         return result;
     }
 
@@ -268,8 +269,7 @@ export async function addBlock(options: MaterialOptions) {
 
     // if (opts.source.type === 'npm')
     const blockCacheDir = getCacheDir('blocks');
-
-    const dest = await downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
+    const tempPath = await downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
     // if (fs.statSync(opts.target).isFile())
     const vueFile = new vfs.VueFile(opts.target);
     await vueFile.open();
@@ -280,14 +280,15 @@ export async function addBlock(options: MaterialOptions) {
 
 
     const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
+    const dest = path.join(localBlocksPath, opts.name + '.vue');
     await fs.ensureDir(localBlocksPath);
-    await fs.move(dest, path.join(localBlocksPath, opts.source.fileName));
+    await fs.move(tempPath, dest);
 
     vueFile.parseScript();
     vueFile.parseTemplate();
 
-    const relativePath = './blocks/' + opts.source.fileName;
-    const { componentName } = utils.normalizeName(opts.source.baseName);
+    const relativePath = './blocks/' + opts.name + '.vue';
+    const { componentName } = utils.normalizeName(opts.name);
 
     const body = vueFile.scriptHandler.ast.program.body;
     for (let i = 0; i < body.length; i++) {
@@ -329,6 +330,9 @@ export async function addBlock(options: MaterialOptions) {
         },
     });
 
+    const rootEl = vueFile.templateHandler.ast;
+    rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
+
     await vueFile.save();
 }
 
@@ -338,8 +342,12 @@ export async function addBlock(options: MaterialOptions) {
  * @param packageName For example: lodash
  * @param saveDir For example: ./blocks
  */
-export async function downloadPackage(registry: string, packageName: string, saveDir: string) {
+export async function downloadPackage(registry: string, packageName: string, saveDir: string, clearCache?: boolean) {
     const { data: pkgInfo } = await axios.get(`${registry}/${packageName}/latest`);
+    const dest = path.join(saveDir, pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version);
+    if (fs.existsSync(dest) && !clearCache)
+        return dest;
+
     const tgzURL = pkgInfo.dist.tarball;
 
     const response = await axios.get(tgzURL, {
@@ -349,9 +357,13 @@ export async function downloadPackage(registry: string, packageName: string, sav
     const temp = path.resolve(os.tmpdir(), packageName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
     await compressing.tgz.uncompress(response.data, temp);
 
-    const dest = path.join(saveDir, pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version);
     await fs.move(path.join(temp, 'package'), dest);
-    await fs.rmdir(temp);
+    fs.removeSync(temp);
+    fs.removeSync(path.resolve(dest, 'screenshots'));
+    fs.removeSync(path.resolve(dest, 'public'));
+    fs.removeSync(path.resolve(dest, 'docs'));
+    fs.removeSync(path.resolve(dest, 'package.json'));
+    fs.removeSync(path.resolve(dest, 'README.md'));
 
     return dest;
 }

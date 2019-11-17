@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const babel = require("@babel/core");
+const compiler = require("vue-template-compiler");
 const fs = require("fs-extra");
 const os = require("os");
 const vfs = require("../fs");
@@ -57,8 +58,8 @@ function processOptions(options) {
     let source = options.source;
     if (typeof source !== 'string') {
         result.source = source;
-        const fileName = result.source.fileName = path.basename(result.source.name);
-        result.source.baseName = path.basename(fileName, path.extname(fileName));
+        // const fileName = result.source.fileName = path.basename(result.source.name);
+        // result.source.baseName = path.basename(fileName, path.extname(fileName));
         return result;
     }
     if (source[0] === '.' || source[0] === '~' || source[0] === '/') {
@@ -224,7 +225,7 @@ function addBlock(options) {
         const opts = processOptions(options);
         // if (opts.source.type === 'npm')
         const blockCacheDir = getCacheDir('blocks');
-        const dest = yield downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
+        const tempPath = yield downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
         // if (fs.statSync(opts.target).isFile())
         const vueFile = new vfs.VueFile(opts.target);
         yield vueFile.open();
@@ -233,12 +234,13 @@ function addBlock(options) {
             yield vueFile.save();
         }
         const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
+        const dest = path.join(localBlocksPath, opts.name + '.vue');
         yield fs.ensureDir(localBlocksPath);
-        yield fs.move(dest, path.join(localBlocksPath, opts.source.fileName));
+        yield fs.move(tempPath, dest);
         vueFile.parseScript();
         vueFile.parseTemplate();
-        const relativePath = './blocks/' + opts.source.fileName;
-        const { componentName } = utils.normalizeName(opts.source.baseName);
+        const relativePath = './blocks/' + opts.name + '.vue';
+        const { componentName } = utils.normalizeName(opts.name);
         const body = vueFile.scriptHandler.ast.program.body;
         for (let i = 0; i < body.length; i++) {
             const node = body[i];
@@ -275,6 +277,8 @@ function addBlock(options) {
                 }
             },
         });
+        const rootEl = vueFile.templateHandler.ast;
+        rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
         yield vueFile.save();
     });
 }
@@ -285,18 +289,25 @@ exports.addBlock = addBlock;
  * @param packageName For example: lodash
  * @param saveDir For example: ./blocks
  */
-function downloadPackage(registry, packageName, saveDir) {
+function downloadPackage(registry, packageName, saveDir, clearCache) {
     return __awaiter(this, void 0, void 0, function* () {
         const { data: pkgInfo } = yield axios_1.default.get(`${registry}/${packageName}/latest`);
+        const dest = path.join(saveDir, pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version);
+        if (fs.existsSync(dest) && !clearCache)
+            return dest;
         const tgzURL = pkgInfo.dist.tarball;
         const response = yield axios_1.default.get(tgzURL, {
             responseType: 'stream',
         });
         const temp = path.resolve(os.tmpdir(), packageName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
         yield compressing.tgz.uncompress(response.data, temp);
-        const dest = path.join(saveDir, pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version);
         yield fs.move(path.join(temp, 'package'), dest);
-        yield fs.rmdir(temp);
+        fs.removeSync(temp);
+        fs.removeSync(path.resolve(dest, 'screenshots'));
+        fs.removeSync(path.resolve(dest, 'public'));
+        fs.removeSync(path.resolve(dest, 'docs'));
+        fs.removeSync(path.resolve(dest, 'package.json'));
+        fs.removeSync(path.resolve(dest, 'README.md'));
         return dest;
     });
 }
