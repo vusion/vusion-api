@@ -171,7 +171,7 @@ class APIHandler {
         return outputs.join('\n');
     }
     markdownAPI(showTitle = MarkdownAPIShowTitle['as-needed']) {
-        let api = this.json;
+        const api = this.json;
         const outputs = [];
         api.forEach(({ name, options, attrs, data, computed, slots, events, methods, aria }) => {
             if (showTitle === MarkdownAPIShowTitle['as-needed'])
@@ -205,7 +205,7 @@ class APIHandler {
             let docs = [];
             if (fs.existsSync(docsDir))
                 docs = yield fs.readdir(docsDir);
-            let api = this.json;
+            const api = this.json;
             const outputs = [];
             const mainComponent = api[0];
             // Title
@@ -252,7 +252,7 @@ class APIHandler {
             let docs = [];
             if (fs.existsSync(docsDir))
                 docs = yield fs.readdir(docsDir);
-            let api = this.json;
+            const api = this.json;
             const outputs = [];
             const mainComponent = api[0];
             // Title
@@ -297,6 +297,44 @@ class APIHandler {
         });
     }
     ;
+    toVetur() {
+        const api = this.json;
+        const vetur = {
+            tags: {},
+            attributes: {},
+        };
+        api.forEach((component, index) => {
+            const veturTag = {
+                attributes: [],
+                description: component.description,
+            };
+            let hasVModel = false;
+            if (component.attrs) {
+                component.attrs.forEach((attr) => {
+                    if (attr.name.startsWith('**'))
+                        return;
+                    const attrName = attr.name.split(/,\s+/g)[0].replace(/\.sync/, '');
+                    if (attr.name.includes('v-model'))
+                        hasVModel = true;
+                    veturTag.attributes.push(attrName);
+                    const veturAttribute = {
+                        type: attr.type,
+                        options: attr.options,
+                        description: attr.description,
+                    };
+                    vetur.attributes[`${component.name}/${attrName}`] = veturAttribute;
+                });
+            }
+            if (hasVModel)
+                veturTag.defaults = ['v-model'];
+            // @TODO: subsubComponent
+            if (index === 0 && api.length > 1)
+                veturTag.subtags = api.slice(1).map((sub) => sub.name);
+            // @TODO: defaults
+            vetur.tags[component.name] = veturTag;
+        });
+        return vetur;
+    }
 }
 exports.default = APIHandler;
 //# sourceMappingURL=APIHandler.js.map

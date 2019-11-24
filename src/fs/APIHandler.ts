@@ -94,6 +94,20 @@ export interface ComponentAPI {
     aria?: Array<AriaAPI>;
 }
 
+export interface VeturTag {
+    attributes?: Array<string>;
+    subtags?: Array<string>;
+    defaults?: Array<string>;
+    description?: string;
+}
+
+export interface VeturAttribute {
+    version?: string;
+    type?: string;
+    options?: Array<string>;
+    description?: string;
+}
+
 export enum MarkdownAPIShowTitle {
     'as-needed' = 'as-needed',
     'simplified' = 'simplified',
@@ -279,7 +293,7 @@ export default class APIHandler {
     }
 
     markdownAPI(showTitle: MarkdownAPIShowTitle = MarkdownAPIShowTitle['as-needed']) {
-        let api = this.json;
+        const api = this.json;
 
         const outputs: Array<string> = [];
 
@@ -317,7 +331,7 @@ export default class APIHandler {
         if (fs.existsSync(docsDir))
             docs = await fs.readdir(docsDir);
 
-        let api = this.json;
+        const api = this.json;
 
         const outputs: Array<string> = [];
         const mainComponent = api[0];
@@ -374,7 +388,7 @@ export default class APIHandler {
         if (fs.existsSync(docsDir))
             docs = await fs.readdir(docsDir);
 
-        let api = this.json;
+        const api = this.json;
 
         const outputs: Array<string> = [];
         const mainComponent = api[0];
@@ -428,4 +442,56 @@ export default class APIHandler {
 
         return outputs.join('\n');
     };
+
+    toVetur() {
+        const api = this.json;
+
+        const vetur: {
+            tags: { [name: string]: VeturTag },
+            attributes: { [name: string]: VeturAttribute },
+        } = {
+            tags: {},
+            attributes: {},
+        };
+
+        api.forEach((component, index) => {
+            const veturTag: VeturTag = {
+                attributes: [],
+                description: component.description,
+            }
+
+            let hasVModel = false;
+            if (component.attrs) {
+                component.attrs.forEach((attr) => {
+                    if (attr.name.startsWith('**'))
+                        return;
+                    const attrName = attr.name.split(/,\s+/g)[0].replace(/\.sync/, '');
+                    if (attr.name.includes('v-model'))
+                        hasVModel = true;
+
+                    veturTag.attributes.push(attrName);
+
+                    const veturAttribute: VeturAttribute = {
+                        type: attr.type,
+                        options: attr.options,
+                        description: attr.description,
+                    };
+                    vetur.attributes[`${component.name}/${attrName}`] = veturAttribute;
+                });
+            }
+
+            if (hasVModel)
+                veturTag.defaults = ['v-model'];
+
+            // @TODO: subsubComponent
+            if (index === 0 && api.length > 1)
+                veturTag.subtags = api.slice(1).map((sub) => sub.name);
+
+            // @TODO: defaults
+
+            vetur.tags[component.name] = veturTag;
+        });
+
+        return vetur;
+    }
 }
