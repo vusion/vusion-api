@@ -20,5 +20,13 @@ exports.LibraryType = Library_1.LibraryType;
 var View_1 = require("./View");
 exports.View = View_1.default;
 exports.ViewType = View_1.ViewType;
+var TemplateHandler_1 = require("./TemplateHandler");
+exports.TemplateHandler = TemplateHandler_1.default;
+var ScriptHandler_1 = require("./ScriptHandler");
+exports.ScriptHandler = ScriptHandler_1.default;
+var StyleHandler_1 = require("./StyleHandler");
+exports.StyleHandler = StyleHandler_1.default;
+var APIHandler_1 = require("./APIHandler");
+exports.APIHandler = APIHandler_1.default;
 __export(require("./service"));
 //# sourceMappingURL=index.js.map
