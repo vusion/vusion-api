@@ -66,9 +66,13 @@ function resolve(cwd, configPath = 'vusion.config.js', args, throwErrors) {
     }
     else if (config.type === 'component' || config.type === 'block') {
         config.srcPath = cwd;
-        const libraryName = Object.keys(require(packagePath).peerDependencies).find((key) => key.endsWith('.vusion'));
-        if (libraryName)
-            config.libraryPath = path.dirname(require.resolve(`${libraryName}/src`));
+        const pkg = require(packagePath);
+        let libraryName = pkg.vusion.ui;
+        if (!libraryName)
+            libraryName = Object.keys(pkg.peerDependencies).find((key) => key.endsWith('.vusion'));
+        if (!libraryName)
+            libraryName = 'proto-ui.vusion';
+        config.libraryPath = path.dirname(require.resolve(`${libraryName}/src`));
     }
     let themeAutoDetected = false;
     if (!config.theme) {

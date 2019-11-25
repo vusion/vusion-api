@@ -17,13 +17,23 @@ const os = require("os");
 const vfs = require("../fs");
 const utils = require("../utils");
 const compressing = require("compressing");
+const rc = require("../rc");
 const axios_1 = require("axios");
-const platformAxios = axios_1.default.create({
-    baseURL: 'http://akos.test.netease.com:7001/internal',
-    headers: {
-        'access_token': 'f2224e629a7e24423e6b1bf6f7a08ea0a549fb975bbd86b2111a9f74f2fa8bc3b66530a79a4cf910429595ba56a7bbbf34baacf843446f0f6ca2cc6ab961f360',
-    }
-});
+let platformAxios;
+const getPlatformAxios = () => {
+    return new Promise((res, rej) => {
+        if (platformAxios)
+            return res(platformAxios);
+        const config = rc.configurator.load();
+        platformAxios = axios_1.default.create({
+            baseURL: config.platform + '/internal',
+            headers: {
+                'access_token': config.access_token,
+            }
+        });
+        res(platformAxios);
+    });
+};
 function getCacheDir(subPath = '') {
     const cacheDir = path.join(os.homedir(), '.vusion', subPath);
     if (!fs.existsSync(cacheDir))
@@ -174,20 +184,41 @@ function removeModule(options) {
     });
 }
 exports.removeModule = removeModule;
+function getBlock(packageName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.get('block/info', {
+            params: {
+                name: packageName,
+            },
+        }).then((res) => res.data.result);
+    });
+}
+exports.getBlock = getBlock;
 function getBlocks() {
     return __awaiter(this, void 0, void 0, function* () {
-        return platformAxios.get('block/list')
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.get('block/list')
             .then((res) => res.data.result.rows);
     });
 }
 exports.getBlocks = getBlocks;
 function publishBlock(params) {
     return __awaiter(this, void 0, void 0, function* () {
-        return platformAxios.post('block/publish', params)
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.post('block/publish', params)
             .then((res) => res.data);
     });
 }
 exports.publishBlock = publishBlock;
+function publishComponent(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.post('component/publish', params)
+            .then((res) => res.data);
+    });
+}
+exports.publishComponent = publishComponent;
 function createBlock(dir, name, title) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils.normalizeName(name);

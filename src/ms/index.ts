@@ -6,15 +6,26 @@ import * as os from 'os';
 import * as vfs from '../fs';
 import * as utils from '../utils';
 import * as compressing from 'compressing';
+import * as rc from '../rc';
 
 
-import axios from 'axios';
-const platformAxios = axios.create({
-    baseURL: 'http://akos.test.netease.com:7001/internal',
-    headers: {
-        'access_token': 'f2224e629a7e24423e6b1bf6f7a08ea0a549fb975bbd86b2111a9f74f2fa8bc3b66530a79a4cf910429595ba56a7bbbf34baacf843446f0f6ca2cc6ab961f360',
-    }
-});
+import axios, { AxiosInstance } from 'axios';
+let platformAxios: AxiosInstance;
+const getPlatformAxios = (): Promise<AxiosInstance> => {
+    return new Promise((res, rej) => {
+        if (platformAxios)
+            return res(platformAxios);
+
+        const config = rc.configurator.load();
+        platformAxios = axios.create({
+            baseURL: config.platform + '/internal',
+            headers: {
+                'access_token': config.access_token,
+            }
+        });
+        res(platformAxios);
+    });
+}
 
 export function getCacheDir(subPath: string = '') {
     const cacheDir = path.join(os.homedir(), '.vusion', subPath);
@@ -224,13 +235,30 @@ export async function removeModule(options: MaterialOptions) {
     }
 }
 
+export async function getBlock(packageName: string) {
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.get('block/info', {
+        params: {
+            name: packageName,
+        },
+    }).then((res) => res.data.result);
+}
+
 export async function getBlocks() {
-    return platformAxios.get('block/list')
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.get('block/list')
         .then((res) => res.data.result.rows);
 }
 
 export async function publishBlock(params: object) {
-    return platformAxios.post('block/publish', params)
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.post('block/publish', params)
+        .then((res) => res.data);
+}
+
+export async function publishComponent(params: object) {
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.post('component/publish', params)
         .then((res) => res.data);
 }
 
