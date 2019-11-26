@@ -262,6 +262,12 @@ export async function publishComponent(params: object) {
         .then((res) => res.data);
 }
 
+export async function publishTemplate(params: object) {
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.post('template/publish', params)
+        .then((res) => res.data);
+}
+
 export async function createBlock(dir: string, name?: string, title?: string) {
     const normalized = utils.normalizeName(name);
     const dest = vfs.handleSame(dir, normalized.baseName);

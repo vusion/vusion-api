@@ -219,6 +219,14 @@ function publishComponent(params) {
     });
 }
 exports.publishComponent = publishComponent;
+function publishTemplate(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.post('template/publish', params)
+            .then((res) => res.data);
+    });
+}
+exports.publishTemplate = publishTemplate;
 function createBlock(dir, name, title) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils.normalizeName(name);
