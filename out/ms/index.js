@@ -28,7 +28,7 @@ const getPlatformAxios = () => {
         platformAxios = axios_1.default.create({
             baseURL: config.platform + '/internal',
             headers: {
-                'access_token': config.access_token,
+                'access-token': config.access_token,
             }
         });
         res(platformAxios);

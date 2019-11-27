@@ -68,7 +68,7 @@ function resolve(cwd, configPath = 'vusion.config.js', args, throwErrors) {
         config.srcPath = cwd;
         const pkg = require(packagePath);
         let libraryName = pkg.vusion.ui;
-        if (!libraryName)
+        if (!libraryName && pkg.peerDependencies)
             libraryName = Object.keys(pkg.peerDependencies).find((key) => key.endsWith('.vusion'));
         if (!libraryName)
             libraryName = 'proto-ui.vusion';

@@ -20,7 +20,7 @@ const getPlatformAxios = (): Promise<AxiosInstance> => {
         platformAxios = axios.create({
             baseURL: config.platform + '/internal',
             headers: {
-                'access_token': config.access_token,
+                'access-token': config.access_token,
             }
         });
         res(platformAxios);

@@ -8,7 +8,7 @@ import * as utils from '../utils';
  * 所以需要提取到 vusion-api 中
  */
 
-function escape(name: string) {
+function escape(name: string = '') {
     return name.replace(/\\?([[\]<>|])/g, '\\$1');
 }
 
@@ -127,7 +127,12 @@ export default class APIHandler {
     }
 
     parse(content: string) {
-        return YAML.parse(content);
+        try {
+            return YAML.parse(content);
+        } catch(e) {
+            console.error(this.fullPath);
+            console.error(e);
+        }
     }
 
     generate() {
@@ -307,7 +312,7 @@ export default class APIHandler {
 
             if (!(options || attrs || data || computed || slots || events || methods || aria)) {
                 outputs.push('');
-                // outputs.push('无');
+                outputs.push('暂无');
                 // outputs.push('');
             } else {
                 options && outputs.push(this.markdownOptions(options));

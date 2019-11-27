@@ -17,7 +17,7 @@ const utils = require("../utils");
  * 此 API 为了在 vusion、vue-cli-plugin-vusion 和 @vusion/doc-loader 三者之间共用
  * 所以需要提取到 vusion-api 中
  */
-function escape(name) {
+function escape(name = '') {
     return name.replace(/\\?([[\]<>|])/g, '\\$1');
 }
 function formatValue(type, value) {
@@ -45,7 +45,13 @@ class APIHandler {
         this.json = this.parse(content);
     }
     parse(content) {
-        return YAML.parse(content);
+        try {
+            return YAML.parse(content);
+        }
+        catch (e) {
+            console.error(this.fullPath);
+            console.error(e);
+        }
     }
     generate() {
         return YAML.stringify(this.json);
@@ -182,7 +188,7 @@ class APIHandler {
                 outputs.push(`## ${utils.kebab2Camel(name)} API`);
             if (!(options || attrs || data || computed || slots || events || methods || aria)) {
                 outputs.push('');
-                // outputs.push('无');
+                outputs.push('暂无');
                 // outputs.push('');
             }
             else {
