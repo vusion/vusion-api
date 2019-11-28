@@ -367,12 +367,12 @@ export default class APIHandler {
         if (docs.includes('setup.md'))
             outputs.push(`<u-h2-tab title="安装配置" to="setup"></u-h2-tab>`);
         if (docs.includes('cases.md'))
-            outputs.push(`<u-h2-tab title="测试用例" to="cases"></u-h2-tab>`);
+            outputs.push(`<u-h2-tab v-if="NODE_ENV === \'development\'" title="测试用例" to="cases"></u-h2-tab>`);
 
         if (mainComponent.docs) {
             Object.keys(mainComponent.docs).forEach((name) => {
                 if (docs.includes(name + '.md'))
-                    outputs.push(`<u-h2-tab${name === 'cases' ? ' v-if="NODE_ENV === \'development\'"' : ''} title="${mainComponent.docs[name]}" to="${name}"></u-h2-tab>`);
+                    outputs.push(`<u-h2-tab title="${mainComponent.docs[name]}" to="${name}"></u-h2-tab>`);
             });
         }
 
