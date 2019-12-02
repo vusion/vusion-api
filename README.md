@@ -33,24 +33,27 @@ Introduce some major features of this project.
 ## Install
 
 ``` shell
-npm install --save-dev vusion-api
+npm install --save vusion-api
 ```
 
-## Options
+## Modules
 
-#### name
+### fs
 
-Name of something.
+文件系统
 
-- Type: `string`
-- Default: `'hello'`
+### ms
 
-#### auto
+物料系统
 
-Do something automatically.
+### config
 
-- Type: `boolean`
-- Default: `'true'`
+vusion.config.js 相关
+
+### rc
+
+.vusionrc 相关
+
 
 ## Develop
 

@@ -36,7 +36,7 @@ export async function batchReplace(src: string | Array<string>, replacers: Array
 
 export interface ListFilesFilters {
     type?: string, // both, file, directory
-    all?: boolean,
+    dot?: boolean,
     patterns?: Array<string>,
     includes?: string | RegExp | Array<string | RegExp>,
     excludes?: string | RegExp | Array<string | RegExp>,
@@ -46,7 +46,7 @@ export interface ListFilesFilters {
 export function listFiles(dir?: string, filters: ListFilesFilters = {}, recursive: boolean = false) {
     const pattern = recursive ? '**' : '*';
     return globby.sync([dir ? dir + path.sep + pattern : pattern].concat(filters.patterns || []), {
-        dot: filters.all,
+        dot: filters.dot,
         onlyFiles: false,
     }).filter((filePath) => {
         if (filters.type) {

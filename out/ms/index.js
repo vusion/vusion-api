@@ -16,8 +16,10 @@ const fs = require("fs-extra");
 const os = require("os");
 const vfs = require("../fs");
 const utils = require("../utils");
-const compressing = require("compressing");
 const rc = require("../rc");
+const download = require("./download");
+exports.download = download;
+const _ = require("lodash");
 const axios_1 = require("axios");
 let platformAxios;
 const getPlatformAxios = () => {
@@ -46,6 +48,38 @@ function getRunControl() {
     return rcPath;
 }
 exports.getRunControl = getRunControl;
+const defaultFormatter = (content, params) => {
+    return _.template(content)(params);
+};
+function formatTemplate(src, params = {}, formatter = defaultFormatter) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return Promise.all(vfs.listAllFiles(src, {
+            type: 'file',
+            dot: true,
+            patterns: ['!**/node_modules', '!**/.git'],
+        }).map((filePath) => {
+            return fs.readFile(filePath, 'utf8').then((content) => {
+                content = formatter(content, params);
+                return fs.writeFile(filePath, content);
+            });
+        }));
+    });
+}
+exports.formatTemplate = formatTemplate;
+function formatTemplateTo(src, dest, params = {}, formatter = defaultFormatter) {
+    return Promise.all(vfs.listAllFiles(src, {
+        type: 'file',
+        dot: true,
+        patterns: ['!**/node_modules', '!**/.git'],
+    }).map((filePath) => {
+        return fs.readFile(filePath, 'utf8').then((content) => {
+            content = formatter(content, params);
+            console.log(path.join(dest, path.relative(src, filePath)));
+            return fs.outputFile(path.join(dest, path.relative(src, filePath)), content);
+        });
+    }));
+}
+exports.formatTemplateTo = formatTemplateTo;
 ;
 ;
 ;
@@ -264,7 +298,10 @@ function addBlock(options) {
         const opts = processOptions(options);
         // if (opts.source.type === 'npm')
         const blockCacheDir = getCacheDir('blocks');
-        const tempPath = yield downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
+        const tempPath = yield download.npm({
+            registry: opts.source.registry,
+            name: opts.source.name,
+        }, blockCacheDir);
         // if (fs.statSync(opts.target).isFile())
         const vueFile = new vfs.VueFile(opts.target);
         yield vueFile.open();
@@ -322,33 +359,4 @@ function addBlock(options) {
     });
 }
 exports.addBlock = addBlock;
-/**
- *
- * @param registry For example: https://registry.npm.taobao.org
- * @param packageName For example: lodash
- * @param saveDir For example: ./blocks
- */
-function downloadPackage(registry, packageName, saveDir, clearCache) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { data: pkgInfo } = yield axios_1.default.get(`${registry}/${packageName}/latest`);
-        const dest = path.join(saveDir, pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version);
-        if (fs.existsSync(dest) && !clearCache)
-            return dest;
-        const tgzURL = pkgInfo.dist.tarball;
-        const response = yield axios_1.default.get(tgzURL, {
-            responseType: 'stream',
-        });
-        const temp = path.resolve(os.tmpdir(), packageName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
-        yield compressing.tgz.uncompress(response.data, temp);
-        yield fs.move(path.join(temp, 'package'), dest);
-        fs.removeSync(temp);
-        fs.removeSync(path.resolve(dest, 'screenshots'));
-        fs.removeSync(path.resolve(dest, 'public'));
-        fs.removeSync(path.resolve(dest, 'docs'));
-        fs.removeSync(path.resolve(dest, 'package.json'));
-        fs.removeSync(path.resolve(dest, 'README.md'));
-        return dest;
-    });
-}
-exports.downloadPackage = downloadPackage;
 //# sourceMappingURL=index.js.map

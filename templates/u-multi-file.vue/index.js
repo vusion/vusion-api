@@ -1,5 +1,5 @@
-export const USample = {
-    name: 'u-sample',
+export const <%= componentName %> = {
+    name: '<%= tagName %>',
 };
 
-export default USample;
+export default <%= componentName %>;

@@ -5,9 +5,11 @@ import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as vfs from '../fs';
 import * as utils from '../utils';
-import * as compressing from 'compressing';
 import * as rc from '../rc';
+import * as download from './download';
+import * as _ from 'lodash';
 
+export { download };
 
 import axios, { AxiosInstance } from 'axios';
 let platformAxios: AxiosInstance;
@@ -37,6 +39,37 @@ export function getCacheDir(subPath: string = '') {
 export function getRunControl() {
     const rcPath = path.join(os.homedir(), '.vusion');
     return rcPath;
+}
+
+const defaultFormatter = (content: string, params: object) => {
+    return _.template(content)(params);
+}
+
+export async function formatTemplate(src: string, params: object = {}, formatter: (content: string, params: object) => string = defaultFormatter) {
+    return Promise.all(vfs.listAllFiles(src, {
+        type: 'file',
+        dot: true,
+        patterns: ['!**/node_modules', '!**/.git'],
+    }).map((filePath) => {
+        return fs.readFile(filePath, 'utf8').then((content) => {
+            content = formatter(content, params);
+            return fs.writeFile(filePath, content);
+        });
+    }));
+}
+
+export function formatTemplateTo(src: string, dest: string, params: object = {}, formatter: (content: string, params: object) => string = defaultFormatter) {
+    return Promise.all(vfs.listAllFiles(src, {
+        type: 'file',
+        dot: true,
+        patterns: ['!**/node_modules', '!**/.git'],
+    }).map((filePath) => {
+        return fs.readFile(filePath, 'utf8').then((content) => {
+            content = formatter(content, params);
+            console.log(path.join(dest, path.relative(src, filePath)));
+            return fs.outputFile(path.join(dest, path.relative(src, filePath)), content);
+        });
+    }));
 }
 
 export interface MaterialSource {
@@ -303,7 +336,10 @@ export async function addBlock(options: MaterialOptions) {
 
     // if (opts.source.type === 'npm')
     const blockCacheDir = getCacheDir('blocks');
-    const tempPath = await downloadPackage(opts.source.registry, opts.source.name, blockCacheDir);
+    const tempPath = await download.npm({
+        registry: opts.source.registry,
+        name: opts.source.name,
+    }, blockCacheDir);
     // if (fs.statSync(opts.target).isFile())
     const vueFile = new vfs.VueFile(opts.target);
     await vueFile.open();
@@ -368,36 +404,4 @@ export async function addBlock(options: MaterialOptions) {
     rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
 
     await vueFile.save();
-}
-
-/**
- *
- * @param registry For example: https://registry.npm.taobao.org
- * @param packageName For example: lodash
- * @param saveDir For example: ./blocks
- */
-export async function downloadPackage(registry: string, packageName: string, saveDir: string, clearCache?: boolean) {
-    const { data: pkgInfo } = await axios.get(`${registry}/${packageName}/latest`);
-    const dest = path.join(saveDir, pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version);
-    if (fs.existsSync(dest) && !clearCache)
-        return dest;
-
-    const tgzURL = pkgInfo.dist.tarball;
-
-    const response = await axios.get(tgzURL, {
-        responseType: 'stream',
-    });
-
-    const temp = path.resolve(os.tmpdir(), packageName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
-    await compressing.tgz.uncompress(response.data, temp);
-
-    await fs.move(path.join(temp, 'package'), dest);
-    fs.removeSync(temp);
-    fs.removeSync(path.resolve(dest, 'screenshots'));
-    fs.removeSync(path.resolve(dest, 'public'));
-    fs.removeSync(path.resolve(dest, 'docs'));
-    fs.removeSync(path.resolve(dest, 'package.json'));
-    fs.removeSync(path.resolve(dest, 'README.md'));
-
-    return dest;
 }

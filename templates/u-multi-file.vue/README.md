@@ -1,6 +1,6 @@
-# USample 样本组件
+# <%= componentName %> <%= title %>
 
-这里是样本组件的基本描述。
+<%= description %>
 
 ## 示例
 ### 基本形式
@@ -8,16 +8,16 @@
 基本形式是这样的，Balabala。
 
 ``` html
-<u-sample some-prop></u-sample>
+<<%= tagName %> some-prop></<%= tagName %>>
 ```
 
 ### 复杂示例
 
 ``` vue
 <template>
-<u-sample v-model="value">
+<<%= tagName %> v-model="value">
     <div>Something</div>
-</u-sample>
+</<%= tagName %>>
 </template>
 
 <script>
@@ -53,7 +53,7 @@ export default {
 | $event.value | String | 传递的值 |
 | $event.content | String | 传递的内容 |
 | $event.preventDefault | Function | 阻止关闭流程 |
-| senderVM | USample | 发送事件实例 |
+| senderVM | <%= componentName %> | 发送事件实例 |
 
 #### @action
 
@@ -63,7 +63,7 @@ export default {
 | ----- | ---- | ----------- |
 | $event.page | Number | 当前页码 |
 | $event.oldPage | Number | 旧的页码 |
-| senderVM | USample | 发送事件实例 |
+| senderVM | <%= componentName %> | 发送事件实例 |
 
 #### @change
 
@@ -73,7 +73,7 @@ export default {
 | ----- | ---- | ----------- |
 | $event.value | Number | 当前值 |
 | $event.oldValue | Number | 旧的值 |
-| senderVM | UComboPagination | 发送事件实例 |
+| senderVM | <%= componentName %> | 发送事件实例 |
 
 ### Methods
 
