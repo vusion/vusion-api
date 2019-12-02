@@ -17,7 +17,18 @@ import * as shell from 'shelljs';
 export async function npm(info: {
     registry: string, name: string, version?: string,
 }, dir: string, name?: string, clearExisting?: boolean) {
-    const { data: pkgInfo } = await axios.get(`${info.registry}/${info.name}/${info.version || 'latest'}`);
+    const version = info.version || 'latest';
+    let pkgInfo;
+    if (info.registry === 'https://registry.npmjs.org' && info.name[0] === '@') { // npm 有个 bug 去！！
+        const data = (await axios.get(`${info.registry}/${info.name}`)).data;
+        if (data.versions[version])
+            pkgInfo = data.versions[version];
+        else if (data['dist-tags'][version])
+            pkgInfo = data.versions[data['dist-tags'][version]];
+        else
+            throw new Error(`Cannot find package ${info.name} version ${version}!`);
+    } else
+        pkgInfo = (await axios.get(`${info.registry}/${info.name}/${version}`)).data;
     name = name || pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version;
     const dest = path.join(dir, name);
     if (fs.existsSync(dest)) {

@@ -52,7 +52,11 @@ export async function formatTemplate(src: string, params: object = {}, formatter
         patterns: ['!**/node_modules', '!**/.git'],
     }).map((filePath) => {
         return fs.readFile(filePath, 'utf8').then((content) => {
-            content = formatter(content, params);
+            try {
+                content = formatter(content, params);
+            } catch(e) {
+                throw new Error(filePath + '\n' + e);
+            }
             return fs.writeFile(filePath, content);
         });
     }));
@@ -65,8 +69,11 @@ export function formatTemplateTo(src: string, dest: string, params: object = {},
         patterns: ['!**/node_modules', '!**/.git'],
     }).map((filePath) => {
         return fs.readFile(filePath, 'utf8').then((content) => {
-            content = formatter(content, params);
-            console.log(path.join(dest, path.relative(src, filePath)));
+            try {
+                content = formatter(content, params);
+            } catch(e) {
+                throw new Error(filePath + '\n' + e);
+            }
             return fs.outputFile(path.join(dest, path.relative(src, filePath)), content);
         });
     }));
@@ -198,14 +205,13 @@ export async function addModule(options: MaterialOptions) {
         const temp = path.resolve(moduleCacheDir, opts.source.fileName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
         const dest = path.resolve(opts.target, opts.name);
 
+        // 先在临时文件地方处理掉，防止 Webpack 加载多次
         await fs.copy(path.resolve(opts.source.path), temp);
-        await vfs.batchReplace(vfs.listAllFiles(moduleCacheDir, {
-            type: 'file',
-        }), [
-            [/sample/g, opts.name],
-            [/Sample/g, utils.kebab2Camel(opts.name)],
-            [/样本/g, opts.title],
-        ]);
+        await formatTemplate(moduleCacheDir, {
+            name: opts.name,
+            camelName: utils.kebab2Camel(opts.name),
+            title: opts.title,
+        });
         await fs.move(temp, dest);
 
         // 修改 modules.order 配置
@@ -352,7 +358,7 @@ export async function addBlock(options: MaterialOptions) {
     const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
     const dest = path.join(localBlocksPath, opts.name + '.vue');
     await fs.ensureDir(localBlocksPath);
-    await fs.move(tempPath, dest);
+    await fs.copy(tempPath, dest);
 
     vueFile.parseScript();
     vueFile.parseTemplate();

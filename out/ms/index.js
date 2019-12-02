@@ -59,7 +59,12 @@ function formatTemplate(src, params = {}, formatter = defaultFormatter) {
             patterns: ['!**/node_modules', '!**/.git'],
         }).map((filePath) => {
             return fs.readFile(filePath, 'utf8').then((content) => {
-                content = formatter(content, params);
+                try {
+                    content = formatter(content, params);
+                }
+                catch (e) {
+                    throw new Error(filePath + '\n' + e);
+                }
                 return fs.writeFile(filePath, content);
             });
         }));
@@ -73,8 +78,12 @@ function formatTemplateTo(src, dest, params = {}, formatter = defaultFormatter) 
         patterns: ['!**/node_modules', '!**/.git'],
     }).map((filePath) => {
         return fs.readFile(filePath, 'utf8').then((content) => {
-            content = formatter(content, params);
-            console.log(path.join(dest, path.relative(src, filePath)));
+            try {
+                content = formatter(content, params);
+            }
+            catch (e) {
+                throw new Error(filePath + '\n' + e);
+            }
             return fs.outputFile(path.join(dest, path.relative(src, filePath)), content);
         });
     }));
@@ -154,14 +163,13 @@ function addModule(options) {
         if (opts.source.type === 'file') {
             const temp = path.resolve(moduleCacheDir, opts.source.fileName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
             const dest = path.resolve(opts.target, opts.name);
+            // 先在临时文件地方处理掉，防止 Webpack 加载多次
             yield fs.copy(path.resolve(opts.source.path), temp);
-            yield vfs.batchReplace(vfs.listAllFiles(moduleCacheDir, {
-                type: 'file',
-            }), [
-                [/sample/g, opts.name],
-                [/Sample/g, utils.kebab2Camel(opts.name)],
-                [/样本/g, opts.title],
-            ]);
+            yield formatTemplate(moduleCacheDir, {
+                name: opts.name,
+                camelName: utils.kebab2Camel(opts.name),
+                title: opts.title,
+            });
             yield fs.move(temp, dest);
             // 修改 modules.order 配置
             const modulesOrderPath = path.resolve(opts.target, 'modules.order.js');
@@ -312,7 +320,7 @@ function addBlock(options) {
         const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
         const dest = path.join(localBlocksPath, opts.name + '.vue');
         yield fs.ensureDir(localBlocksPath);
-        yield fs.move(tempPath, dest);
+        yield fs.copy(tempPath, dest);
         vueFile.parseScript();
         vueFile.parseTemplate();
         const relativePath = './blocks/' + opts.name + '.vue';
