@@ -4,7 +4,7 @@ import chalk from 'chalk';
 // import chokidar from 'chokidar';
 import getDefaults, { VusionConfig, Theme } from './getDefaults';
 
-const TYPES = ['library', 'app', 'html5', 'fullstack', 'component', 'block'];
+const TYPES = ['library', 'app', 'html5', 'fullstack', 'component', 'block', 'template', 'repository'];
 
 function getConfig(cwd: string, configPath: string, packagePath: string) {
     delete require.cache[configPath];

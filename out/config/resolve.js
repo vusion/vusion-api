@@ -5,7 +5,7 @@ const path = require("path");
 const chalk_1 = require("chalk");
 // import chokidar from 'chokidar';
 const getDefaults_1 = require("./getDefaults");
-const TYPES = ['library', 'app', 'html5', 'fullstack', 'component', 'block'];
+const TYPES = ['library', 'app', 'html5', 'fullstack', 'component', 'block', 'template', 'repository'];
 function getConfig(cwd, configPath, packagePath) {
     delete require.cache[configPath];
     delete require.cache[packagePath];
