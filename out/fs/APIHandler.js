@@ -75,7 +75,12 @@ class APIHandler {
         outputs.push('| Prop/Attr | Type | Options | Default | Description |');
         outputs.push('| --------- | ---- | ------- | ------- | ----------- |');
         attrs.forEach((attr) => {
-            outputs.push(`| ${attr.name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(attr.type, option)).join(', ') : ''} | ${formatValue(attr.type, attr.default)} | ${attr.description} |`);
+            let name = attr.name;
+            if (attr.sync)
+                name += '.sync';
+            if (attr.model)
+                name += ', v-model';
+            outputs.push(`| ${name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(attr.type, option)).join(', ') : ''} | ${formatValue(attr.type, attr.default)} | ${attr.description} |`);
         });
         outputs.push('');
         return outputs.join('\n');
