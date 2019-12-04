@@ -41,9 +41,11 @@ function batchReplace(src, replacers) {
 }
 exports.batchReplace = batchReplace;
 ;
-function listFiles(dir, filters = {}, recursive = false) {
+function listFiles(dir = '', filters = {}, recursive = false) {
+    dir = dir.replace(/\\/g, '/');
     const pattern = recursive ? '**' : '*';
-    return globby.sync([dir ? dir + path.sep + pattern : pattern].concat(filters.patterns || []), {
+    // globby 只支持 /
+    return globby.sync([dir ? dir + '/' + pattern : pattern].concat(filters.patterns || []), {
         dot: filters.dot,
         onlyFiles: false,
     }).filter((filePath) => {
