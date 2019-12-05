@@ -153,6 +153,9 @@ function createSingleFile(dirPath, componentName) {
     });
 }
 exports.createSingleFile = createSingleFile;
+/**
+ * @deprecated
+ **/
 function createMultiFile(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);
@@ -171,6 +174,9 @@ function createMultiFile(dirPath, componentName) {
     });
 }
 exports.createMultiFile = createMultiFile;
+/**
+ * @deprecated
+ **/
 function createMultiFileWithSubdocs(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);
@@ -190,6 +196,9 @@ function createMultiFileWithSubdocs(dirPath, componentName) {
     });
 }
 exports.createMultiFileWithSubdocs = createMultiFileWithSubdocs;
+/**
+ * @deprecated
+ **/
 function createMultiFileWithScreenshots(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);
@@ -208,6 +217,9 @@ function createMultiFileWithScreenshots(dirPath, componentName) {
     });
 }
 exports.createMultiFileWithScreenshots = createMultiFileWithScreenshots;
+/**
+ * @deprecated
+ **/
 function createMultiFilePackage(dirPath, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);
@@ -227,6 +239,9 @@ function createMultiFilePackage(dirPath, componentName) {
     });
 }
 exports.createMultiFilePackage = createMultiFilePackage;
+/**
+ * @deprecated
+ **/
 function createPage(dirPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = handleSame(dirPath, 'page');
@@ -235,6 +250,9 @@ function createPage(dirPath) {
     });
 }
 exports.createPage = createPage;
+/**
+ * @deprecated
+ **/
 function createListPage(dirPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = handleSame(dirPath, 'list');
@@ -243,6 +261,9 @@ function createListPage(dirPath) {
     });
 }
 exports.createListPage = createListPage;
+/**
+ * @deprecated
+ **/
 function createFormPage(dirPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = handleSame(dirPath, 'form');
@@ -251,6 +272,9 @@ function createFormPage(dirPath) {
     });
 }
 exports.createFormPage = createFormPage;
+/**
+ * @deprecated
+ **/
 function createDetailPage(dirPath) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = handleSame(dirPath, 'detail');
@@ -259,87 +283,72 @@ function createDetailPage(dirPath) {
     });
 }
 exports.createDetailPage = createDetailPage;
-function addDoc(vuePath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!fs.statSync(vuePath).isDirectory())
-            throw new Error('Unsupport adding blocks in single vue file!');
-        const dest = path.resolve(vuePath, 'README.md');
-        if (fs.existsSync(dest))
-            throw new FileExistsError('File README.md exists!');
-        yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file.vue/README.md'), dest);
-        const baseName = path.basename(vuePath, path.extname(vuePath));
-        const componentName = utils_1.kebab2Camel(baseName);
-        yield batchReplace(dest, [
-            [/u-sample/g, baseName],
-            [/USample/g, componentName],
-        ]);
-        return dest;
-    });
-}
-exports.addDoc = addDoc;
-function addDocWithSubs(vuePath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!fs.statSync(vuePath).isDirectory())
-            throw new Error('Unsupport adding blocks in single vue file!');
-        const baseName = path.basename(vuePath, path.extname(vuePath));
-        const componentName = utils_1.kebab2Camel(baseName);
-        const dest = path.resolve(vuePath, 'README.md');
-        if (fs.existsSync(dest))
-            throw new FileExistsError('File "README.md" exists!');
-        yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue/README.md'), dest);
-        yield batchReplace(dest, [
-            [/u-sample/g, baseName],
-            [/USample/g, componentName],
-        ]);
-        const dest2 = path.resolve(vuePath, 'docs');
-        if (fs.existsSync(dest2))
-            throw new FileExistsError('Directory "docs/" exists!');
-        yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue/docs'), dest2);
-        yield batchReplace([
-            path.join(dest, 'api.md'),
-            path.join(dest, 'examples.md'),
-        ], [
-            [/u-sample/g, baseName],
-            [/USample/g, componentName],
-        ]);
-        return dest;
-    });
-}
-exports.addDocWithSubs = addDocWithSubs;
-function addDocWithScreenshots(vuePath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!fs.statSync(vuePath).isDirectory())
-            throw new Error('Unsupport adding blocks in single vue file!');
-        const dest = path.resolve(vuePath, 'README.md');
-        if (fs.existsSync(dest))
-            throw new Error('File README.md exists!');
-        yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-screenshots.vue/README.md'), dest);
-        const baseName = path.basename(vuePath, path.extname(vuePath));
-        const componentName = utils_1.kebab2Camel(baseName);
-        yield batchReplace(dest, [
-            [/u-sample/g, baseName],
-            [/USample/g, componentName],
-        ]);
-        const dest2 = path.resolve(vuePath, 'screenshots');
-        if (fs.existsSync(dest2))
-            throw new Error('Directory "screenshots/" exists!');
-        yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-screenshots.vue/screenshots'), dest2);
-        return dest;
-    });
-}
-exports.addDocWithScreenshots = addDocWithScreenshots;
 function addModuleCSS(vuePath) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!fs.statSync(vuePath).isDirectory())
-            throw new Error('Unsupport adding blocks in single vue file!');
+            throw new Error('Unsupport adding functional block in single vue file!');
         const dest = path.resolve(vuePath, 'module.css');
         if (fs.existsSync(dest))
             throw new Error('File module.css exists!');
-        yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file.vue/module.css'), dest);
+        yield fs.copy(path.resolve(__dirname, '../../templates/u-fully-functional.vue/module.css'), dest);
         return dest;
     });
 }
 exports.addModuleCSS = addModuleCSS;
+function addAPI(vuePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!fs.statSync(vuePath).isDirectory())
+            throw new Error('Unsupport adding functional block in single vue file!');
+        const dest = path.resolve(vuePath, 'api.yaml');
+        if (fs.existsSync(dest))
+            throw new Error('File api.yaml exists!');
+        yield fs.copy(path.resolve(__dirname, '../../templates/u-fully-functional.vue/api.yaml'), dest);
+        const baseName = path.basename(vuePath, path.extname(vuePath));
+        const componentName = utils_1.kebab2Camel(baseName);
+        yield batchReplace(dest, [
+            [/u-sample/g, baseName],
+            [/USample/g, componentName],
+        ]);
+        return dest;
+    });
+}
+exports.addAPI = addAPI;
+function addDocs(vuePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!fs.statSync(vuePath).isDirectory())
+            throw new Error('Unsupport adding functional block in single vue file!');
+        const dest = path.resolve(vuePath, 'docs');
+        if (fs.existsSync(dest))
+            throw new FileExistsError('Directory docs exists!');
+        yield fs.copy(path.resolve(__dirname, '../../templates/u-fully-functional.vue/docs'), dest);
+        const baseName = path.basename(vuePath, path.extname(vuePath));
+        const componentName = utils_1.kebab2Camel(baseName);
+        yield batchReplace(listAllFiles(dest), [
+            [/u-sample/g, baseName],
+            [/USample/g, componentName],
+        ]);
+        return dest;
+    });
+}
+exports.addDocs = addDocs;
+function addPackage(vuePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!fs.statSync(vuePath).isDirectory())
+            throw new Error('Unsupport adding functional block in single vue file!');
+        const dest = path.resolve(vuePath, 'package.json');
+        if (fs.existsSync(dest))
+            throw new FileExistsError('File package.json exists!');
+        yield fs.copy(path.resolve(__dirname, '../../templates/u-fully-functional.vue/package.json'), dest);
+        const baseName = path.basename(vuePath, path.extname(vuePath));
+        const componentName = utils_1.kebab2Camel(baseName);
+        yield batchReplace(dest, [
+            [/u-sample/g, baseName],
+            [/USample/g, componentName],
+        ]);
+        return dest;
+    });
+}
+exports.addPackage = addPackage;
 /**
  * 扩展到新的路径中
  * @param vueFile 原组件库需要扩展的组件，一级、二级组件均可
@@ -378,12 +387,12 @@ function extendToLibrary(vueFile, from, to, mode, subDir) {
         let importFrom;
         if (from instanceof _1.Library) {
             if (subDir === undefined)
-                subDir = to.config.type !== 'library' ? from.baseName : ''; // @example 'cloud-ui';
+                subDir = to.config.type !== 'library' && to.config.type !== 'repository' ? from.baseName : ''; // @example 'cloud-ui';
             importFrom = from.fileName;
         }
         else {
             if (subDir === undefined)
-                subDir = to.config.type !== 'library' ? 'other' : '';
+                subDir = to.config.type !== 'library' && to.config.type !== 'repository' ? 'other' : '';
             importFrom = from;
         }
         const arr = vueFile.fullPath.split(path.sep);

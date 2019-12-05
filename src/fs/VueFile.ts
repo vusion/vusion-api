@@ -49,6 +49,8 @@ export default class VueFile extends FSEntry {
     styleHandler: StyleHandler; // 为`undefined`表示还未解析
 
     constructor(fullPath: string) {
+        if (!fullPath.endsWith('.vue'))
+            throw new Error('Not a vue file: ' + fullPath);
         super(fullPath, undefined);
         this.isVue = true;
         this.tagName = VueFile.resolveTagName(fullPath);
@@ -187,7 +189,7 @@ export default class VueFile extends FSEntry {
     async save() {
         this.isSaving = true;
 
-        if (fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
+        if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
             shell.rm('-rf', this.fullPath);
 
         let template = this.template;

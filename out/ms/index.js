@@ -48,6 +48,32 @@ function getRunControl() {
     return rcPath;
 }
 exports.getRunControl = getRunControl;
+/**
+ * 获取最新的区块模板
+ */
+function fetchLatestBlockTemplate() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cacheDir = getCacheDir('templates');
+        return download.npm({
+            registry: rc.configurator.getDownloadRegistry(),
+            name: '@vusion-templates/block',
+        }, cacheDir);
+    });
+}
+exports.fetchLatestBlockTemplate = fetchLatestBlockTemplate;
+/**
+ * 获取最新的组件模板
+ */
+function fetchLatestComponentTemplate() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cacheDir = getCacheDir('templates');
+        return download.npm({
+            registry: rc.configurator.getDownloadRegistry(),
+            name: '@vusion-templates/component',
+        }, cacheDir);
+    });
+}
+exports.fetchLatestComponentTemplate = fetchLatestComponentTemplate;
 const defaultFormatter = (content, params) => {
     return _.template(content)(params);
 };
@@ -269,38 +295,34 @@ function publishTemplate(params) {
     });
 }
 exports.publishTemplate = publishTemplate;
-function createBlock(dir, name, title) {
+function createBlockPackage(dir, options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const normalized = utils.normalizeName(name);
-        const dest = vfs.handleSame(dir, normalized.baseName);
-        yield fs.copy(path.resolve(__dirname, '../../templates/s-block.vue'), dest);
-        yield vfs.batchReplace(vfs.listAllFiles(dest, {
-            type: 'file',
-        }), [
-            [/s-block/g, normalized.baseName],
-            [/SBlock/g, normalized.componentName],
-            [/区块/g, title || '区块'],
-        ]);
+        const tplPath = yield fetchLatestBlockTemplate();
+        const baseName = path.basename(options.name, path.extname(options.name));
+        if (path.extname(options.name) !== '.vue')
+            options.name = baseName + '.vue';
+        options.componentName = utils.kebab2Camel(baseName);
+        options.tagName = baseName;
+        const dest = vfs.handleSame(dir, baseName);
+        yield fs.copy(tplPath, dest);
+        yield formatTemplate(dest, options);
+        const _packageJSONPath = path.resolve(dest, '_package.json');
+        const packageJSONPath = path.resolve(dest, 'package.json');
+        if (fs.existsSync(_packageJSONPath))
+            yield fs.move(_packageJSONPath, packageJSONPath, { overwrite: true });
+        if (fs.existsSync(packageJSONPath)) {
+            const pkg = JSON.parse(yield fs.readFile(packageJSONPath, 'utf8'));
+            pkg.vusion = pkg.vusion || {};
+            pkg.vusion.title = options.title || pkg.vusion.title;
+            pkg.vusion.category = options.category || pkg.vusion.category;
+            pkg.vusion.access = options.access || pkg.vusion.access;
+            pkg.vusion.team = options.team || pkg.vusion.team;
+            yield fs.outputFile(packageJSONPath, JSON.stringify(pkg, null, 2));
+        }
         return dest;
     });
 }
-exports.createBlock = createBlock;
-function createBlockInLibrary(dir, name, title) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const normalized = utils.normalizeName(name);
-        const dest = vfs.handleSame(dir, normalized.baseName);
-        yield fs.copy(path.resolve(__dirname, '../../templates/s-library-block.vue'), dest);
-        yield vfs.batchReplace(vfs.listAllFiles(dest, {
-            type: 'file',
-        }), [
-            [/s-block/g, normalized.baseName],
-            [/SBlock/g, normalized.componentName],
-            [/区块/g, title || '区块'],
-        ]);
-        return dest;
-    });
-}
-exports.createBlockInLibrary = createBlockInLibrary;
+exports.createBlockPackage = createBlockPackage;
 function addBlock(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = processOptions(options);
@@ -314,6 +336,10 @@ function addBlock(options) {
         const vueFile = new vfs.VueFile(opts.target);
         yield vueFile.open();
         if (!vueFile.isDirectory) {
+            if (!vueFile.script)
+                vueFile.script = 'export default {}\n';
+            if (!vueFile.template)
+                vueFile.template = '<div></div>\n';
             vueFile.transform();
             yield vueFile.save();
         }
@@ -321,6 +347,10 @@ function addBlock(options) {
         const dest = path.join(localBlocksPath, opts.name + '.vue');
         yield fs.ensureDir(localBlocksPath);
         yield fs.copy(tempPath, dest);
+        yield fs.remove(path.join(dest, 'public'));
+        yield fs.remove(path.join(dest, 'screenshots'));
+        yield fs.remove(path.join(dest, 'package.json'));
+        yield fs.remove(path.join(dest, 'README.md'));
         vueFile.parseScript();
         vueFile.parseTemplate();
         const relativePath = './blocks/' + opts.name + '.vue';
@@ -367,4 +397,69 @@ function addBlock(options) {
     });
 }
 exports.addBlock = addBlock;
+function createComponentPackage(dir, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const tplPath = yield fetchLatestComponentTemplate();
+        const baseName = path.basename(options.name, path.extname(options.name));
+        if (path.extname(options.name) !== '.vue')
+            options.name = baseName + '.vue';
+        options.componentName = utils.kebab2Camel(baseName);
+        options.tagName = baseName;
+        const dest = vfs.handleSame(dir, baseName);
+        yield fs.copy(tplPath, dest);
+        yield formatTemplate(dest, options);
+        const _packageJSONPath = path.resolve(dest, '_package.json');
+        const packageJSONPath = path.resolve(dest, 'package.json');
+        if (fs.existsSync(_packageJSONPath))
+            yield fs.move(_packageJSONPath, packageJSONPath, { overwrite: true });
+        if (fs.existsSync(packageJSONPath)) {
+            const pkg = JSON.parse(yield fs.readFile(packageJSONPath, 'utf8'));
+            pkg.vusion = pkg.vusion || {};
+            pkg.vusion.title = options.title || pkg.vusion.title;
+            pkg.vusion.category = options.category || pkg.vusion.category;
+            pkg.vusion.access = options.access || pkg.vusion.access;
+            pkg.vusion.team = options.team || pkg.vusion.team;
+            yield fs.outputFile(packageJSONPath, JSON.stringify(pkg, null, 2));
+        }
+        return dest;
+    });
+}
+exports.createComponentPackage = createComponentPackage;
+function createMultiFile(dirPath, componentName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const normalized = utils.normalizeName(componentName);
+        const dest = vfs.handleSame(dirPath, normalized.baseName);
+        const tplPath = yield fetchLatestComponentTemplate();
+        yield fs.copy(tplPath, dest);
+        yield fs.remove(path.join(dest, 'docs'));
+        yield fs.remove(path.join(dest, '_package.json'));
+        yield fs.remove(path.join(dest, 'package.json'));
+        yield fs.remove(path.join(dest, 'api.yaml'));
+        yield formatTemplate(dest, {
+            tagName: normalized.baseName,
+            componentName: normalized.componentName,
+        });
+        return dest;
+    });
+}
+exports.createMultiFile = createMultiFile;
+function createMultiFileWithSubdocs(dirPath, componentName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const normalized = utils.normalizeName(componentName);
+        const dest = vfs.handleSame(dirPath, normalized.baseName);
+        const tplPath = yield fetchLatestComponentTemplate();
+        yield fs.copy(tplPath, dest);
+        // await fs.remove(path.join(dest, 'docs'));
+        yield fs.remove(path.join(dest, '_package.json'));
+        yield fs.remove(path.join(dest, 'package.json'));
+        // await fs.remove(path.join(dest, 'api.yaml'));
+        yield formatTemplate(dest, {
+            tagName: normalized.baseName,
+            componentName: normalized.componentName,
+            title: '请输入标题',
+        });
+        return dest;
+    });
+}
+exports.createMultiFileWithSubdocs = createMultiFileWithSubdocs;
 //# sourceMappingURL=index.js.map

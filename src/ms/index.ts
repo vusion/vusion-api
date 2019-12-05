@@ -41,6 +41,28 @@ export function getRunControl() {
     return rcPath;
 }
 
+/**
+ * 获取最新的区块模板
+ */
+export async function fetchLatestBlockTemplate() {
+    const cacheDir = getCacheDir('templates');
+    return download.npm({
+        registry: rc.configurator.getDownloadRegistry(),
+        name: '@vusion-templates/block',
+    }, cacheDir);
+}
+
+/**
+ * 获取最新的组件模板
+ */
+export async function fetchLatestComponentTemplate() {
+    const cacheDir = getCacheDir('templates');
+    return download.npm({
+        registry: rc.configurator.getDownloadRegistry(),
+        name: '@vusion-templates/component',
+    }, cacheDir);
+}
+
 const defaultFormatter = (content: string, params: object) => {
     return _.template(content)(params);
 }
@@ -307,33 +329,40 @@ export async function publishTemplate(params: object) {
         .then((res) => res.data);
 }
 
-export async function createBlock(dir: string, name?: string, title?: string) {
-    const normalized = utils.normalizeName(name);
-    const dest = vfs.handleSame(dir, normalized.baseName);
-    await fs.copy(path.resolve(__dirname, '../../templates/s-block.vue'), dest);
+export async function createBlockPackage(dir: string, options: {
+    name: string, // packageName
+    title?: string,
+    category?: string,
+    access?: string,
+    team?: string,
+    inVusionProject?: boolean,
+    [prop: string]: string | boolean,
+}) {
+    const tplPath = await fetchLatestBlockTemplate();
 
-    await vfs.batchReplace(vfs.listAllFiles(dest, {
-        type: 'file',
-    }), [
-        [/s-block/g, normalized.baseName],
-        [/SBlock/g, normalized.componentName],
-        [/区块/g, title || '区块'],
-    ]);
-    return dest;
-}
+    const baseName = path.basename(options.name, path.extname(options.name));
+    if (path.extname(options.name) !== '.vue')
+        options.name = baseName + '.vue';
+    options.componentName = utils.kebab2Camel(baseName);
+    options.tagName = baseName;
 
-export async function createBlockInLibrary(dir: string, name?: string, title?: string) {
-    const normalized = utils.normalizeName(name);
-    const dest = vfs.handleSame(dir, normalized.baseName);
-    await fs.copy(path.resolve(__dirname, '../../templates/s-library-block.vue'), dest);
+    const dest = vfs.handleSame(dir, baseName);
+    await fs.copy(tplPath, dest);
+    await formatTemplate(dest, options);
 
-    await vfs.batchReplace(vfs.listAllFiles(dest, {
-        type: 'file',
-    }), [
-        [/s-block/g, normalized.baseName],
-        [/SBlock/g, normalized.componentName],
-        [/区块/g, title || '区块'],
-    ]);
+    const _packageJSONPath = path.resolve(dest, '_package.json');
+    const packageJSONPath = path.resolve(dest, 'package.json');
+    if (fs.existsSync(_packageJSONPath))
+        await fs.move(_packageJSONPath, packageJSONPath, { overwrite: true });
+    if (fs.existsSync(packageJSONPath)) {
+        const pkg = JSON.parse(await fs.readFile(packageJSONPath, 'utf8'));
+        pkg.vusion = pkg.vusion || {};
+        pkg.vusion.title = options.title || pkg.vusion.title;
+        pkg.vusion.category = options.category || pkg.vusion.category;
+        pkg.vusion.access = options.access || pkg.vusion.access;
+        pkg.vusion.team = options.team || pkg.vusion.team;
+        await fs.outputFile(packageJSONPath, JSON.stringify(pkg, null, 2));
+    }
     return dest;
 }
 
@@ -350,15 +379,22 @@ export async function addBlock(options: MaterialOptions) {
     const vueFile = new vfs.VueFile(opts.target);
     await vueFile.open();
     if (!vueFile.isDirectory) {
+        if (!vueFile.script)
+            vueFile.script = 'export default {}\n';
+        if (!vueFile.template)
+            vueFile.template = '<div></div>\n';
         vueFile.transform();
         await vueFile.save();
     }
-
 
     const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
     const dest = path.join(localBlocksPath, opts.name + '.vue');
     await fs.ensureDir(localBlocksPath);
     await fs.copy(tempPath, dest);
+    await fs.remove(path.join(dest, 'public'));
+    await fs.remove(path.join(dest, 'screenshots'));
+    await fs.remove(path.join(dest, 'package.json'));
+    await fs.remove(path.join(dest, 'README.md'));
 
     vueFile.parseScript();
     vueFile.parseTemplate();
@@ -410,4 +446,78 @@ export async function addBlock(options: MaterialOptions) {
     rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
 
     await vueFile.save();
+}
+
+export async function createComponentPackage(dir: string, options: {
+    name: string, // packageName
+    title?: string,
+    category?: string,
+    access?: string,
+    team?: string,
+    inVusionProject?: boolean,
+    [prop: string]: string | boolean,
+}) {
+    const tplPath = await fetchLatestComponentTemplate();
+
+    const baseName = path.basename(options.name, path.extname(options.name));
+    if (path.extname(options.name) !== '.vue')
+        options.name = baseName + '.vue';
+    options.componentName = utils.kebab2Camel(baseName);
+    options.tagName = baseName;
+
+    const dest = vfs.handleSame(dir, baseName);
+    await fs.copy(tplPath, dest);
+    await formatTemplate(dest, options);
+
+    const _packageJSONPath = path.resolve(dest, '_package.json');
+    const packageJSONPath = path.resolve(dest, 'package.json');
+    if (fs.existsSync(_packageJSONPath))
+        await fs.move(_packageJSONPath, packageJSONPath, { overwrite: true });
+    if (fs.existsSync(packageJSONPath)) {
+        const pkg = JSON.parse(await fs.readFile(packageJSONPath, 'utf8'));
+        pkg.vusion = pkg.vusion || {};
+        pkg.vusion.title = options.title || pkg.vusion.title;
+        pkg.vusion.category = options.category || pkg.vusion.category;
+        pkg.vusion.access = options.access || pkg.vusion.access;
+        pkg.vusion.team = options.team || pkg.vusion.team;
+        await fs.outputFile(packageJSONPath, JSON.stringify(pkg, null, 2));
+    }
+    return dest;
+}
+
+export async function createMultiFile(dirPath: string, componentName?: string) {
+    const normalized = utils.normalizeName(componentName);
+    const dest = vfs.handleSame(dirPath, normalized.baseName);
+
+    const tplPath = await fetchLatestComponentTemplate();
+    await fs.copy(tplPath, dest);
+    await fs.remove(path.join(dest, 'docs'));
+    await fs.remove(path.join(dest, '_package.json'));
+    await fs.remove(path.join(dest, 'package.json'));
+    await fs.remove(path.join(dest, 'api.yaml'));
+    await formatTemplate(dest, {
+        tagName: normalized.baseName,
+        componentName: normalized.componentName,
+    });
+
+    return dest;
+}
+
+export async function createMultiFileWithSubdocs(dirPath: string, componentName?: string) {
+    const normalized = utils.normalizeName(componentName);
+    const dest = vfs.handleSame(dirPath, normalized.baseName);
+
+    const tplPath = await fetchLatestComponentTemplate();
+    await fs.copy(tplPath, dest);
+    // await fs.remove(path.join(dest, 'docs'));
+    await fs.remove(path.join(dest, '_package.json'));
+    await fs.remove(path.join(dest, 'package.json'));
+    // await fs.remove(path.join(dest, 'api.yaml'));
+    await formatTemplate(dest, {
+        tagName: normalized.baseName,
+        componentName: normalized.componentName,
+        title: '请输入标题',
+    });
+
+    return dest;
 }

@@ -36,6 +36,8 @@ var VueFileExtendMode;
 ;
 class VueFile extends FSEntry_1.default {
     constructor(fullPath) {
+        if (!fullPath.endsWith('.vue'))
+            throw new Error('Not a vue file: ' + fullPath);
         super(fullPath, undefined);
         this.isVue = true;
         this.tagName = VueFile.resolveTagName(fullPath);
@@ -169,7 +171,7 @@ class VueFile extends FSEntry_1.default {
         });
         return __awaiter(this, void 0, void 0, function* () {
             this.isSaving = true;
-            if (fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
+            if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
                 shell.rm('-rf', this.fullPath);
             let template = this.template;
             let script = this.script;

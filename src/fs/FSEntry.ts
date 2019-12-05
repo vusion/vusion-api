@@ -109,8 +109,10 @@ export default class FSEntry {
             const hash = new Date().toJSON();
 
             const fsWatch = chokidar.watch(fullPath, {
+                ignored: [path.join(fullPath, 'node_modules/**'), path.join(fullPath, '.git/**')],
                 ignoreInitial: true,
                 followSymlinks: false,
+                depth: 1,
             }).on('all', async (event, filePath) => {
                 if (fsEntry.isSaving)
                     return;

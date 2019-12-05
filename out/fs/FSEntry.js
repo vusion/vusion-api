@@ -92,8 +92,10 @@ class FSEntry {
             _caches.set(key, fsEntry);
             const hash = new Date().toJSON();
             const fsWatch = chokidar.watch(fullPath, {
+                ignored: [path.join(fullPath, 'node_modules/**'), path.join(fullPath, '.git/**')],
                 ignoreInitial: true,
                 followSymlinks: false,
+                depth: 1,
             }).on('all', (event, filePath) => __awaiter(this, void 0, void 0, function* () {
                 if (fsEntry.isSaving)
                     return;
