@@ -9,7 +9,10 @@ import * as rc from '../rc';
 import * as download from './download';
 import * as _ from 'lodash';
 
-export { download };
+import Block from './Block';
+import Component from './Component';
+
+export { download, Block, Component };
 
 import axios, { AxiosInstance } from 'axios';
 let platformAxios: AxiosInstance;
@@ -105,11 +108,11 @@ export interface MaterialSource {
     type: string,
     registry: string,
     name: string, // source.name, npm name, repo name
-    path: string,
+    path?: string,
     version?: string,
     commit?: string,
-    fileName: string,
-    baseName: string,
+    fileName?: string,
+    baseName?: string,
 };
 
 export interface MaterialOptions {
@@ -296,19 +299,47 @@ export async function removeModule(options: MaterialOptions) {
     }
 }
 
-export async function getBlock(packageName: string) {
+export async function getBlock(packageName: string): Promise<Block> {
     const pfAxios = await getPlatformAxios();
     return pfAxios.get('block/info', {
         params: {
             name: packageName,
         },
-    }).then((res) => res.data.result);
+    }).then((res) => {
+        const block = res.data.result;
+        const fileName = path.basename(block.name);
+        block.tagName = path.basename(fileName, path.extname(fileName));
+        block.componentName = utils.kebab2Camel(block.tagName);
+        return block;
+    });
 }
 
-export async function getBlocks() {
+export async function getBlocks(): Promise<Block[]> {
     const pfAxios = await getPlatformAxios();
     return pfAxios.get('block/list')
-        .then((res) => res.data.result.rows);
+        .then((res) => {
+            const blocks = res.data.result.rows as Block[];
+            blocks.forEach((block) => {
+                const fileName = path.basename(block.name);
+                block.tagName = path.basename(fileName, path.extname(fileName));
+                block.componentName = utils.kebab2Camel(block.tagName);
+            });
+            return blocks;
+        });
+}
+
+export async function getComponents(): Promise<Component[]> {
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.get('component/list')
+        .then((res) => {
+            const components = res.data.result.rows as Component[];
+            components.forEach((component) => {
+                const fileName = path.basename(component.name);
+                component.tagName = path.basename(fileName, path.extname(fileName));
+                component.componentName = utils.kebab2Camel(component.tagName);
+            });
+            return components;
+        });
 }
 
 export async function publishBlock(params: object) {
@@ -437,7 +468,11 @@ export async function addBlock(options: MaterialOptions) {
                     declaration.properties.splice(pos, 0, componentsProperty);
                 }
 
-                (componentsProperty.value as babel.types.ObjectExpression).properties.push(blockProperty);
+                const componentsProperties = (componentsProperty.value as babel.types.ObjectExpression).properties;
+                // 判断有没有重复的项，如果有则忽略，不覆盖
+                if (componentsProperties.find((property) => property.type === 'ObjectProperty' && property.key.name === componentName))
+                    return;
+                componentsProperties.push(blockProperty);
             }
         },
     });
@@ -446,6 +481,71 @@ export async function addBlock(options: MaterialOptions) {
     rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
 
     await vueFile.save();
+}
+
+export async function removeBlock(vueFilePath: string, baseName: string) {
+    const vueFile = new vfs.VueFile(vueFilePath);
+    await vueFile.open();
+    if (!vueFile.isDirectory)
+        return;
+
+    vueFile.parseScript();
+    vueFile.parseTemplate();
+
+    const relativePath = './blocks/' + baseName + '.vue';
+    const { componentName } = utils.normalizeName(baseName);
+
+    const body = vueFile.scriptHandler.ast.program.body;
+    for (let i = 0; i < body.length; i++) {
+        const node = body[i];
+        if (node.type === 'ImportDeclaration') {
+            node.source.value === relativePath;
+            body.splice(i, 1);
+        }
+    }
+    babel.traverse(vueFile.scriptHandler.ast, {
+        ExportDefaultDeclaration(nodePath) {
+            const declaration = nodePath.node.declaration;
+            if (declaration && declaration.type === 'ObjectExpression') {
+                let pos = 0;
+                const propertiesBefore = [
+                    'el',
+                    'name',
+                    'parent',
+                    'functional',
+                    'delimiters',
+                    'comments',
+                ]
+                let componentsProperty = declaration.properties.find((property, index) => {
+                    if (property.type === 'ObjectProperty' && propertiesBefore.includes(property.key.name))
+                        pos = index;
+                    return property.type === 'ObjectProperty' && property.key.name === 'components';
+                }) as babel.types.ObjectProperty;
+                if (!componentsProperty)
+                    return;
+
+                const properties = (componentsProperty.value as babel.types.ObjectExpression).properties;
+                for (let i = 0; i < properties.length; i++) {
+                    const property = properties[i];
+                    if (property.type === 'ObjectProperty' && property.key.name === componentName)
+                        properties.splice(i, 1);
+                }
+            }
+        },
+    });
+
+    // const rootEl = vueFile.templateHandler.ast;
+    // rootEl
+    vueFile.templateHandler.traverse((nodePath) => {
+        if ((nodePath.node as compiler.ASTElement).tag === baseName)
+            nodePath.remove();
+    });
+
+    await vueFile.save();
+
+    const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
+    const dest = path.join(localBlocksPath, baseName + '.vue');
+    await fs.remove(dest);
 }
 
 export async function createComponentPackage(dir: string, options: {

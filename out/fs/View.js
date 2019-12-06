@@ -24,6 +24,7 @@ class View extends FSEntry_1.default {
     constructor(fullPath, viewType = ViewType.wrapper, isDirectory = true) {
         super(fullPath, isDirectory);
         this.viewType = viewType;
+        this.routePath = '';
     }
     /**
      * 提前检测 View 文件类型，以及子 View 等
@@ -31,12 +32,36 @@ class View extends FSEntry_1.default {
      */
     preOpen() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.viewsPath = this.fullPath;
+            const viewsPath = path.join(this.viewsPath, 'views');
+            if (fs.existsSync(viewsPath))
+                this.viewsPath = viewsPath;
+            if (this.viewType === ViewType.root) {
+                this.routePath = '/';
+            }
+            else if (this.viewType === ViewType.page) {
+                this.vueFilePath = path.join(this.viewsPath, 'index.vue');
+                this.routePath = this.parent.routePath + this.baseName + '#/';
+            }
+            else if (this.viewType === ViewType.module) {
+                this.vueFilePath = path.join(this.viewsPath, 'index.vue');
+                this.routePath = this.parent.routePath + this.baseName + '/';
+            }
+            else if (this.viewType === ViewType.wrapper) {
+                this.vueFilePath = path.join(this.viewsPath, 'index.vue');
+                this.routePath = this.parent.routePath + this.baseName + '/';
+            }
+            else {
+                this.vueFilePath = this.fullPath;
+                this.routePath = this.parent.routePath + this.baseName;
+            }
             // this.alias = await this.readTitleInReadme();
         });
     }
     forceOpen() {
         return __awaiter(this, void 0, void 0, function* () {
             this.close();
+            yield this.preOpen();
             yield this.load();
             this.isOpen = true;
         });
@@ -50,19 +75,18 @@ class View extends FSEntry_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
                 throw new Error(`Cannot find: ${this.fullPath}`);
+            if (this.viewType === ViewType.vue) // 没有打开的必要了
+                return;
             const children = [];
-            this.viewsPath = this.fullPath;
-            let fileNames = yield fs.readdir(this.viewsPath);
-            if (fileNames.includes('views')) {
-                this.viewsPath = path.join(this.viewsPath, 'views');
-                fileNames = yield fs.readdir(this.viewsPath);
-            }
+            const fileNames = yield fs.readdir(this.viewsPath);
             fileNames.forEach((name) => {
                 const fullPath = path.join(this.viewsPath, name);
                 const isDirectory = fs.statSync(fullPath).isDirectory();
                 if (!isDirectory && !name.endsWith('.vue'))
                     return;
                 if (name === '.DS_Store' || name === '.git')
+                    return;
+                if (this.viewType !== ViewType.vue && name === 'index.vue')
                     return;
                 let view = new View(fullPath, ViewType.wrapper, isDirectory);
                 // if (this.isWatched)
@@ -74,7 +98,7 @@ class View extends FSEntry_1.default {
                     view.viewType = ViewType.page;
                 else if (this.viewType === ViewType.page && fileNames.includes('modules.js'))
                     view.viewType = ViewType.module;
-                // view.parent = this;
+                view.parent = this;
                 // view.isChild = true;
                 children.push(view);
             });

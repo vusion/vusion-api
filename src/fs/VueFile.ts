@@ -43,6 +43,7 @@ export default class VueFile extends FSEntry {
     script: string;
     style: string;
     sample: string;
+    package: Object;
 
     templateHandler: TemplateHandler; // 为`undefined`表示还未解析
     scriptHandler: ScriptHandler; // 为`undefined`表示还未解析
@@ -145,6 +146,7 @@ export default class VueFile extends FSEntry {
         this.script = undefined;
         this.style = undefined;
         this.sample = undefined;
+        this.package = undefined;
 
         this.templateHandler = undefined;
         this.scriptHandler = undefined;
@@ -175,6 +177,14 @@ export default class VueFile extends FSEntry {
                 const templateRE = /<template.*?>([\s\S]*?)<\/template>/i;
                 const sample = sampleRaw.match(templateRE);
                 this.sample = sample && sample[1].trim();
+            }
+            if (fs.existsSync(path.join(this.fullPath, 'package.json'))) {
+                const content = await fs.readFile(path.join(this.fullPath, 'package.json'), 'utf8');
+                try {
+                    this.package = JSON.parse(content);
+                } catch (e) {
+                    this.package = content;
+                }
             }
         } else {
             this.content = await fs.readFile(this.fullPath, 'utf8');
@@ -211,6 +221,8 @@ export default class VueFile extends FSEntry {
             template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), template));
             script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), script));
             style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), style));
+            if (this.package && typeof this.package === 'object')
+                promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), JSON.stringify(this.package, null, 2)));
 
             result = await Promise.all(promises);
         } else {

@@ -1,6 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const compiler = require("vue-template-compiler");
+class ASTNodePath {
+    constructor(node, parent) {
+        this.node = node;
+        this.parent = parent;
+    }
+    remove() {
+        const index = this.parent.children.indexOf(this.node);
+        ~index && this.parent.children.splice(index, 1);
+    }
+}
+exports.ASTNodePath = ASTNodePath;
 class TemplateHandler {
     constructor(code = '', options) {
         this.code = code;
@@ -54,6 +65,20 @@ class TemplateHandler {
             attrsLength += attr.length;
         });
         return `<${el.tag}${attrs.length ? attrsString : ''}>` + content + (shouldFormat ? '\n' + tabs : '') + `</${el.tag}>`;
+    }
+    traverse(func) {
+        let queue = [];
+        queue = queue.concat(new ASTNodePath(this.ast, null));
+        let nodePath;
+        while ((nodePath = queue.shift())) {
+            if (nodePath.node.type === 1) {
+                const parent = nodePath.node;
+                queue = queue.concat(parent.children.map((node) => new ASTNodePath(node, parent)));
+            }
+            const result = func(nodePath);
+            if (result !== undefined)
+                return result;
+        }
     }
 }
 exports.default = TemplateHandler;

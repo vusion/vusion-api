@@ -1,5 +1,17 @@
 import * as compiler from 'vue-template-compiler';
 
+export class ASTNodePath {
+    constructor(
+        public node: compiler.ASTNode,
+        public parent: compiler.ASTElement,
+    ) {}
+
+    remove() {
+        const index = this.parent.children.indexOf(this.node);
+        ~index && this.parent.children.splice(index, 1);
+    }
+}
+
 class TemplateHandler {
     code: string;
     ast: compiler.ASTElement;
@@ -71,6 +83,21 @@ class TemplateHandler {
 
 
         return `<${el.tag}${attrs.length ? attrsString : ''}>` + content + (shouldFormat ? '\n' + tabs : '') + `</${el.tag}>`;
+    }
+
+    traverse(func: (nodePath: ASTNodePath) => any) {
+        let queue: Array<ASTNodePath> = [];
+        queue = queue.concat(new ASTNodePath(this.ast, null));
+        let nodePath: ASTNodePath;
+        while ((nodePath = queue.shift())) {
+            if (nodePath.node.type === 1) {
+                const parent = nodePath.node as compiler.ASTElement;
+                queue = queue.concat(parent.children.map((node) => new ASTNodePath(node, parent)));
+            }
+            const result = func(nodePath);
+            if (result !== undefined)
+                return result;
+        }
     }
 }
 
