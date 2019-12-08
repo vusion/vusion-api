@@ -79,7 +79,7 @@ export default class Library {
         if (!fs.existsSync(packageJSONPath))
             return;
 
-        this.package = require(packageJSONPath);
+        this.package = JSON.parse(await fs.readFile(packageJSONPath, 'utf8'));
         this.config = config.resolve(this.fullPath);
         this.libraryPath = path.resolve(this.fullPath, this.config.libraryPath);
         if (typeof this.config.docs === 'object' && this.config.docs.components) {
@@ -127,5 +127,25 @@ export default class Library {
             if (fs.existsSync(componentsIndexPath))
                 this.componentsIndexFile = new JSFile(componentsIndexPath);
         }
+    }
+
+    async forceOpenOthers() {
+        if (!fs.existsSync(this.fullPath))
+            throw new Error(`Cannot find: ${this.fullPath}!`);
+
+        const packageJSONPath = path.resolve(this.fullPath, 'package.json');
+        if (!fs.existsSync(packageJSONPath))
+            return;
+
+        this.package = JSON.parse(await fs.readFile(packageJSONPath, 'utf8'));
+
+        /* 在 package.json 中查找 .vusion 或 .vue 的依赖项 */
+        const vueDeps: Array<string> = [];
+        Object.keys(this.package.dependencies).forEach((dep) => {
+            if (dep.endsWith('.vue'))
+                vueDeps.push(dep);
+        });
+
+        this.otherComponents = vueDeps.map((dep) => new VueFile(path.resolve(this.fullPath, 'node_modules', dep)));
     }
 }

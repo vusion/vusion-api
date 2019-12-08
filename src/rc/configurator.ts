@@ -50,7 +50,7 @@ publish_manager: npm
             if (config.download_manager === 'yarn')
                 return `yarn add ${packageName}${save === false ? '' : (save === true ? '' : ' --' + save)}`;
             else
-                return `${config.download_manager} install ${packageName}${save === false ? '' : (save === true ? '--save' : ' --save-' + save)}`;
+                return `${config.download_manager} install ${packageName}${save === false ? '' : (save === true ? ' --save' : ' --save-' + save)}`;
         }
     },
 };
