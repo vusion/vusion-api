@@ -25,6 +25,7 @@ class View extends FSEntry_1.default {
     constructor(fullPath, viewType = ViewType.branch, isDirectory = true) {
         super(fullPath, isDirectory);
         this.viewType = viewType;
+        this.viewsPath = '';
         this.routePath = '';
     }
     /**
@@ -33,23 +34,21 @@ class View extends FSEntry_1.default {
      */
     preOpen() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.viewsPath = this.fullPath;
-            const viewsPath = path.join(this.viewsPath, 'views');
-            if (fs.existsSync(viewsPath))
-                this.viewsPath = viewsPath;
+            if (fs.existsSync(path.join(this.fullPath, 'views')))
+                this.viewsPath = 'views';
             if (this.viewType === ViewType.root) {
                 this.routePath = '/';
             }
             else if (this.viewType === ViewType.page) {
-                this.vueFilePath = path.join(this.viewsPath, 'index.vue');
+                this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
                 this.routePath = this.parent.routePath + this.baseName + '#/';
             }
             else if (this.viewType === ViewType.module) {
-                this.vueFilePath = path.join(this.viewsPath, 'index.vue');
+                this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
                 this.routePath = this.parent.routePath + this.baseName + '/';
             }
             else if (this.viewType === ViewType.branch) {
-                this.vueFilePath = path.join(this.viewsPath, 'index.vue');
+                this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
                 this.routePath = this.parent.routePath + this.baseName + '/';
             }
             else {
@@ -79,9 +78,9 @@ class View extends FSEntry_1.default {
             if (this.viewType === ViewType.vue) // 没有打开的必要了
                 return;
             const children = [];
-            const fileNames = yield fs.readdir(this.viewsPath);
+            const fileNames = yield fs.readdir(path.join(this.fullPath, this.viewsPath));
             fileNames.forEach((name) => {
-                const fullPath = path.join(this.viewsPath, name);
+                const fullPath = path.join(this.fullPath, this.viewsPath, name);
                 const isDirectory = fs.statSync(fullPath).isDirectory();
                 if (!isDirectory && !name.endsWith('.vue'))
                     return;
@@ -89,10 +88,11 @@ class View extends FSEntry_1.default {
                     return;
                 if (this.viewType !== ViewType.vue && name === 'index.vue')
                     return;
-                let view = new View(fullPath, ViewType.branch, isDirectory);
-                // if (this.isWatched)
-                //     view = View.fetch(fullPath);
-                // else
+                let view;
+                if (this.isWatched)
+                    view = View.fetch(fullPath, ViewType.branch, isDirectory);
+                else
+                    view = new View(fullPath, ViewType.branch, isDirectory);
                 if (fullPath.endsWith('.vue'))
                     view.viewType = ViewType.vue;
                 else if (fullPath.endsWith('.md'))
@@ -140,12 +140,16 @@ class View extends FSEntry_1.default {
             const childView = this.children.find((view) => view.fileName === next);
             if (arr.length === 0)
                 throw new Error('Error path: ' + relativePath);
-            else if (arr.length === 1)
-                return childView;
+            else if (arr.length === 1) {
+                if (childView)
+                    return childView;
+                else
+                    return alwaysFindOne ? this : childView;
+            }
             else if (!childView.isDirectory)
                 throw new Error('Not a directory: ' + childView.fullPath);
             else
-                return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded);
+                return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded, alwaysFindOne);
         });
     }
     findByRoute(relativePath, openIfNotLoaded = false) {
@@ -172,8 +176,8 @@ class View extends FSEntry_1.default {
                 return childView.findByRoute(arr.slice(1).join(path.sep), openIfNotLoaded);
         });
     }
-    static fetch(fullPath) {
-        return super.fetch(fullPath);
+    static fetch(fullPath, viewType = ViewType.branch, isDirectory = true) {
+        return super.fetch(fullPath, viewType, isDirectory);
     }
 }
 exports.default = View;

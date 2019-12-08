@@ -83,6 +83,7 @@ class FSEntry {
      * @param args
      */
     static fetch(fullPath, ...args) {
+        // this.name 是 constructor 的 name
         const key = this.name + '-' + fullPath;
         if (_caches.has(key))
             return _caches.get(key);

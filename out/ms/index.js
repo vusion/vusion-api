@@ -13,6 +13,7 @@ const path = require("path");
 const babel = require("@babel/core");
 const compiler = require("vue-template-compiler");
 const fs = require("fs-extra");
+const shell = require("shelljs");
 const os = require("os");
 const vfs = require("../fs");
 const utils = require("../utils");
@@ -178,80 +179,6 @@ function processOptions(options) {
     return result;
 }
 exports.processOptions = processOptions;
-/**
- * 从业务模板中添加模块
- */
-function addModule(options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const opts = processOptions(options);
-        const moduleCacheDir = getCacheDir('modules');
-        yield fs.emptyDir(moduleCacheDir);
-        if (opts.source.type === 'file') {
-            const temp = path.resolve(moduleCacheDir, opts.source.fileName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
-            const dest = path.resolve(opts.target, opts.name);
-            // 先在临时文件地方处理掉，防止 Webpack 加载多次
-            yield fs.copy(path.resolve(opts.source.path), temp);
-            yield formatTemplate(moduleCacheDir, {
-                name: opts.name,
-                camelName: utils.kebab2Camel(opts.name),
-                title: opts.title,
-            });
-            yield fs.move(temp, dest);
-            // 修改 modules.order 配置
-            const modulesOrderPath = path.resolve(opts.target, 'modules.order.js');
-            if (fs.existsSync(modulesOrderPath)) {
-                const jsFile = new vfs.JSFile(modulesOrderPath);
-                yield jsFile.open();
-                jsFile.parse();
-                let changed = false;
-                babel.traverse(jsFile.handler.ast, {
-                    ExportDefaultDeclaration(nodePath) {
-                        const declaration = nodePath.node.declaration;
-                        if (declaration && declaration.type === 'ArrayExpression') {
-                            const element = Object.assign(babel.types.stringLiteral(opts.name), { raw: `'${opts.name}'` });
-                            declaration.elements.push(element);
-                            changed = true;
-                        }
-                    }
-                });
-                if (changed)
-                    yield jsFile.save();
-            }
-        }
-    });
-}
-exports.addModule = addModule;
-function removeModule(options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const dest = path.resolve(options.target, options.name);
-        yield fs.remove(dest);
-        // 修改 modules.order 配置
-        const modulesOrderPath = path.resolve(options.target, 'modules.order.js');
-        if (fs.existsSync(modulesOrderPath)) {
-            const jsFile = new vfs.JSFile(modulesOrderPath);
-            yield jsFile.open();
-            jsFile.parse();
-            let changed = false;
-            babel.traverse(jsFile.handler.ast, {
-                ExportDefaultDeclaration(nodePath) {
-                    const declaration = nodePath.node.declaration;
-                    if (declaration && declaration.type === 'ArrayExpression') {
-                        for (let i = 0; i < declaration.elements.length; i++) {
-                            const element = declaration.elements[i];
-                            if (element.type === 'StringLiteral' && element.value === options.name) {
-                                declaration.elements.splice(i, 1);
-                                changed = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            });
-            yield jsFile.save();
-        }
-    });
-}
-exports.removeModule = removeModule;
 function getBlock(packageName) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
@@ -381,6 +308,7 @@ function addBlock(options) {
         yield fs.remove(path.join(dest, 'screenshots'));
         yield fs.remove(path.join(dest, 'package.json'));
         yield fs.remove(path.join(dest, 'README.md'));
+        shell.rm('-rf', '.*');
         vueFile.parseScript();
         vueFile.parseTemplate();
         const relativePath = './blocks/' + opts.name + '.vue';
@@ -520,10 +448,10 @@ function createComponentPackage(dir, options) {
     });
 }
 exports.createComponentPackage = createComponentPackage;
-function createMultiFile(dirPath, componentName) {
+function createMultiFile(dir, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils.normalizeName(componentName);
-        const dest = vfs.handleSame(dirPath, normalized.baseName);
+        const dest = vfs.handleSame(dir, normalized.baseName);
         const tplPath = yield fetchLatestComponentTemplate();
         yield fs.copy(tplPath, dest);
         yield fs.remove(path.join(dest, 'docs'));
@@ -538,10 +466,10 @@ function createMultiFile(dirPath, componentName) {
     });
 }
 exports.createMultiFile = createMultiFile;
-function createMultiFileWithSubdocs(dirPath, componentName) {
+function createMultiFileWithSubdocs(dir, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils.normalizeName(componentName);
-        const dest = vfs.handleSame(dirPath, normalized.baseName);
+        const dest = vfs.handleSame(dir, normalized.baseName);
         const tplPath = yield fetchLatestComponentTemplate();
         yield fs.copy(tplPath, dest);
         // await fs.remove(path.join(dest, 'docs'));
@@ -557,4 +485,314 @@ function createMultiFileWithSubdocs(dirPath, componentName) {
     });
 }
 exports.createMultiFileWithSubdocs = createMultiFileWithSubdocs;
+/**
+ * 从业务模板中添加模块
+ */
+function addModule(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const opts = processOptions(options);
+        const moduleCacheDir = getCacheDir('modules');
+        yield fs.emptyDir(moduleCacheDir);
+        if (opts.source.type === 'file') {
+            const temp = path.resolve(moduleCacheDir, opts.source.fileName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
+            const dest = path.resolve(opts.target, opts.name);
+            // 先在临时文件地方处理掉，防止 Webpack 加载多次
+            yield fs.copy(path.resolve(opts.source.path), temp);
+            yield formatTemplate(moduleCacheDir, {
+                name: opts.name,
+                camelName: utils.kebab2Camel(opts.name),
+                title: opts.title,
+            });
+            yield fs.move(temp, dest);
+            // 修改 modules.order 配置
+            const modulesOrderPath = path.resolve(opts.target, 'modules.order.js');
+            if (fs.existsSync(modulesOrderPath)) {
+                const jsFile = new vfs.JSFile(modulesOrderPath);
+                yield jsFile.open();
+                jsFile.parse();
+                let changed = false;
+                babel.traverse(jsFile.handler.ast, {
+                    ExportDefaultDeclaration(nodePath) {
+                        const declaration = nodePath.node.declaration;
+                        if (declaration && declaration.type === 'ArrayExpression') {
+                            const element = Object.assign(babel.types.stringLiteral(opts.name), { raw: `'${opts.name}'` });
+                            declaration.elements.push(element);
+                            changed = true;
+                        }
+                    }
+                });
+                if (changed)
+                    yield jsFile.save();
+            }
+        }
+    });
+}
+exports.addModule = addModule;
+function removeModule(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const dest = path.resolve(options.target, options.name);
+        yield fs.remove(dest);
+        // 修改 modules.order 配置
+        const modulesOrderPath = path.resolve(options.target, 'modules.order.js');
+        if (fs.existsSync(modulesOrderPath)) {
+            const jsFile = new vfs.JSFile(modulesOrderPath);
+            yield jsFile.open();
+            jsFile.parse();
+            let changed = false;
+            babel.traverse(jsFile.handler.ast, {
+                ExportDefaultDeclaration(nodePath) {
+                    const declaration = nodePath.node.declaration;
+                    if (declaration && declaration.type === 'ArrayExpression') {
+                        for (let i = 0; i < declaration.elements.length; i++) {
+                            const element = declaration.elements[i];
+                            if (element.type === 'StringLiteral' && element.value === options.name) {
+                                declaration.elements.splice(i, 1);
+                                changed = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+            yield jsFile.save();
+        }
+    });
+}
+exports.removeModule = removeModule;
+function findRouteObjectAndParentArray(objectExpression, relativePath, createChildrenArrayIfNeeded = false, pos = 0) {
+    const arr = Array.isArray(relativePath) ? relativePath : relativePath.split('/');
+    if (arr[pos] === 'views')
+        pos++;
+    if (pos === arr.length)
+        throw new Error('Route path error. Cannot find route: ' + arr.join('/'));
+    const nextName = arr[pos].replace(/\.vue$/, '');
+    let childrenProperty = objectExpression.properties.find((property) => property.type === 'ObjectProperty' && property.key.name === 'children');
+    if (!childrenProperty) {
+        if (createChildrenArrayIfNeeded) {
+            childrenProperty = babel.types.objectProperty(babel.types.identifier('children'), babel.types.arrayExpression([]));
+            objectExpression.properties.push(childrenProperty);
+        }
+        else
+            return { routeObject: undefined, parentArray: undefined };
+    }
+    const arrayExpression = childrenProperty.value;
+    const routeObject = arrayExpression.elements.find((element) => {
+        return ((element.type === 'ObjectExpression' && element.properties.some((property) => property.type === 'ObjectProperty' && property.key.name === 'path' && property.value.type === 'StringLiteral' && property.value.value === nextName))
+            || (element.type === 'ObjectExpression' && element.properties.some((property) => property.type === 'ObjectProperty' && property.key.name === 'component' && property.value.type === 'ArrowFunctionExpression'
+                && property.value.body.arguments[0].value === './' + arr.slice(0, pos + 1).join('/') + (arr[pos].endsWith('.vue') ? '' : '/index.vue'))));
+    });
+    if (pos === arr.length - 1) {
+        return { routeObject, parentArray: arrayExpression };
+    }
+    else {
+        if (!routeObject)
+            return { routeObject: undefined, parentArray: undefined };
+        else
+            return findRouteObjectAndParentArray(routeObject, arr, createChildrenArrayIfNeeded, pos + 1);
+    }
+}
+exports.findRouteObjectAndParentArray = findRouteObjectAndParentArray;
+function addLeafViewRoute(parent, name, title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // 添加路由
+        // 目前只支持在 module 层添加路由
+        let module = parent;
+        while (module && module.viewType !== vfs.ViewType.module)
+            module = module.parent;
+        if (!module)
+            return;
+        const routesPath = path.join(module.fullPath, 'routes.js');
+        if (!fs.existsSync(routesPath))
+            return;
+        const jsFile = new vfs.JSFile(routesPath);
+        yield jsFile.open();
+        jsFile.parse();
+        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name + '.vue'));
+        let changed = false;
+        babel.traverse(jsFile.handler.ast, {
+            ExportDefaultDeclaration(nodePath) {
+                const declaration = nodePath.node.declaration;
+                if (declaration && declaration.type === 'ObjectExpression') {
+                    const { routeObject, parentArray } = findRouteObjectAndParentArray(declaration, relativePath, true);
+                    if (parentArray && !routeObject) {
+                        const tpl = babel.parse(`[{
+                        path: '${name}',
+                        component: () => import(/* webpackChunkName: '${module.baseName}' */ './${relativePath}'),
+                        ${title ? 'meta: { title: ' + title + ' },' : ''}
+                    }]`, {
+                            plugins: [require('@babel/plugin-syntax-dynamic-import')]
+                        });
+                        const element = tpl.program.body[0].expression.elements[0];
+                        parentArray.elements.push(element);
+                        changed = true;
+                    }
+                }
+            }
+        });
+        if (changed)
+            yield jsFile.save();
+        return;
+    });
+}
+exports.addLeafViewRoute = addLeafViewRoute;
+function addLeafView(parent, name, title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // parent view 必然是个目录
+        const dest = vfs.handleSame(path.join(parent.fullPath, parent.viewsPath), name);
+        const tplPath = path.resolve(__dirname, '../../templates/leaf-view.vue');
+        yield fs.copy(tplPath, dest);
+        yield addLeafViewRoute(parent, name, title);
+        return dest;
+    });
+}
+exports.addLeafView = addLeafView;
+function addLeafViewFromBlock(source, parent, name, title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // parent view 必然是个目录
+        const dest = vfs.handleSame(path.join(parent.fullPath, parent.viewsPath), name);
+        const blockCacheDir = getCacheDir('blocks');
+        const tempPath = yield download.npm({
+            registry: source.registry,
+            name: source.name,
+        }, blockCacheDir);
+        yield fs.copy(tempPath, dest);
+        yield fs.remove(path.join(dest, 'public'));
+        yield fs.remove(path.join(dest, 'screenshots'));
+        yield fs.remove(path.join(dest, 'package.json'));
+        yield fs.remove(path.join(dest, 'README.md'));
+        shell.rm('-rf', '.*');
+        const vueFile = new vfs.VueFile(dest);
+        yield vueFile.preOpen();
+        if (vueFile.checkTransform() === true) {
+            yield vueFile.open();
+            vueFile.transform();
+            yield vueFile.save();
+        }
+        yield addLeafViewRoute(parent, name, title);
+        return dest;
+    });
+}
+exports.addLeafViewFromBlock = addLeafViewFromBlock;
+function addBranchViewRoute(parent, name, title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // 添加路由
+        // 目前只支持在 module 层添加路由
+        let module = parent;
+        while (module && module.viewType !== vfs.ViewType.module)
+            module = module.parent;
+        if (!module)
+            return;
+        const routesPath = path.join(module.fullPath, 'routes.js');
+        if (!fs.existsSync(routesPath))
+            return;
+        const jsFile = new vfs.JSFile(routesPath);
+        yield jsFile.open();
+        jsFile.parse();
+        // 纯目录，不带 /index.vue 的
+        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name));
+        let changed = false;
+        babel.traverse(jsFile.handler.ast, {
+            ExportDefaultDeclaration(nodePath) {
+                const declaration = nodePath.node.declaration;
+                if (declaration && declaration.type === 'ObjectExpression') {
+                    const { routeObject, parentArray } = findRouteObjectAndParentArray(declaration, relativePath, true);
+                    if (parentArray && !routeObject) {
+                        const tpl = babel.parse(`[{
+                        path: '${name}',
+                        component: () => import(/* webpackChunkName: '${module.baseName}' */ './${relativePath + '/index.vue'}'),
+                        ${title ? 'meta: { title: ' + title + ' },' : ''}
+                        children: [],
+                    }]`, {
+                            plugins: [require('@babel/plugin-syntax-dynamic-import')]
+                        });
+                        const element = tpl.program.body[0].expression.elements[0];
+                        parentArray.elements.push(element);
+                        changed = true;
+                    }
+                }
+            }
+        });
+        if (changed)
+            yield jsFile.save();
+        return;
+    });
+}
+exports.addBranchViewRoute = addBranchViewRoute;
+function addBranchView(parent, name, title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // parent view 必然是个目录
+        const dir = path.join(parent.fullPath, parent.viewsPath, name);
+        const tplPath = path.resolve(__dirname, '../../templates/branch-view');
+        yield fs.copy(tplPath, dir);
+        const dest = path.join(dir, 'index.vue');
+        yield addBranchViewRoute(parent, name, title);
+        return dest;
+    });
+}
+exports.addBranchView = addBranchView;
+function addBranchViewFromBlock(source, parent, name, title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // parent view 必然是个目录
+        const dir = path.join(parent.fullPath, parent.viewsPath, name);
+        const tplPath = path.resolve(__dirname, '../../templates/branch-view');
+        yield fs.copy(tplPath, dir);
+        const dest = path.join(dir, 'index.vue');
+        const blockCacheDir = getCacheDir('blocks');
+        const tempPath = yield download.npm({
+            registry: source.registry,
+            name: source.name,
+        }, blockCacheDir);
+        yield fs.copy(tempPath, path.join(dest, 'index.vue'));
+        yield fs.remove(path.join(dest, 'public'));
+        yield fs.remove(path.join(dest, 'screenshots'));
+        yield fs.remove(path.join(dest, 'package.json'));
+        yield fs.remove(path.join(dest, 'README.md'));
+        shell.rm('-rf', '.*');
+        const vueFile = new vfs.VueFile(dest);
+        yield vueFile.preOpen();
+        if (vueFile.checkTransform() === true) {
+            yield vueFile.open();
+            vueFile.transform();
+            yield vueFile.save();
+        }
+        yield addLeafViewRoute(parent, name, title);
+        return dest;
+    });
+}
+exports.addBranchViewFromBlock = addBranchViewFromBlock;
+function removeLeafView(view) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield (() => __awaiter(this, void 0, void 0, function* () {
+            let module = view.parent;
+            while (module && module.viewType !== vfs.ViewType.module)
+                module = module.parent;
+            if (!module)
+                return;
+            const routesPath = path.join(module.fullPath, 'routes.js');
+            if (!fs.existsSync(routesPath))
+                return;
+            const jsFile = new vfs.JSFile(routesPath);
+            yield jsFile.open();
+            jsFile.parse();
+            const relativePath = path.relative(module.fullPath, view.fullPath);
+            let changed = false;
+            babel.traverse(jsFile.handler.ast, {
+                ExportDefaultDeclaration(nodePath) {
+                    const declaration = nodePath.node.declaration;
+                    if (declaration && declaration.type === 'ObjectExpression') {
+                        const { routeObject, parentArray } = findRouteObjectAndParentArray(declaration, relativePath, true);
+                        if (routeObject) {
+                            parentArray.elements.splice(parentArray.elements.indexOf(routeObject), 1);
+                            changed = true;
+                        }
+                    }
+                },
+            });
+            if (changed)
+                yield jsFile.save();
+        }))();
+        yield fs.remove(view.fullPath);
+    });
+}
+exports.removeLeafView = removeLeafView;
 //# sourceMappingURL=index.js.map

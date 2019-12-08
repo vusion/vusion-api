@@ -13,8 +13,8 @@ export class FileExistsError extends Error {
     }
 }
 
-export function handleSame(dirPath: string, baseName: string = 'u-sample') {
-    let dest = path.resolve(dirPath, `${baseName}.vue`);
+export function handleSame(dir: string, baseName: string = 'u-sample') {
+    let dest = path.resolve(dir, `${baseName}.vue`);
 
     if (fs.existsSync(dest))
         throw new FileExistsError(dest);
@@ -96,8 +96,8 @@ export function listAllFiles(dir?: string, filters: ListFilesFilters = {}) {
 
 /* 以下代码复制粘贴写得冗余了一点，不过之后可能各部分功能会有差异，所以先不整合 */
 
-export async function createDirectory(dirPath: string, dirName: string) {
-    const dest = path.resolve(dirPath, dirName);
+export async function createDirectory(dir: string, dirName: string) {
+    const dest = path.resolve(dir, dirName);
     if (fs.existsSync(dest))
         throw new FileExistsError(dest);
 
@@ -134,9 +134,9 @@ export async function rename(fullPath: string, newName: string) {
     return dest;
 }
 
-export async function createSingleFile(dirPath: string, componentName?: string) {
+export async function createSingleFile(dir: string, componentName?: string) {
     const normalized = normalizeName(componentName);
-    const dest = handleSame(dirPath, normalized.baseName);
+    const dest = handleSame(dir, normalized.baseName);
     await fs.copy(path.resolve(__dirname, '../../templates/u-single-file.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
@@ -151,9 +151,9 @@ export async function createSingleFile(dirPath: string, componentName?: string) 
 /**
  * @deprecated
  **/
-export async function createMultiFile(dirPath: string, componentName?: string) {
+export async function createMultiFile(dir: string, componentName?: string) {
     const normalized = normalizeName(componentName);
-    const dest = handleSame(dirPath, normalized.baseName);
+    const dest = handleSame(dir, normalized.baseName);
     await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
@@ -171,9 +171,9 @@ export async function createMultiFile(dirPath: string, componentName?: string) {
 /**
  * @deprecated
  **/
-export async function createMultiFileWithSubdocs(dirPath: string, componentName?: string) {
+export async function createMultiFileWithSubdocs(dir: string, componentName?: string) {
     const normalized = normalizeName(componentName);
-    const dest = handleSame(dirPath, normalized.baseName);
+    const dest = handleSame(dir, normalized.baseName);
     await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
@@ -192,9 +192,9 @@ export async function createMultiFileWithSubdocs(dirPath: string, componentName?
 /**
  * @deprecated
  **/
-export async function createMultiFileWithScreenshots(dirPath: string, componentName?: string) {
+export async function createMultiFileWithScreenshots(dir: string, componentName?: string) {
     const normalized = normalizeName(componentName);
-    const dest = handleSame(dirPath, normalized.baseName);
+    const dest = handleSame(dir, normalized.baseName);
     await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-screenshots.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
@@ -212,9 +212,9 @@ export async function createMultiFileWithScreenshots(dirPath: string, componentN
 /**
  * @deprecated
  **/
-export async function createMultiFilePackage(dirPath: string, componentName?: string) {
+export async function createMultiFilePackage(dir: string, componentName?: string) {
     const normalized = normalizeName(componentName);
-    const dest = handleSame(dirPath, normalized.baseName);
+    const dest = handleSame(dir, normalized.baseName);
     await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-package.vue'), dest);
 
     if (normalized.baseName !== 'u-sample') {
@@ -233,8 +233,8 @@ export async function createMultiFilePackage(dirPath: string, componentName?: st
 /**
  * @deprecated
  **/
-export async function createPage(dirPath: string) {
-    const dest = handleSame(dirPath, 'page');
+export async function createPage(dir: string) {
+    const dest = handleSame(dir, 'page');
     await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
     return dest;
 }
@@ -242,8 +242,8 @@ export async function createPage(dirPath: string) {
 /**
  * @deprecated
  **/
-export async function createListPage(dirPath: string) {
-    const dest = handleSame(dirPath, 'list');
+export async function createListPage(dir: string) {
+    const dest = handleSame(dir, 'list');
     await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue'), dest);
     return dest;
 }
@@ -251,8 +251,8 @@ export async function createListPage(dirPath: string) {
 /**
  * @deprecated
  **/
-export async function createFormPage(dirPath: string) {
-    const dest = handleSame(dirPath, 'form');
+export async function createFormPage(dir: string) {
+    const dest = handleSame(dir, 'form');
     await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
     return dest;
 }
@@ -260,8 +260,8 @@ export async function createFormPage(dirPath: string) {
 /**
  * @deprecated
  **/
-export async function createDetailPage(dirPath: string) {
-    const dest = handleSame(dirPath, 'detail');
+export async function createDetailPage(dir: string) {
+    const dest = handleSame(dir, 'detail');
     await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
     return dest;
 }

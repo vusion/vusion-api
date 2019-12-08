@@ -26,6 +26,7 @@ export default class View extends FSEntry {
         super(fullPath, isDirectory);
 
         this.viewType = viewType;
+        this.viewsPath = '';
         this.routePath = '';
     }
 
@@ -34,21 +35,19 @@ export default class View extends FSEntry {
      * 需要异步，否则可能会比较慢
      */
     async preOpen() {
-        this.viewsPath = this.fullPath;
-        const viewsPath = path.join(this.viewsPath, 'views');
-        if (fs.existsSync(viewsPath))
-            this.viewsPath = viewsPath;
+        if (fs.existsSync(path.join(this.fullPath, 'views')))
+            this.viewsPath = 'views';
 
         if (this.viewType === ViewType.root) {
             this.routePath = '/';
         } else if (this.viewType === ViewType.page) {
-            this.vueFilePath = path.join(this.viewsPath, 'index.vue');
+            this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
             this.routePath = this.parent.routePath + this.baseName + '#/';
         } else if (this.viewType === ViewType.module) {
-            this.vueFilePath = path.join(this.viewsPath, 'index.vue');
+            this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
             this.routePath = this.parent.routePath + this.baseName + '/';
         } else if (this.viewType === ViewType.branch) {
-            this.vueFilePath = path.join(this.viewsPath, 'index.vue');
+            this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
             this.routePath = this.parent.routePath + this.baseName + '/';
         } else {
             this.vueFilePath = this.fullPath;
@@ -81,9 +80,9 @@ export default class View extends FSEntry {
 
         const children: Array<View> = [];
 
-        const fileNames = await fs.readdir(this.viewsPath);
+        const fileNames = await fs.readdir(path.join(this.fullPath, this.viewsPath));
         fileNames.forEach((name) => {
-            const fullPath = path.join(this.viewsPath, name);
+            const fullPath = path.join(this.fullPath, this.viewsPath, name);
             const isDirectory = fs.statSync(fullPath).isDirectory();
             if (!isDirectory && !name.endsWith('.vue'))
                 return;
@@ -92,10 +91,12 @@ export default class View extends FSEntry {
             if (this.viewType !== ViewType.vue && name === 'index.vue')
                 return;
 
-            let view: View = new View(fullPath, ViewType.branch, isDirectory);
-            // if (this.isWatched)
-            //     view = View.fetch(fullPath);
-            // else
+            let view: View;
+            if (this.isWatched)
+                view = View.fetch(fullPath, ViewType.branch, isDirectory);
+            else
+                view = new View(fullPath, ViewType.branch, isDirectory);
+
             if (fullPath.endsWith('.vue'))
                 view.viewType = ViewType.vue;
             else if (fullPath.endsWith('.md'))
@@ -149,12 +150,15 @@ export default class View extends FSEntry {
 
         if (arr.length === 0)
             throw new Error('Error path: ' + relativePath);
-        else if (arr.length === 1)
-            return childView;
-        else if (!childView.isDirectory)
+        else if (arr.length === 1) {
+            if (childView)
+                return childView;
+            else
+                return alwaysFindOne ? this : childView;
+        } else if (!childView.isDirectory)
             throw new Error('Not a directory: ' + childView.fullPath);
         else
-            return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded);
+            return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded, alwaysFindOne);
     }
 
     async findByRoute(relativePath: string, openIfNotLoaded: boolean = false): Promise<View> {
@@ -182,7 +186,7 @@ export default class View extends FSEntry {
                 return childView.findByRoute(arr.slice(1).join(path.sep), openIfNotLoaded);
     }
 
-    static fetch(fullPath: string) {
-        return super.fetch(fullPath) as View;
+    static fetch(fullPath: string, viewType: ViewType = ViewType.branch, isDirectory: boolean = true) {
+        return super.fetch(fullPath, viewType, isDirectory) as View;
     }
 }

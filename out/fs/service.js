@@ -22,8 +22,8 @@ class FileExistsError extends Error {
     }
 }
 exports.FileExistsError = FileExistsError;
-function handleSame(dirPath, baseName = 'u-sample') {
-    let dest = path.resolve(dirPath, `${baseName}.vue`);
+function handleSame(dir, baseName = 'u-sample') {
+    let dest = path.resolve(dir, `${baseName}.vue`);
     if (fs.existsSync(dest))
         throw new FileExistsError(dest);
     return dest;
@@ -95,9 +95,9 @@ function listAllFiles(dir, filters = {}) {
 }
 exports.listAllFiles = listAllFiles;
 /* 以下代码复制粘贴写得冗余了一点，不过之后可能各部分功能会有差异，所以先不整合 */
-function createDirectory(dirPath, dirName) {
+function createDirectory(dir, dirName) {
     return __awaiter(this, void 0, void 0, function* () {
-        const dest = path.resolve(dirPath, dirName);
+        const dest = path.resolve(dir, dirName);
         if (fs.existsSync(dest))
             throw new FileExistsError(dest);
         yield fs.mkdir(dest);
@@ -138,10 +138,10 @@ function rename(fullPath, newName) {
     });
 }
 exports.rename = rename;
-function createSingleFile(dirPath, componentName) {
+function createSingleFile(dir, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);
-        const dest = handleSame(dirPath, normalized.baseName);
+        const dest = handleSame(dir, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../../templates/u-single-file.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
             yield batchReplace(dest, [
@@ -156,10 +156,10 @@ exports.createSingleFile = createSingleFile;
 /**
  * @deprecated
  **/
-function createMultiFile(dirPath, componentName) {
+function createMultiFile(dir, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);
-        const dest = handleSame(dirPath, normalized.baseName);
+        const dest = handleSame(dir, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
             yield batchReplace([
@@ -177,10 +177,10 @@ exports.createMultiFile = createMultiFile;
 /**
  * @deprecated
  **/
-function createMultiFileWithSubdocs(dirPath, componentName) {
+function createMultiFileWithSubdocs(dir, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);
-        const dest = handleSame(dirPath, normalized.baseName);
+        const dest = handleSame(dir, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
             yield batchReplace([
@@ -199,10 +199,10 @@ exports.createMultiFileWithSubdocs = createMultiFileWithSubdocs;
 /**
  * @deprecated
  **/
-function createMultiFileWithScreenshots(dirPath, componentName) {
+function createMultiFileWithScreenshots(dir, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);
-        const dest = handleSame(dirPath, normalized.baseName);
+        const dest = handleSame(dir, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-screenshots.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
             yield batchReplace([
@@ -220,10 +220,10 @@ exports.createMultiFileWithScreenshots = createMultiFileWithScreenshots;
 /**
  * @deprecated
  **/
-function createMultiFilePackage(dirPath, componentName) {
+function createMultiFilePackage(dir, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);
-        const dest = handleSame(dirPath, normalized.baseName);
+        const dest = handleSame(dir, normalized.baseName);
         yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-package.vue'), dest);
         if (normalized.baseName !== 'u-sample') {
             yield batchReplace([
@@ -242,9 +242,9 @@ exports.createMultiFilePackage = createMultiFilePackage;
 /**
  * @deprecated
  **/
-function createPage(dirPath) {
+function createPage(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        const dest = handleSame(dirPath, 'page');
+        const dest = handleSame(dir, 'page');
         yield fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
         return dest;
     });
@@ -253,9 +253,9 @@ exports.createPage = createPage;
 /**
  * @deprecated
  **/
-function createListPage(dirPath) {
+function createListPage(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        const dest = handleSame(dirPath, 'list');
+        const dest = handleSame(dir, 'list');
         yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue'), dest);
         return dest;
     });
@@ -264,9 +264,9 @@ exports.createListPage = createListPage;
 /**
  * @deprecated
  **/
-function createFormPage(dirPath) {
+function createFormPage(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        const dest = handleSame(dirPath, 'form');
+        const dest = handleSame(dir, 'form');
         yield fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
         return dest;
     });
@@ -275,9 +275,9 @@ exports.createFormPage = createFormPage;
 /**
  * @deprecated
  **/
-function createDetailPage(dirPath) {
+function createDetailPage(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        const dest = handleSame(dirPath, 'detail');
+        const dest = handleSame(dir, 'detail');
         yield fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
         return dest;
     });
