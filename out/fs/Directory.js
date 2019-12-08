@@ -40,10 +40,10 @@ class Directory extends FSEntry_1.default {
                 const fullPath = path.join(this.fullPath, name);
                 const isDirectory = fs.statSync(fullPath).isDirectory();
                 let fsEntry;
-                if (this.isWatched)
-                    fsEntry = isDirectory ? Directory.fetch(fullPath) : File_1.default.fetch(fullPath);
-                else
-                    fsEntry = isDirectory ? new Directory(fullPath) : new File_1.default(fullPath);
+                // if (this.isWatched)
+                //     fsEntry = isDirectory ? Directory.fetch(fullPath) : File.fetch(fullPath);
+                // else
+                fsEntry = isDirectory ? new Directory(fullPath) : new File_1.default(fullPath);
                 children.push(fsEntry);
             });
             children.sort((a, b) => {

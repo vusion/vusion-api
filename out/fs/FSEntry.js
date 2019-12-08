@@ -77,13 +77,28 @@ class FSEntry {
         const index = listeners.indexOf(listener);
         ~index && listeners.splice(index, 1);
     }
+    watch(listener) {
+        this.isWatched = true;
+        return chokidar.watch(this.fullPath, {
+            ignored: ['**/node_modules', '**/.git'],
+            ignoreInitial: true,
+            followSymlinks: false,
+        }).on('all', (eventName, filePath) => {
+            if (this.isSaving)
+                return;
+            listener(eventName, filePath);
+        });
+    }
     /**
      * 缓存获取
+     * @deprecated
      * @param fullPath
      * @param args
      */
     static fetch(fullPath, ...args) {
+        return new this(fullPath, ...args);
         // this.name 是 constructor 的 name
+        /*
         const key = this.name + '-' + fullPath;
         if (_caches.has(key))
             return _caches.get(key);
@@ -91,42 +106,45 @@ class FSEntry {
             const fsEntry = new this(fullPath, ...args);
             fsEntry.isWatched = true;
             _caches.set(key, fsEntry);
+
             const hash = new Date().toJSON();
+
             const fsWatch = chokidar.watch(fullPath, {
-                ignored: [path.join(fullPath, 'node_modules/**'), path.join(fullPath, '.git/**')],
+                ignored: ['** /node_modules', '** /.git'],
                 ignoreInitial: true,
                 followSymlinks: false,
                 depth: 1,
-            }).on('all', (event, filePath) => __awaiter(this, void 0, void 0, function* () {
+            }).on('all', async (event, filePath) => {
                 if (fsEntry.isSaving)
                     return;
                 if (!_caches.has(key))
                     fsWatch.unwatch(fullPath);
+
                 // 触发 forceOpen 的 miniChange
                 if (filePath === fullPath) {
                     // Remove directory or file
                     if (event === 'unlink' || event === 'unlinkDir') {
                         _caches.delete(key);
                         fsWatch.unwatch(fullPath);
-                    }
-                    else
-                        yield fsEntry.onMiniChange(event, filePath, key, hash);
-                }
-                else {
+                    } else
+                        await fsEntry.onMiniChange(event, filePath, key, hash);
+                } else {
                     if (fsEntry.isVue)
-                        yield fsEntry.onMiniChange(event, filePath, key, hash);
+                        await fsEntry.onMiniChange(event, filePath, key, hash);
                     else {
                         const relativePath = path.relative(fullPath, filePath);
                         if (relativePath.includes('/'))
                             return fsEntry.onChange(event, filePath, key, hash);
                         else if (event !== 'change')
-                            yield fsEntry.onMiniChange(event, filePath, key, hash);
+                            await fsEntry.onMiniChange(event, filePath, key, hash);
                     }
                 }
+
                 return fsEntry.onChange(event, filePath, key, hash);
-            }));
+            });
+
             return fsEntry;
-        }
+        } */
     }
 }
 exports.default = FSEntry;

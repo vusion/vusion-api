@@ -38,10 +38,10 @@ export default class Directory extends FSEntry {
             const isDirectory = fs.statSync(fullPath).isDirectory();
 
             let fsEntry: FSEntry;
-            if (this.isWatched)
-                fsEntry = isDirectory ? Directory.fetch(fullPath) : File.fetch(fullPath);
-            else
-                fsEntry = isDirectory ? new Directory(fullPath) : new File(fullPath);
+            // if (this.isWatched)
+            //     fsEntry = isDirectory ? Directory.fetch(fullPath) : File.fetch(fullPath);
+            // else
+            fsEntry = isDirectory ? new Directory(fullPath) : new File(fullPath);
             children.push(fsEntry);
         });
 

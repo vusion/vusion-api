@@ -742,7 +742,8 @@ function addBranchViewFromBlock(source, parent, name, title) {
             registry: source.registry,
             name: source.name,
         }, blockCacheDir);
-        yield fs.copy(tempPath, path.join(dest, 'index.vue'));
+        yield fs.remove(dest);
+        yield fs.copy(tempPath, dest);
         yield fs.remove(path.join(dest, 'public'));
         yield fs.remove(path.join(dest, 'screenshots'));
         yield fs.remove(path.join(dest, 'package.json'));
@@ -755,7 +756,7 @@ function addBranchViewFromBlock(source, parent, name, title) {
             vueFile.transform();
             yield vueFile.save();
         }
-        yield addLeafViewRoute(parent, name, title);
+        yield addBranchViewRoute(parent, name, title);
         return dest;
     });
 }

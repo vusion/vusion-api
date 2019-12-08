@@ -92,13 +92,30 @@ export default class FSEntry {
         ~index && listeners.splice(index, 1);
     }
 
+    watch(listener: (eventName: string, filePath: string) => void) {
+        this.isWatched = true;
+        return chokidar.watch(this.fullPath, {
+            ignored: ['**/node_modules', '**/.git'],
+            ignoreInitial: true,
+            followSymlinks: false,
+        }).on('all', (eventName, filePath) => {
+            if (this.isSaving)
+                return;
+            listener(eventName, filePath);
+        });
+    }
+
     /**
      * 缓存获取
+     * @deprecated
      * @param fullPath
      * @param args
      */
     static fetch(fullPath: string, ...args: any[]) {
+        return new this(fullPath, ...args);
+
         // this.name 是 constructor 的 name
+        /*
         const key = this.name + '-' + fullPath;
         if (_caches.has(key))
             return _caches.get(key);
@@ -110,7 +127,7 @@ export default class FSEntry {
             const hash = new Date().toJSON();
 
             const fsWatch = chokidar.watch(fullPath, {
-                ignored: [path.join(fullPath, 'node_modules/**'), path.join(fullPath, '.git/**')],
+                ignored: ['** /node_modules', '** /.git'],
                 ignoreInitial: true,
                 followSymlinks: false,
                 depth: 1,
@@ -144,6 +161,6 @@ export default class FSEntry {
             });
 
             return fsEntry;
-        }
+        } */
     }
 }

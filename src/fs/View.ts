@@ -92,10 +92,10 @@ export default class View extends FSEntry {
                 return;
 
             let view: View;
-            if (this.isWatched)
-                view = View.fetch(fullPath, ViewType.branch, isDirectory);
-            else
-                view = new View(fullPath, ViewType.branch, isDirectory);
+            // if (this.isWatched)
+            //     view = View.fetch(fullPath, ViewType.branch, isDirectory);
+            // else
+            view = new View(fullPath, ViewType.branch, isDirectory);
 
             if (fullPath.endsWith('.vue'))
                 view.viewType = ViewType.vue;

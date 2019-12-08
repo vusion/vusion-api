@@ -89,10 +89,10 @@ class View extends FSEntry_1.default {
                 if (this.viewType !== ViewType.vue && name === 'index.vue')
                     return;
                 let view;
-                if (this.isWatched)
-                    view = View.fetch(fullPath, ViewType.branch, isDirectory);
-                else
-                    view = new View(fullPath, ViewType.branch, isDirectory);
+                // if (this.isWatched)
+                //     view = View.fetch(fullPath, ViewType.branch, isDirectory);
+                // else
+                view = new View(fullPath, ViewType.branch, isDirectory);
                 if (fullPath.endsWith('.vue'))
                     view.viewType = ViewType.vue;
                 else if (fullPath.endsWith('.md'))

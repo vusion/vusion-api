@@ -117,10 +117,10 @@ export default class VueFile extends FSEntry {
 
             const fullPath = path.join(this.fullPath, name);
             let vueFile;
-            if (this.isWatched)
-                vueFile = VueFile.fetch(fullPath);
-            else
-                vueFile = new VueFile(fullPath);
+            // if (this.isWatched)
+            //     vueFile = VueFile.fetch(fullPath);
+            // else
+            vueFile = new VueFile(fullPath);
             vueFile.parent = this;
             vueFile.isChild = true;
             children.push(vueFile);

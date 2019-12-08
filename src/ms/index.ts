@@ -831,7 +831,8 @@ export async function addBranchViewFromBlock(source: MaterialSource, parent: vfs
         name: source.name,
     }, blockCacheDir);
 
-    await fs.copy(tempPath, path.join(dest, 'index.vue'));
+    await fs.remove(dest);
+    await fs.copy(tempPath, dest);
     await fs.remove(path.join(dest, 'public'));
     await fs.remove(path.join(dest, 'screenshots'));
     await fs.remove(path.join(dest, 'package.json'));
@@ -847,7 +848,7 @@ export async function addBranchViewFromBlock(source: MaterialSource, parent: vfs
         await vueFile.save();
     }
 
-    await addLeafViewRoute(parent, name, title);
+    await addBranchViewRoute(parent, name, title);
     return dest;
 }
 
