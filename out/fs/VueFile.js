@@ -158,12 +158,9 @@ class VueFile extends FSEntry_1.default {
                 }
                 if (fs.existsSync(path.join(this.fullPath, 'package.json'))) {
                     const content = yield fs.readFile(path.join(this.fullPath, 'package.json'), 'utf8');
-                    try {
-                        this.package = JSON.parse(content);
-                    }
-                    catch (e) {
-                        this.package = content;
-                    }
+                    // try {
+                    this.package = JSON.parse(content);
+                    // } catch (e) {}
                 }
             }
             else {

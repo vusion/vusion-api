@@ -546,6 +546,8 @@ export async function removeBlock(vueFilePath: string, baseName: string) {
     const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
     const dest = path.join(localBlocksPath, baseName + '.vue');
     await fs.remove(dest);
+
+    return vueFile;
 }
 
 export async function createComponentPackage(dir: string, options: {

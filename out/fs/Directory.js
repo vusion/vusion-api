@@ -68,15 +68,15 @@ class Directory extends FSEntry_1.default {
             const next = arr[0];
             if (!next)
                 throw new Error('Starting root / is not allowed!');
-            const nextEntry = this.children.find((fsEntry) => fsEntry.fileName === next);
+            const childEntry = this.children.find((fsEntry) => fsEntry.fileName === next);
             if (arr.length === 0)
                 throw new Error('Error path: ' + relativePath);
             else if (arr.length === 1)
-                return nextEntry;
-            else if (!nextEntry.isDirectory)
-                throw new Error('Not a directory: ' + nextEntry.fullPath);
+                return childEntry;
+            else if (!childEntry.isDirectory)
+                throw new Error('Not a directory: ' + childEntry.fullPath);
             else
-                return nextEntry.find(arr.slice(1).join(path.sep), openIfNotLoaded);
+                return childEntry.find(arr.slice(1).join(path.sep), openIfNotLoaded);
         });
     }
     static fetch(fullPath) {

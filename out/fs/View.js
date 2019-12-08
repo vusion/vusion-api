@@ -17,11 +17,12 @@ var ViewType;
     ViewType["root"] = "root";
     ViewType["page"] = "page";
     ViewType["module"] = "module";
-    ViewType["wrapper"] = "wrapper";
+    ViewType["branch"] = "branch";
     ViewType["vue"] = "vue";
+    ViewType["md"] = "md";
 })(ViewType = exports.ViewType || (exports.ViewType = {}));
 class View extends FSEntry_1.default {
-    constructor(fullPath, viewType = ViewType.wrapper, isDirectory = true) {
+    constructor(fullPath, viewType = ViewType.branch, isDirectory = true) {
         super(fullPath, isDirectory);
         this.viewType = viewType;
         this.routePath = '';
@@ -47,7 +48,7 @@ class View extends FSEntry_1.default {
                 this.vueFilePath = path.join(this.viewsPath, 'index.vue');
                 this.routePath = this.parent.routePath + this.baseName + '/';
             }
-            else if (this.viewType === ViewType.wrapper) {
+            else if (this.viewType === ViewType.branch) {
                 this.vueFilePath = path.join(this.viewsPath, 'index.vue');
                 this.routePath = this.parent.routePath + this.baseName + '/';
             }
@@ -88,12 +89,14 @@ class View extends FSEntry_1.default {
                     return;
                 if (this.viewType !== ViewType.vue && name === 'index.vue')
                     return;
-                let view = new View(fullPath, ViewType.wrapper, isDirectory);
+                let view = new View(fullPath, ViewType.branch, isDirectory);
                 // if (this.isWatched)
                 //     view = View.fetch(fullPath);
                 // else
                 if (fullPath.endsWith('.vue'))
                     view.viewType = ViewType.vue;
+                else if (fullPath.endsWith('.md'))
+                    view.viewType = ViewType.md;
                 else if (this.viewType === ViewType.root)
                     view.viewType = ViewType.page;
                 else if (this.viewType === ViewType.page && fileNames.includes('modules.js'))
@@ -109,6 +112,64 @@ class View extends FSEntry_1.default {
                     return a.isDirectory ? -1 : 1;
             });
             return this.children = children;
+        });
+    }
+    /**
+     *
+     * @param relativePath
+     * @example rootView.find('dashboard')
+     * @example rootView.find('dashboard/views/notice/detail.vue')
+     */
+    findByRealPath(relativePath, openIfNotLoaded = false, alwaysFindOne = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.children) {
+                if (openIfNotLoaded)
+                    yield this.open();
+                else
+                    return;
+            }
+            relativePath = path.normalize(relativePath);
+            const arr = relativePath.split(path.sep);
+            if (arr[0] === 'views')
+                arr.shift();
+            const next = arr[0];
+            if (!next)
+                throw new Error('Starting root / is not allowed!');
+            if (!this.children || !this.children.length || next === 'index.vue')
+                return this;
+            const childView = this.children.find((view) => view.fileName === next);
+            if (arr.length === 0)
+                throw new Error('Error path: ' + relativePath);
+            else if (arr.length === 1)
+                return childView;
+            else if (!childView.isDirectory)
+                throw new Error('Not a directory: ' + childView.fullPath);
+            else
+                return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded);
+        });
+    }
+    findByRoute(relativePath, openIfNotLoaded = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.children) {
+                if (openIfNotLoaded)
+                    yield this.open();
+                else
+                    return;
+            }
+            relativePath = path.normalize(relativePath);
+            const arr = relativePath.split(path.sep);
+            const next = arr[0];
+            if (!next)
+                throw new Error('Starting root / is not allowed!');
+            const childView = this.children.find((view) => view.baseName === next);
+            if (arr.length === 0)
+                throw new Error('Error path: ' + relativePath);
+            else if (arr.length === 1)
+                return childView;
+            else if (!childView.isDirectory)
+                throw new Error('Not a directory: ' + childView.fullPath);
+            else
+                return childView.findByRoute(arr.slice(1).join(path.sep), openIfNotLoaded);
         });
     }
     static fetch(fullPath) {

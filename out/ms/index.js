@@ -488,6 +488,7 @@ function removeBlock(vueFilePath, baseName) {
         const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
         const dest = path.join(localBlocksPath, baseName + '.vue');
         yield fs.remove(dest);
+        return vueFile;
     });
 }
 exports.removeBlock = removeBlock;

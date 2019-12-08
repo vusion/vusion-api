@@ -8,8 +8,9 @@ export enum ViewType {
     root = 'root',
     page = 'page',
     module = 'module',
-    wrapper = 'wrapper',
-    vue = 'vue',
+    branch = 'branch',
+    vue = 'vue', // leaf
+    md = 'md', // leaf
 }
 
 export default class View extends FSEntry {
@@ -21,7 +22,7 @@ export default class View extends FSEntry {
     routePath: string;
     vueFilePath: string;
 
-    constructor(fullPath: string, viewType: ViewType = ViewType.wrapper, isDirectory: boolean = true) {
+    constructor(fullPath: string, viewType: ViewType = ViewType.branch, isDirectory: boolean = true) {
         super(fullPath, isDirectory);
 
         this.viewType = viewType;
@@ -46,7 +47,7 @@ export default class View extends FSEntry {
         } else if (this.viewType === ViewType.module) {
             this.vueFilePath = path.join(this.viewsPath, 'index.vue');
             this.routePath = this.parent.routePath + this.baseName + '/';
-        } else if (this.viewType === ViewType.wrapper) {
+        } else if (this.viewType === ViewType.branch) {
             this.vueFilePath = path.join(this.viewsPath, 'index.vue');
             this.routePath = this.parent.routePath + this.baseName + '/';
         } else {
@@ -91,12 +92,14 @@ export default class View extends FSEntry {
             if (this.viewType !== ViewType.vue && name === 'index.vue')
                 return;
 
-            let view: View = new View(fullPath, ViewType.wrapper, isDirectory);
+            let view: View = new View(fullPath, ViewType.branch, isDirectory);
             // if (this.isWatched)
             //     view = View.fetch(fullPath);
             // else
             if (fullPath.endsWith('.vue'))
                 view.viewType = ViewType.vue;
+            else if (fullPath.endsWith('.md'))
+                view.viewType = ViewType.md;
             else if (this.viewType === ViewType.root)
                 view.viewType = ViewType.page;
             else if (this.viewType === ViewType.page && fileNames.includes('modules.js'))
@@ -116,6 +119,67 @@ export default class View extends FSEntry {
         });
 
         return this.children = children;
+    }
+
+    /**
+     *
+     * @param relativePath
+     * @example rootView.find('dashboard')
+     * @example rootView.find('dashboard/views/notice/detail.vue')
+     */
+    async findByRealPath(relativePath: string, openIfNotLoaded: boolean = false, alwaysFindOne: boolean = false): Promise<View> {
+        if (!this.children) {
+            if (openIfNotLoaded)
+                await this.open();
+            else
+                return;
+        }
+
+        relativePath = path.normalize(relativePath);
+        const arr = relativePath.split(path.sep);
+        if (arr[0] === 'views')
+            arr.shift();
+        const next = arr[0];
+        if (!next)
+            throw new Error('Starting root / is not allowed!');
+
+        if (!this.children || !this.children.length || next === 'index.vue')
+            return this;
+        const childView = this.children.find((view) => view.fileName === next);
+
+        if (arr.length === 0)
+            throw new Error('Error path: ' + relativePath);
+        else if (arr.length === 1)
+            return childView;
+        else if (!childView.isDirectory)
+            throw new Error('Not a directory: ' + childView.fullPath);
+        else
+            return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded);
+    }
+
+    async findByRoute(relativePath: string, openIfNotLoaded: boolean = false): Promise<View> {
+        if (!this.children) {
+            if (openIfNotLoaded)
+                await this.open();
+            else
+                return;
+        }
+
+        relativePath = path.normalize(relativePath);
+        const arr = relativePath.split(path.sep);
+        const next = arr[0];
+        if (!next)
+            throw new Error('Starting root / is not allowed!');
+
+            const childView = this.children.find((view) => view.baseName === next);
+            if (arr.length === 0)
+                throw new Error('Error path: ' + relativePath);
+            else if (arr.length === 1)
+                return childView;
+            else if (!childView.isDirectory)
+                throw new Error('Not a directory: ' + childView.fullPath);
+            else
+                return childView.findByRoute(arr.slice(1).join(path.sep), openIfNotLoaded);
     }
 
     static fetch(fullPath: string) {

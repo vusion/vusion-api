@@ -12,6 +12,7 @@ import ScriptHandler from './ScriptHandler';
 import StyleHandler from './StyleHandler';
 
 import traverse from '@babel/traverse';
+import PackageJSON from '../types/PackageJSON';
 
 const fetchPartialContent = (content: string, tag: string) => {
     const reg = new RegExp(`<${tag}.*?>([\\s\\S]+)<\\/${tag}>`);
@@ -43,7 +44,7 @@ export default class VueFile extends FSEntry {
     script: string;
     style: string;
     sample: string;
-    package: Object;
+    package: PackageJSON;
 
     templateHandler: TemplateHandler; // 为`undefined`表示还未解析
     scriptHandler: ScriptHandler; // 为`undefined`表示还未解析
@@ -180,11 +181,9 @@ export default class VueFile extends FSEntry {
             }
             if (fs.existsSync(path.join(this.fullPath, 'package.json'))) {
                 const content = await fs.readFile(path.join(this.fullPath, 'package.json'), 'utf8');
-                try {
-                    this.package = JSON.parse(content);
-                } catch (e) {
-                    this.package = content;
-                }
+                // try {
+                this.package = JSON.parse(content);
+                // } catch (e) {}
             }
         } else {
             this.content = await fs.readFile(this.fullPath, 'utf8');
