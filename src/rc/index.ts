@@ -1,1 +1,1 @@
-export { default as configurator } from './configurator';
+export { default as configurator, ManagerInstallSaveOptions } from './configurator';

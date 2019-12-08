@@ -75,18 +75,18 @@ class View extends FSEntry_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
                 throw new Error(`Cannot find: ${this.fullPath}`);
-            if (this.viewType === ViewType.vue) // 没有打开的必要了
+            if (this.viewType === ViewType.vue || this.viewType === ViewType.md) // 没有打开的必要了
                 return;
             const children = [];
             const fileNames = yield fs.readdir(path.join(this.fullPath, this.viewsPath));
             fileNames.forEach((name) => {
                 const fullPath = path.join(this.fullPath, this.viewsPath, name);
                 const isDirectory = fs.statSync(fullPath).isDirectory();
-                if (!isDirectory && !name.endsWith('.vue'))
+                if (!(isDirectory || name.endsWith('.vue') || name.endsWith('.md')))
                     return;
                 if (name === '.DS_Store' || name === '.git')
                     return;
-                if (this.viewType !== ViewType.vue && name === 'index.vue')
+                if (name === 'index.vue' || name === 'index.md')
                     return;
                 let view;
                 // if (this.isWatched)
@@ -135,7 +135,7 @@ class View extends FSEntry_1.default {
             const next = arr[0];
             if (!next)
                 throw new Error('Starting root / is not allowed!');
-            if (!this.children || !this.children.length || next === 'index.vue')
+            if (!this.children || !this.children.length || next === 'index.vue' || next === 'index.md')
                 return this;
             const childView = this.children.find((view) => view.fileName === next);
             if (arr.length === 0)

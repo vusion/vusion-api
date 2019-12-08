@@ -53,6 +53,7 @@ export default class View extends FSEntry {
             this.vueFilePath = this.fullPath;
             this.routePath = this.parent.routePath + this.baseName;
         }
+
         // this.alias = await this.readTitleInReadme();
     }
 
@@ -75,7 +76,7 @@ export default class View extends FSEntry {
         if (!fs.existsSync(this.fullPath))
             throw new Error(`Cannot find: ${this.fullPath}`);
 
-        if (this.viewType === ViewType.vue) // 没有打开的必要了
+        if (this.viewType === ViewType.vue || this.viewType === ViewType.md) // 没有打开的必要了
             return;
 
         const children: Array<View> = [];
@@ -84,11 +85,11 @@ export default class View extends FSEntry {
         fileNames.forEach((name) => {
             const fullPath = path.join(this.fullPath, this.viewsPath, name);
             const isDirectory = fs.statSync(fullPath).isDirectory();
-            if (!isDirectory && !name.endsWith('.vue'))
+            if (!(isDirectory || name.endsWith('.vue') || name.endsWith('.md')))
                 return;
             if (name === '.DS_Store' || name === '.git')
                 return;
-            if (this.viewType !== ViewType.vue && name === 'index.vue')
+            if (name === 'index.vue' || name === 'index.md')
                 return;
 
             let view: View;
@@ -144,7 +145,7 @@ export default class View extends FSEntry {
         if (!next)
             throw new Error('Starting root / is not allowed!');
 
-        if (!this.children || !this.children.length || next === 'index.vue')
+        if (!this.children || !this.children.length || next === 'index.vue' || next === 'index.md')
             return this;
         const childView = this.children.find((view) => view.fileName === next);
 

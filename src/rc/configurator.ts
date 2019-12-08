@@ -6,8 +6,6 @@ import * as YAML from 'yaml';
 const rcPath = path.resolve(os.homedir(), '.vusionrc');
 
 export enum ManagerInstallSaveOptions {
-    false = 'false',
-    true = 'true',
     'dep' = 'dep',
     'dev' = 'dev',
     'peer' = 'peer',
@@ -41,7 +39,7 @@ publish_manager: npm
         const config = this.load();
         return config.registries[config.download_manager] || 'https://registry.npmjs.org';
     },
-    getInstallCommand(packageName?: string, save: ManagerInstallSaveOptions = ManagerInstallSaveOptions.false) {
+    getInstallCommand(packageName?: string, save: ManagerInstallSaveOptions | boolean = false) {
         const config = this.load();
         if (!packageName) {
             if (config.download_manager === 'yarn')
@@ -50,9 +48,9 @@ publish_manager: npm
                 return `${config.download_manager} install`;
         } else {
             if (config.download_manager === 'yarn')
-                return `yarn add ${packageName}${save === ManagerInstallSaveOptions.false || save === ManagerInstallSaveOptions.true ? '' : ' --' + save}`;
+                return `yarn add ${packageName}${save === false ? '' : (save === true ? '' : ' --' + save)}`;
             else
-                return `${config.download_manager} install ${packageName}${save === ManagerInstallSaveOptions.false || save === ManagerInstallSaveOptions.true ? '' : ' --save-' + save}`;
+                return `${config.download_manager} install ${packageName}${save === false ? '' : (save === true ? '--save' : ' --save-' + save)}`;
         }
     },
 };

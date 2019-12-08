@@ -7,8 +7,6 @@ const YAML = require("yaml");
 const rcPath = path.resolve(os.homedir(), '.vusionrc');
 var ManagerInstallSaveOptions;
 (function (ManagerInstallSaveOptions) {
-    ManagerInstallSaveOptions["false"] = "false";
-    ManagerInstallSaveOptions["true"] = "true";
     ManagerInstallSaveOptions["dep"] = "dep";
     ManagerInstallSaveOptions["dev"] = "dev";
     ManagerInstallSaveOptions["peer"] = "peer";
@@ -38,7 +36,7 @@ publish_manager: npm
         const config = this.load();
         return config.registries[config.download_manager] || 'https://registry.npmjs.org';
     },
-    getInstallCommand(packageName, save = ManagerInstallSaveOptions.false) {
+    getInstallCommand(packageName, save = false) {
         const config = this.load();
         if (!packageName) {
             if (config.download_manager === 'yarn')
@@ -48,9 +46,9 @@ publish_manager: npm
         }
         else {
             if (config.download_manager === 'yarn')
-                return `yarn add ${packageName}${save === ManagerInstallSaveOptions.false || save === ManagerInstallSaveOptions.true ? '' : ' --' + save}`;
+                return `yarn add ${packageName}${save === false ? '' : (save === true ? '' : ' --' + save)}`;
             else
-                return `${config.download_manager} install ${packageName}${save === ManagerInstallSaveOptions.false || save === ManagerInstallSaveOptions.true ? '' : ' --save-' + save}`;
+                return `${config.download_manager} install ${packageName}${save === false ? '' : (save === true ? '--save' : ' --save-' + save)}`;
         }
     },
 };
