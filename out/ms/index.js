@@ -228,6 +228,14 @@ function getComponents() {
     });
 }
 exports.getComponents = getComponents;
+function teamExist(teamName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.get('team/exist', { params: { teamName } })
+            .then((res) => res.data.result.isExist);
+    });
+}
+exports.teamExist = teamExist;
 function publishBlock(params) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();

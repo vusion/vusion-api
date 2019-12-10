@@ -262,6 +262,12 @@ export async function getComponents(): Promise<Component[]> {
         });
 }
 
+export async function teamExist(teamName: string) {
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.get('team/exist', { params: { teamName } })
+        .then((res) => res.data.result.isExist);
+}
+
 export async function publishBlock(params: object) {
     const pfAxios = await getPlatformAxios();
     return pfAxios.post('block/publish', params)
