@@ -63,7 +63,7 @@ export default class Library {
     async open() {
         if (this.isOpen)
             return;
-        this.forceOpen();
+        return this.forceOpen();
     }
 
     async forceOpen() {
@@ -92,6 +92,7 @@ export default class Library {
         /* 在 package.json 中查找 .vusion 或 .vue 的依赖项 */
         const vusionDeps: Array<string> = [];
         const vueDeps: Array<string> = [];
+
         Object.keys(this.package.dependencies).forEach((dep) => {
             if (dep.endsWith('.vusion'))
                 vusionDeps.push(dep);

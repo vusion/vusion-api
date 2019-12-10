@@ -39,7 +39,7 @@ class Library {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.isOpen)
                 return;
-            this.forceOpen();
+            return this.forceOpen();
         });
     }
     forceOpen() {
