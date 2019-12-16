@@ -74,7 +74,7 @@ class TemplateHandler {
         let attrsString = '';
         attrs.forEach((attr) => {
             if (attrsLength >= 120 || attr.length >= 120) {
-                attrsString += '\n' + tabs + ' '.repeat(el.tag.length + 1);
+                attrsString += '\n' + tabs + ' '.repeat(4) // ' '.repeat(el.tag.length + 1);
                 attrsLength = 0;
             }
             attrsString += ' ' + attr;

@@ -24,7 +24,7 @@ const traverse_1 = require("@babel/traverse");
 const fetchPartialContent = (content, tag) => {
     const reg = new RegExp(`<${tag}.*?>([\\s\\S]+)<\\/${tag}>`);
     const m = content.match(reg);
-    return m ? m[1].trim() + '\n' : '';
+    return m ? m[1].replace(/^\n+/, '') : '';
 };
 var VueFileExtendMode;
 (function (VueFileExtendMode) {
@@ -242,6 +242,16 @@ class VueFile extends FSEntry_1.default {
     }
     transform() {
         const isDirectory = this.isDirectory;
+        if (!isDirectory && !this.script) {
+            this.script = `export default {};\n`;
+        }
+        console.log(this.template.match(/^ */)[0]);
+        if (!isDirectory && this.template) {
+            const tabs = this.template.match(/^ */)[0];
+            console.log(tabs.length);
+            if (tabs)
+                this.template = this.template.replace(new RegExp('^' + tabs, 'mg'), '');
+        }
         this.parseScript();
         this.parseStyle();
         // this.parseTemplate();

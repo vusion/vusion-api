@@ -17,7 +17,7 @@ import PackageJSON from '../types/PackageJSON';
 const fetchPartialContent = (content: string, tag: string) => {
     const reg = new RegExp(`<${tag}.*?>([\\s\\S]+)<\\/${tag}>`);
     const m = content.match(reg);
-    return m ? m[1].trim() + '\n' : '';
+    return m ? m[1].replace(/^\n+/, '') : '';
 };
 
 export enum VueFileExtendMode {
@@ -276,6 +276,18 @@ export default class VueFile extends FSEntry {
 
     transform() {
         const isDirectory = this.isDirectory;
+
+        if (!isDirectory && !this.script) {
+            this.script = `export default {};\n`;
+        }
+
+        console.log(this.template.match(/^ */)[0]);
+        if (!isDirectory && this.template) {
+            const tabs = this.template.match(/^ */)[0];
+            console.log(tabs.length);
+            if (tabs)
+                this.template = this.template.replace(new RegExp('^' + tabs, 'mg'), '');
+        }
 
         this.parseScript();
         this.parseStyle();
