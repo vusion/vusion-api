@@ -278,7 +278,7 @@ export default class VueFile extends FSEntry {
         const isDirectory = this.isDirectory;
 
         if (!isDirectory && !this.script) {
-            this.script = `export default {};\n`;
+            this.script = 'export default {};\n';
         }
 
         console.log(this.template.match(/^ */)[0]);

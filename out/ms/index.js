@@ -280,8 +280,8 @@ function createBlockPackage(dir, options) {
             pkg.vusion = pkg.vusion || {};
             pkg.vusion.title = options.title || pkg.vusion.title;
             pkg.vusion.category = options.category || pkg.vusion.category;
-            pkg.vusion.access = options.access || pkg.vusion.access;
             pkg.vusion.team = options.team || pkg.vusion.team;
+            pkg.vusion.access = options.access || pkg.vusion.access;
             yield fs.outputFile(packageJSONPath, JSON.stringify(pkg, null, 2));
         }
         return dest;
@@ -301,9 +301,9 @@ function addBlock(options) {
         const vueFile = new vfs.VueFile(opts.target);
         yield vueFile.open();
         if (!vueFile.isDirectory) {
-            if (!vueFile.script)
-                vueFile.script = 'export default {}\n';
-            if (!vueFile.template)
+            // if (!vueFile.script)
+            //     vueFile.script = 'export default {};\n';
+            if (!vueFile.template) // @TODO: should check
                 vueFile.template = '<div></div>\n';
             vueFile.transform();
             yield vueFile.save();
