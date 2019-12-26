@@ -89,6 +89,8 @@ export default class View extends FSEntry {
                 return;
             if (name === '.DS_Store' || name === '.git')
                 return;
+            if (isDirectory && name.endsWith('.blocks'))
+                return;
             if (name === 'index.vue' || name === 'index.md')
                 return;
 

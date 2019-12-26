@@ -13,7 +13,6 @@ const path = require("path");
 const babel = require("@babel/core");
 const compiler = require("vue-template-compiler");
 const fs = require("fs-extra");
-const shell = require("shelljs");
 const os = require("os");
 const vfs = require("../fs");
 const utils = require("../utils");
@@ -297,18 +296,9 @@ function addBlock(options) {
             registry: opts.source.registry,
             name: opts.source.name,
         }, blockCacheDir);
-        // if (fs.statSync(opts.target).isFile())
         const vueFile = new vfs.VueFile(opts.target);
         yield vueFile.open();
-        if (!vueFile.isDirectory) {
-            // if (!vueFile.script)
-            //     vueFile.script = 'export default {};\n';
-            if (!vueFile.template) // @TODO: should check
-                vueFile.template = '<div></div>\n';
-            vueFile.transform();
-            yield vueFile.save();
-        }
-        const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
+        const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
         const dest = path.join(localBlocksPath, opts.name + '.vue');
         yield fs.ensureDir(localBlocksPath);
         yield fs.copy(tempPath, dest);
@@ -316,10 +306,9 @@ function addBlock(options) {
         yield fs.remove(path.join(dest, 'screenshots'));
         yield fs.remove(path.join(dest, 'package.json'));
         yield fs.remove(path.join(dest, 'README.md'));
-        shell.rm('-rf', '.*');
         vueFile.parseScript();
         vueFile.parseTemplate();
-        const relativePath = './blocks/' + opts.name + '.vue';
+        const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
         const { componentName } = utils.normalizeName(opts.name);
         const body = vueFile.scriptHandler.ast.program.body;
         for (let i = 0; i < body.length; i++) {
@@ -371,18 +360,15 @@ function removeBlock(vueFilePath, baseName) {
     return __awaiter(this, void 0, void 0, function* () {
         const vueFile = new vfs.VueFile(vueFilePath);
         yield vueFile.open();
-        if (!vueFile.isDirectory)
-            return;
         vueFile.parseScript();
         vueFile.parseTemplate();
-        const relativePath = './blocks/' + baseName + '.vue';
+        const relativePath = `./${vueFile.baseName}.blocks/${baseName}.vue`;
         const { componentName } = utils.normalizeName(baseName);
         const body = vueFile.scriptHandler.ast.program.body;
         for (let i = 0; i < body.length; i++) {
             const node = body[i];
-            if (node.type === 'ImportDeclaration') {
-                node.source.value === relativePath;
-                body.splice(i, 1);
+            if (node.type === 'ImportDeclaration' && node.source.value === relativePath) {
+                body.splice(i--, 1);
             }
         }
         babel.traverse(vueFile.scriptHandler.ast, {
@@ -421,7 +407,7 @@ function removeBlock(vueFilePath, baseName) {
                 nodePath.remove();
         });
         yield vueFile.save();
-        const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
+        const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
         const dest = path.join(localBlocksPath, baseName + '.vue');
         yield fs.remove(dest);
         return vueFile;
@@ -673,7 +659,6 @@ function addLeafViewFromBlock(source, parent, name, title) {
         yield fs.remove(path.join(dest, 'screenshots'));
         yield fs.remove(path.join(dest, 'package.json'));
         yield fs.remove(path.join(dest, 'README.md'));
-        shell.rm('-rf', '.*');
         const vueFile = new vfs.VueFile(dest);
         yield vueFile.preOpen();
         if (vueFile.checkTransform() === true) {
@@ -765,7 +750,6 @@ function addBranchViewFromBlock(source, parent, name, title) {
         yield fs.remove(path.join(dest, 'screenshots'));
         yield fs.remove(path.join(dest, 'package.json'));
         yield fs.remove(path.join(dest, 'README.md'));
-        shell.rm('-rf', '.*');
         const vueFile = new vfs.VueFile(dest);
         yield vueFile.preOpen();
         if (vueFile.checkTransform() === true) {

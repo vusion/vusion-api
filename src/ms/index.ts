@@ -332,19 +332,11 @@ export async function addBlock(options: MaterialOptions) {
         registry: opts.source.registry,
         name: opts.source.name,
     }, blockCacheDir);
-    // if (fs.statSync(opts.target).isFile())
+
     const vueFile = new vfs.VueFile(opts.target);
     await vueFile.open();
-    if (!vueFile.isDirectory) {
-        // if (!vueFile.script)
-        //     vueFile.script = 'export default {};\n';
-        if (!vueFile.template) // @TODO: should check
-            vueFile.template = '<div></div>\n';
-        vueFile.transform();
-        await vueFile.save();
-    }
 
-    const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
+    const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
     const dest = path.join(localBlocksPath, opts.name + '.vue');
     await fs.ensureDir(localBlocksPath);
     await fs.copy(tempPath, dest);
@@ -352,12 +344,11 @@ export async function addBlock(options: MaterialOptions) {
     await fs.remove(path.join(dest, 'screenshots'));
     await fs.remove(path.join(dest, 'package.json'));
     await fs.remove(path.join(dest, 'README.md'));
-    shell.rm('-rf', '.*');
 
     vueFile.parseScript();
     vueFile.parseTemplate();
 
-    const relativePath = './blocks/' + opts.name + '.vue';
+    const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
     const { componentName } = utils.normalizeName(opts.name);
 
     const body = vueFile.scriptHandler.ast.program.body;
@@ -413,21 +404,17 @@ export async function addBlock(options: MaterialOptions) {
 export async function removeBlock(vueFilePath: string, baseName: string) {
     const vueFile = new vfs.VueFile(vueFilePath);
     await vueFile.open();
-    if (!vueFile.isDirectory)
-        return;
-
     vueFile.parseScript();
     vueFile.parseTemplate();
 
-    const relativePath = './blocks/' + baseName + '.vue';
+    const relativePath = `./${vueFile.baseName}.blocks/${baseName}.vue`;
     const { componentName } = utils.normalizeName(baseName);
 
     const body = vueFile.scriptHandler.ast.program.body;
     for (let i = 0; i < body.length; i++) {
         const node = body[i];
-        if (node.type === 'ImportDeclaration') {
-            node.source.value === relativePath;
-            body.splice(i, 1);
+        if (node.type === 'ImportDeclaration' && node.source.value === relativePath) {
+            body.splice(i--, 1);
         }
     }
     babel.traverse(vueFile.scriptHandler.ast, {
@@ -470,7 +457,7 @@ export async function removeBlock(vueFilePath: string, baseName: string) {
 
     await vueFile.save();
 
-    const localBlocksPath = path.join(vueFile.fullPath, 'blocks');
+    const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
     const dest = path.join(localBlocksPath, baseName + '.vue');
     await fs.remove(dest);
 
@@ -751,7 +738,6 @@ export async function addLeafViewFromBlock(source: MaterialSource, parent: vfs.V
     await fs.remove(path.join(dest, 'screenshots'));
     await fs.remove(path.join(dest, 'package.json'));
     await fs.remove(path.join(dest, 'README.md'));
-    shell.rm('-rf', '.*');
 
     const vueFile = new vfs.VueFile(dest);
     await vueFile.preOpen();
@@ -852,7 +838,6 @@ export async function addBranchViewFromBlock(source: MaterialSource, parent: vfs
     await fs.remove(path.join(dest, 'screenshots'));
     await fs.remove(path.join(dest, 'package.json'));
     await fs.remove(path.join(dest, 'README.md'));
-    shell.rm('-rf', '.*');
 
     const vueFile = new vfs.VueFile(dest);
     await vueFile.preOpen();
