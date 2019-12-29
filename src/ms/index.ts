@@ -323,6 +323,36 @@ export async function createBlockPackage(dir: string, options: {
     return dest;
 }
 
+export async function fetchBlock(options: MaterialOptions) {
+    const opts = processOptions(options);
+
+    const blockCacheDir = getCacheDir('blocks');
+    return await download.npm({
+        registry: opts.source.registry,
+        name: opts.source.name,
+    }, blockCacheDir);
+}
+
+export function checkBlockOnlyHasTemplate(blockPath: string) {
+    // const vueFile = new vfs.VueFile(blockPath);
+    // await vueFile.open();
+    const scriptPath = path.resolve(blockPath, 'index.js');
+    const script = fs.readFileSync(scriptPath, 'utf8');
+    if (script && script.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== 'export default {};')
+        return false;
+    const moduleCSSPath = path.resolve(blockPath, 'module.css');
+    if (!fs.existsSync(moduleCSSPath))
+        return true;
+
+    const style = fs.readFileSync(moduleCSSPath, 'utf8');
+    if (style && style.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== '.root {}')
+        return false;
+
+    return true;
+}
+
+// export async function addBlockTag
+
 export async function addBlock(options: MaterialOptions) {
     const opts = processOptions(options);
 
@@ -397,6 +427,84 @@ export async function addBlock(options: MaterialOptions) {
 
     const rootEl = vueFile.templateHandler.ast;
     rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
+
+    await vueFile.save();
+}
+
+export async function addBlockOnlyScripts(options: MaterialOptions, tempPath: string) {
+    const opts = processOptions(options);
+
+    // if (opts.source.type === 'npm')
+    // const blockCacheDir = getCacheDir('blocks');
+    // const tempPath = await download.npm({
+    //     registry: opts.source.registry,
+    //     name: opts.source.name,
+    // }, blockCacheDir);
+
+    const vueFile = new vfs.VueFile(opts.target);
+    await vueFile.open();
+
+    const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
+    const dest = path.join(localBlocksPath, opts.name + '.vue');
+    await fs.ensureDir(localBlocksPath);
+    await fs.copy(tempPath, dest);
+    await fs.remove(path.join(dest, 'public'));
+    await fs.remove(path.join(dest, 'screenshots'));
+    await fs.remove(path.join(dest, 'package.json'));
+    await fs.remove(path.join(dest, 'README.md'));
+
+    vueFile.parseScript();
+    vueFile.parseTemplate();
+
+    const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
+    const { componentName } = utils.normalizeName(opts.name);
+
+    const body = vueFile.scriptHandler.ast.program.body;
+    for (let i = 0; i < body.length; i++) {
+        const node = body[i];
+        if (node.type !== 'ImportDeclaration') {
+            const importDeclaration = babel.template(`import ${componentName} from '${relativePath}'`)() as babel.types.ImportDeclaration;
+            body.splice(i, 0, importDeclaration);
+            break;
+        }
+    }
+    babel.traverse(vueFile.scriptHandler.ast, {
+        ExportDefaultDeclaration(nodePath) {
+            const declaration = nodePath.node.declaration;
+            if (declaration && declaration.type === 'ObjectExpression') {
+                let pos = 0;
+                const propertiesBefore = [
+                    'el',
+                    'name',
+                    'parent',
+                    'functional',
+                    'delimiters',
+                    'comments',
+                ]
+                let componentsProperty = declaration.properties.find((property, index) => {
+                    if (property.type === 'ObjectProperty' && propertiesBefore.includes(property.key.name))
+                        pos = index;
+                    return property.type === 'ObjectProperty' && property.key.name === 'components';
+                }) as babel.types.ObjectProperty;
+
+                const blockProperty = babel.types.objectProperty(babel.types.identifier(componentName), babel.types.identifier(componentName));
+
+                if (!componentsProperty) {
+                    componentsProperty = babel.types.objectProperty(babel.types.identifier('components'), babel.types.objectExpression([]));
+                    declaration.properties.splice(pos, 0, componentsProperty);
+                }
+
+                const componentsProperties = (componentsProperty.value as babel.types.ObjectExpression).properties;
+                // 判断有没有重复的项，如果有则忽略，不覆盖
+                if (componentsProperties.find((property) => property.type === 'ObjectProperty' && property.key.name === componentName))
+                    return;
+                componentsProperties.push(blockProperty);
+            }
+        },
+    });
+
+    // const rootEl = vueFile.templateHandler.ast;
+    // rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
 
     await vueFile.save();
 }
