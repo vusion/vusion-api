@@ -17,6 +17,7 @@ class TemplateHandler {
     ast: compiler.ASTElement;
     options: {
         tabLength: number,
+        startLevel: number,
     };
 
     constructor(code: string = '', options?: Object) {
@@ -24,6 +25,7 @@ class TemplateHandler {
         this.ast = this.parse(code);
         this.options = {
             tabLength: 4,
+            startLevel: 0,
         };
     }
 
@@ -38,7 +40,8 @@ class TemplateHandler {
 
     generate() {
         // @TODO: 暂时没有很好的 generate
-        return this.generateElement(this.ast, 0) + '\n';
+        const tabs = ' '.repeat(this.options.tabLength*this.options.startLevel);
+        return tabs + this.generateElement(this.ast, this.options.startLevel) + '\n';
         // return this.code;
     }
 
@@ -74,7 +77,7 @@ class TemplateHandler {
         let attrsString = '';
         attrs.forEach((attr) => {
             if (attrsLength >= 120 || attr.length >= 120) {
-                attrsString += '\n' + tabs + ' '.repeat(4) // ' '.repeat(el.tag.length + 1);
+                attrsString += '\n' + tabs + ' '.repeat(3) // ' '.repeat(el.tag.length + 1);
                 attrsLength = 0;
             }
             attrsString += ' ' + attr;

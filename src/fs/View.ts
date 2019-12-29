@@ -153,15 +153,14 @@ export default class View extends FSEntry {
 
         if (arr.length === 0)
             throw new Error('Error path: ' + relativePath);
-        else if (arr.length === 1) {
-            if (childView)
+        else {
+            if (!childView)
+                return alwaysFindOne ? this : childView;
+            else if (arr.length === 1)
                 return childView;
             else
-                return alwaysFindOne ? this : childView;
-        } else if (!childView.isDirectory)
-            throw new Error('Not a directory: ' + childView.fullPath);
-        else
-            return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded, alwaysFindOne);
+                return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded, alwaysFindOne);
+        }
     }
 
     async findByRoute(relativePath: string, openIfNotLoaded: boolean = false): Promise<View> {

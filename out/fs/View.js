@@ -142,16 +142,14 @@ class View extends FSEntry_1.default {
             const childView = this.children.find((view) => view.fileName === next);
             if (arr.length === 0)
                 throw new Error('Error path: ' + relativePath);
-            else if (arr.length === 1) {
-                if (childView)
+            else {
+                if (!childView)
+                    return alwaysFindOne ? this : childView;
+                else if (arr.length === 1)
                     return childView;
                 else
-                    return alwaysFindOne ? this : childView;
+                    return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded, alwaysFindOne);
             }
-            else if (!childView.isDirectory)
-                throw new Error('Not a directory: ' + childView.fullPath);
-            else
-                return childView.findByRealPath(arr.slice(1).join(path.sep), openIfNotLoaded, alwaysFindOne);
         });
     }
     findByRoute(relativePath, openIfNotLoaded = false) {

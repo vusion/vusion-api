@@ -183,8 +183,11 @@ class VueFile extends FSEntry_1.default {
             let template = this.template;
             let script = this.script;
             let style = this.style;
-            if (this.templateHandler)
+            if (this.templateHandler) {
+                if (!this.isDirectory)
+                    this.templateHandler.options.startLevel = 1;
                 this.template = template = this.templateHandler.generate();
+            }
             if (this.scriptHandler)
                 this.script = script = this.scriptHandler.generate();
             if (this.styleHandler)
