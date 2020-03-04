@@ -259,6 +259,22 @@ function publishTemplate(params) {
     });
 }
 exports.publishTemplate = publishTemplate;
+function recordMicroAppVersion(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.post('micro/app/version/create', params)
+            .then((res) => res.data);
+    });
+}
+exports.recordMicroAppVersion = recordMicroAppVersion;
+function refreshMicroVersion(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.post('micro/relation/updateApp', params)
+            .then((res) => res.data);
+    });
+}
+exports.refreshMicroVersion = refreshMicroVersion;
 function createBlockPackage(dir, options) {
     return __awaiter(this, void 0, void 0, function* () {
         const tplPath = yield fetchLatestBlockTemplate();
