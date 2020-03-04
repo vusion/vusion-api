@@ -180,7 +180,7 @@ class APIHandler {
         outputs.push('| Key | Description |');
         outputs.push('| --- | ----------- |');
         aria.forEach((item) => {
-            outputs.push(`| ${item.key} | ${item.description} |`);
+            outputs.push(`| <kdb>${item.key}</kdb> | ${item.description} |`);
         });
         outputs.push('');
         return outputs.join('\n');
@@ -255,6 +255,8 @@ class APIHandler {
             if (docs.includes('faq.md'))
                 outputs.push(`<u-h2-tab title="常见问题" to="faq"></u-h2-tab>`);
             outputs.push(`<u-h2-tab title="API" to="api"></u-h2-tab>`);
+            if (fs.existsSync(path.join(this.fullPath, '../CHANGELOG.md')))
+                outputs.push(`<u-h2-tab title="更新日志" to="changelog"></u-h2-tab>`);
             outputs.push(`</u-h2-tabs>`);
             outputs.push('<router-view></router-view>');
             return outputs.join('\n');

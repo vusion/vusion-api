@@ -9,6 +9,8 @@ import * as utils from '../utils';
 import * as rc from '../rc';
 import * as download from './download';
 import * as _ from 'lodash';
+import * as compressing from 'compressing';
+import * as FormData from 'form-data';
 
 import Block from './Block';
 import Component from './Component';
@@ -43,6 +45,35 @@ export function getCacheDir(subPath: string = '') {
 export function getRunControl() {
     const rcPath = path.join(os.homedir(), '.vusion');
     return rcPath;
+}
+
+export interface FormFile {
+    filename: string,
+    filepath: string,
+    [prop: string]: any,
+};
+
+export const upload = {
+    async nos(files: string | FormFile | Array<string | FormFile>) {
+        if (!Array.isArray(files))
+            files = [files];
+        files = files.map((file) => {
+            if (typeof file === 'string')
+                return { filename: path.basename(file), filepath: file };
+            else
+                return file;
+        });
+
+        const pfAxios = await getPlatformAxios();
+        const form = new FormData();
+        files.forEach((file, index) => {
+            form.append('file', fs.createReadStream((file as FormFile).filepath), file);
+        });
+
+        return pfAxios.post('nos/upload', form, {
+            headers: form.getHeaders(),
+        }).then((res) => res.data);
+    },
 }
 
 /**

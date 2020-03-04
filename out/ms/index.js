@@ -20,6 +20,7 @@ const rc = require("../rc");
 const download = require("./download");
 exports.download = download;
 const _ = require("lodash");
+const FormData = require("form-data");
 const axios_1 = require("axios");
 let platformAxios;
 const getPlatformAxios = () => {
@@ -48,6 +49,29 @@ function getRunControl() {
     return rcPath;
 }
 exports.getRunControl = getRunControl;
+;
+exports.upload = {
+    nos(files) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!Array.isArray(files))
+                files = [files];
+            files = files.map((file) => {
+                if (typeof file === 'string')
+                    return { filename: path.basename(file), filepath: file };
+                else
+                    return file;
+            });
+            const pfAxios = yield getPlatformAxios();
+            const form = new FormData();
+            files.forEach((file, index) => {
+                form.append('file', fs.createReadStream(file.filepath), file);
+            });
+            return pfAxios.post('nos/upload', form, {
+                headers: form.getHeaders(),
+            }).then((res) => res.data);
+        });
+    },
+};
 /**
  * 获取最新的区块模板
  */
