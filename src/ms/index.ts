@@ -286,6 +286,18 @@ export async function publishTemplate(params: object) {
         .then((res) => res.data);
 }
 
+export async function recordMicroAppVersion(params: object) {
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.post('micro/app/version/create', params)
+        .then((res) => res.data);
+}
+
+export async function refreshMicroVersion(params: object) {
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.post('micro/relation/updateApp', params)
+        .then((res) => res.data);
+}
+
 export async function createBlockPackage(dir: string, options: {
     name: string, // packageName
     title?: string,
