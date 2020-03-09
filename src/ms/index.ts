@@ -48,8 +48,8 @@ export function getRunControl() {
 }
 
 export interface FormFile {
-    filename: string,
-    filepath: string,
+    name: string,
+    path: string,
     [prop: string]: any,
 };
 
@@ -59,15 +59,17 @@ export const upload = {
             files = [files];
         files = files.map((file) => {
             if (typeof file === 'string')
-                return { filename: path.basename(file), filepath: file };
+                return { name: path.basename(file), path: file };
             else
                 return file;
         });
 
         const pfAxios = await getPlatformAxios();
         const form = new FormData();
-        files.forEach((file, index) => {
-            form.append('file', fs.createReadStream((file as FormFile).filepath), file);
+        files.forEach((file: FormFile, index: number) => {
+            form.append('file', fs.createReadStream(file.path), {
+                filepath: file.name, // filepath 在 Form 提交的时候是 name
+            });
         });
 
         return pfAxios.post('nos/upload', form, {

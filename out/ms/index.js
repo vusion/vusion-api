@@ -57,14 +57,16 @@ exports.upload = {
                 files = [files];
             files = files.map((file) => {
                 if (typeof file === 'string')
-                    return { filename: path.basename(file), filepath: file };
+                    return { name: path.basename(file), path: file };
                 else
                     return file;
             });
             const pfAxios = yield getPlatformAxios();
             const form = new FormData();
             files.forEach((file, index) => {
-                form.append('file', fs.createReadStream(file.filepath), file);
+                form.append('file', fs.createReadStream(file.path), {
+                    filepath: file.name,
+                });
             });
             return pfAxios.post('nos/upload', form, {
                 headers: form.getHeaders(),
