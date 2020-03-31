@@ -54,7 +54,7 @@ export interface FormFile {
 };
 
 export const upload = {
-    getFilesFormData(files: string | FormFile | Array<string | FormFile>): FormData {
+    getFormData(files: string | FormFile | Array<string | FormFile>): FormData {
         if (!Array.isArray(files))
             files = [files];
         files = files.map((file) => {
@@ -63,27 +63,27 @@ export const upload = {
             else
                 return file;
         });
-        const form = new FormData();
+        const formData = new FormData();
         files.forEach((file: FormFile, index: number) => {
-            form.append('file', fs.createReadStream(file.path), {
+            formData.append('file', fs.createReadStream(file.path), {
                 filepath: file.name, // filepath 在 Form 提交的时候是 name
             });
         });
-        return form;
+        return formData;
     },
     async nos(files: string | FormFile | Array<string | FormFile>) {
-        const form = upload.getFilesFormData(files);
+        const formData = upload.getFormData(files);
         const pfAxios = await getPlatformAxios();
-        return pfAxios.post('nos/upload', form, {
-            headers: form.getHeaders(),
+        return pfAxios.post('nos/upload', formData, {
+            headers: formData.getHeaders(),
         }).then((res) => res.data);
     },
     async framework(files: string | FormFile | Array<string | FormFile>, framework: string) {
-        const form = upload.getFilesFormData(files);
-        form.append('ui', framework);
+        const formData = upload.getFormData(files);
+        formData.append('ui', framework);
         const pfAxios = await getPlatformAxios();
-        return pfAxios.post('framework/upload', form, {
-            headers: form.getHeaders(),
+        return pfAxios.post('framework/upload', formData, {
+            headers: formData.getHeaders(),
         }).then((res) => res.data);
     },
 }
