@@ -51,24 +51,38 @@ function getRunControl() {
 exports.getRunControl = getRunControl;
 ;
 exports.upload = {
+    getFilesFormData(files) {
+        if (!Array.isArray(files))
+            files = [files];
+        files = files.map((file) => {
+            if (typeof file === 'string')
+                return { name: path.basename(file), path: file };
+            else
+                return file;
+        });
+        const form = new FormData();
+        files.forEach((file, index) => {
+            form.append('file', fs.createReadStream(file.path), {
+                filepath: file.name,
+            });
+        });
+        return form;
+    },
     nos(files) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!Array.isArray(files))
-                files = [files];
-            files = files.map((file) => {
-                if (typeof file === 'string')
-                    return { name: path.basename(file), path: file };
-                else
-                    return file;
-            });
+            const form = exports.upload.getFilesFormData(files);
             const pfAxios = yield getPlatformAxios();
-            const form = new FormData();
-            files.forEach((file, index) => {
-                form.append('file', fs.createReadStream(file.path), {
-                    filepath: file.name,
-                });
-            });
             return pfAxios.post('nos/upload', form, {
+                headers: form.getHeaders(),
+            }).then((res) => res.data);
+        });
+    },
+    framework(files, framework) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const form = exports.upload.getFilesFormData(files);
+            form.append('ui', framework);
+            const pfAxios = yield getPlatformAxios();
+            return pfAxios.post('framework/upload', form, {
                 headers: form.getHeaders(),
             }).then((res) => res.data);
         });

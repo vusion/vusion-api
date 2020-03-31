@@ -54,7 +54,7 @@ export interface FormFile {
 };
 
 export const upload = {
-    async nos(files: string | FormFile | Array<string | FormFile>) {
+    getFilesFormData(files: string | FormFile | Array<string | FormFile>): FormData {
         if (!Array.isArray(files))
             files = [files];
         files = files.map((file) => {
@@ -63,16 +63,26 @@ export const upload = {
             else
                 return file;
         });
-
-        const pfAxios = await getPlatformAxios();
         const form = new FormData();
         files.forEach((file: FormFile, index: number) => {
             form.append('file', fs.createReadStream(file.path), {
                 filepath: file.name, // filepath 在 Form 提交的时候是 name
             });
         });
-
+        return form;
+    },
+    async nos(files: string | FormFile | Array<string | FormFile>) {
+        const form = upload.getFilesFormData(files);
+        const pfAxios = await getPlatformAxios();
         return pfAxios.post('nos/upload', form, {
+            headers: form.getHeaders(),
+        }).then((res) => res.data);
+    },
+    async framework(files: string | FormFile | Array<string | FormFile>, framework: string) {
+        const form = upload.getFilesFormData(files);
+        form.append('ui', framework);
+        const pfAxios = await getPlatformAxios();
+        return pfAxios.post('framework/upload', form, {
             headers: form.getHeaders(),
         }).then((res) => res.data);
     },
