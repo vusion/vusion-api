@@ -29,7 +29,8 @@ const getPlatformAxios = (): Promise<AxiosInstance> => {
             baseURL: config.platform + '/internal',
             headers: {
                 'access-token': config.access_token,
-            }
+            },
+            maxContentLength: 1024 * 1024 * 50,
         });
         res(platformAxios);
     });
