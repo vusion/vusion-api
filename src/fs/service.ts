@@ -230,42 +230,6 @@ export async function createMultiFilePackage(dir: string, componentName?: string
     return dest;
 }
 
-/**
- * @deprecated
- **/
-export async function createPage(dir: string) {
-    const dest = handleSame(dir, 'page');
-    await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
-    return dest;
-}
-
-/**
- * @deprecated
- **/
-export async function createListPage(dir: string) {
-    const dest = handleSame(dir, 'list');
-    await fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue'), dest);
-    return dest;
-}
-
-/**
- * @deprecated
- **/
-export async function createFormPage(dir: string) {
-    const dest = handleSame(dir, 'form');
-    await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
-    return dest;
-}
-
-/**
- * @deprecated
- **/
-export async function createDetailPage(dir: string) {
-    const dest = handleSame(dir, 'detail');
-    await fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
-    return dest;
-}
-
 export async function addModuleCSS(vuePath: string) {
     if (!fs.statSync(vuePath).isDirectory())
         throw new Error('Unsupport adding functional block in single vue file!');

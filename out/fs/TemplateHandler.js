@@ -2,9 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const compiler = require("vue-template-compiler");
 class ASTNodePath {
-    constructor(node, parent) {
+    constructor(node, parent, route = '') {
         this.node = node;
         this.parent = parent;
+        this.route = route;
     }
     remove() {
         const index = this.parent.children.indexOf(this.node);
@@ -75,12 +76,20 @@ class TemplateHandler {
         while ((nodePath = queue.shift())) {
             if (nodePath.node.type === 1) {
                 const parent = nodePath.node;
-                queue = queue.concat(parent.children.map((node) => new ASTNodePath(node, parent)));
+                queue = queue.concat(parent.children.map((node, index) => new ASTNodePath(node, parent, nodePath.route + '/' + index)));
             }
             const result = func(nodePath);
             if (result !== undefined)
                 return result;
         }
+    }
+    findByRoute(route, node) {
+        route = route.slice(1);
+        const arr = route.split('/');
+        if (!route || !arr.length)
+            return node;
+        else
+            return this.findByRoute(arr.slice(1).join('/'), node.children[+arr[0]]);
     }
 }
 exports.default = TemplateHandler;

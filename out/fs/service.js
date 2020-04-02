@@ -239,50 +239,6 @@ function createMultiFilePackage(dir, componentName) {
     });
 }
 exports.createMultiFilePackage = createMultiFilePackage;
-/**
- * @deprecated
- **/
-function createPage(dir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const dest = handleSame(dir, 'page');
-        yield fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
-        return dest;
-    });
-}
-exports.createPage = createPage;
-/**
- * @deprecated
- **/
-function createListPage(dir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const dest = handleSame(dir, 'list');
-        yield fs.copy(path.resolve(__dirname, '../../templates/u-multi-file-with-subdocs.vue'), dest);
-        return dest;
-    });
-}
-exports.createListPage = createListPage;
-/**
- * @deprecated
- **/
-function createFormPage(dir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const dest = handleSame(dir, 'form');
-        yield fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
-        return dest;
-    });
-}
-exports.createFormPage = createFormPage;
-/**
- * @deprecated
- **/
-function createDetailPage(dir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const dest = handleSame(dir, 'detail');
-        yield fs.copy(path.resolve(__dirname, '../../templates/page.vue'), dest);
-        return dest;
-    });
-}
-exports.createDetailPage = createDetailPage;
 function addModuleCSS(vuePath) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!fs.statSync(vuePath).isDirectory())

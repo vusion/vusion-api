@@ -4,6 +4,7 @@ export class ASTNodePath {
     constructor(
         public node: compiler.ASTNode,
         public parent: compiler.ASTElement,
+        public route: string = '',
     ) {}
 
     remove() {
@@ -95,12 +96,21 @@ class TemplateHandler {
         while ((nodePath = queue.shift())) {
             if (nodePath.node.type === 1) {
                 const parent = nodePath.node as compiler.ASTElement;
-                queue = queue.concat(parent.children.map((node) => new ASTNodePath(node, parent)));
+                queue = queue.concat(parent.children.map((node, index) => new ASTNodePath(node, parent, nodePath.route + '/' + index)));
             }
             const result = func(nodePath);
             if (result !== undefined)
                 return result;
         }
+    }
+
+    findByRoute(route: string, node: compiler.ASTNode): compiler.ASTNode {
+        route = route.slice(1);
+        const arr = route.split('/');
+        if (!route || !arr.length)
+            return node;
+        else
+            return this.findByRoute(arr.slice(1).join('/'), (node as compiler.ASTElement).children[+arr[0]]);
     }
 }
 

@@ -386,6 +386,9 @@ export default class APIHandler {
             });
         }
 
+        if (docs.includes('blocks.md'))
+            outputs.push(`<u-h2-tab v-if="NODE_ENV === \'development\'" title="内置区块" to="blocks"></u-h2-tab>`);
+
         if (docs.includes('cases.md'))
             outputs.push(`<u-h2-tab v-if="NODE_ENV === \'development\'" title="测试用例" to="cases"></u-h2-tab>`);
 

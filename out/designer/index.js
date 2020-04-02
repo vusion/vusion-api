@@ -13,7 +13,7 @@ const path = require("path");
 const fs = require("fs-extra");
 const vfs = require("../fs");
 const compiler = require("vue-template-compiler");
-function addLayout(fullPath, type) {
+function addLayout(fullPath, route, type) {
     return __awaiter(this, void 0, void 0, function* () {
         const vueFile = new vfs.VueFile(fullPath);
         yield vueFile.open();
@@ -22,9 +22,21 @@ function addLayout(fullPath, type) {
         let tpl = yield fs.readFile(tplPath, 'utf8');
         tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '');
         const rootEl = vueFile.templateHandler.ast;
-        rootEl.children.push(compiler.compile(tpl).ast);
+        const selectedEl = vueFile.templateHandler.findByRoute(route, rootEl);
+        selectedEl.children.push(compiler.compile(tpl).ast);
         yield vueFile.save();
     });
 }
 exports.addLayout = addLayout;
+// export async function mergeBlock(fullPath: string, type: string) {
+//     const vueFile = new vfs.VueFile(fullPath);
+//     await vueFile.open();
+//     vueFile.parseTemplate();
+//     let tplPath = path.resolve(__dirname, `../../snippets/${type}.vue`);
+//     let tpl = await fs.readFile(tplPath, 'utf8');
+//     tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '');
+//     const rootEl = vueFile.templateHandler.ast;
+//     rootEl.children.push(compiler.compile(tpl).ast);
+//     await vueFile.save();
+// }
 //# sourceMappingURL=index.js.map
