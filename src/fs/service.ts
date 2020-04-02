@@ -148,9 +148,6 @@ export async function createSingleFile(dir: string, componentName?: string) {
     return dest;
 }
 
-/**
- * @deprecated
- **/
 export async function createMultiFile(dir: string, componentName?: string) {
     const normalized = normalizeName(componentName);
     const dest = handleSame(dir, normalized.baseName);

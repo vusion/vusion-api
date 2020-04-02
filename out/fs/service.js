@@ -153,9 +153,6 @@ function createSingleFile(dir, componentName) {
     });
 }
 exports.createSingleFile = createSingleFile;
-/**
- * @deprecated
- **/
 function createMultiFile(dir, componentName) {
     return __awaiter(this, void 0, void 0, function* () {
         const normalized = utils_1.normalizeName(componentName);

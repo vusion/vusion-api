@@ -1,1 +1,3 @@
-export default {};
+export const USample = {};
+
+export default USample;
