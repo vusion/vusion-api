@@ -23,27 +23,52 @@ const format = (label: string, msg: string) => msg.split('\n').map((line, i) => 
 
 const chalkTag = (msg: string) => chalk.bgBlackBright.white.dim(` ${msg} `);
 
-export const log = (msg: string = '', tag?: string) => {
+/**
+ * 打印普通日志
+ * @param msg 日志信息
+ * @param tag 添加一个灰色标签
+ */
+export function log (msg: string = '', tag?: string) {
     tag ? console.info(format(chalkTag(tag), msg)) : console.info(msg);
     _log('log', tag, msg);
 };
 
-export const info = (msg: string = '', tag?: string) => {
+/**
+ * 打印信息日志
+ * @param msg 日志信息
+ * @param tag 添加一个灰色标签
+ */
+export function info (msg: string = '', tag?: string) {
     console.info(format(chalk.bgBlue.black(' INFO ') + (tag ? chalkTag(tag) : ''), msg));
     _log('info', tag, msg);
 };
 
-export const done = (msg: string = '', tag?: string) => {
+/**
+ * 打印普通日志
+ * @param msg 日志信息
+ * @param tag 添加一个灰色标签
+ */
+export function done (msg: string = '', tag?: string) {
     console.info(format(chalk.bgGreen.black(' DONE ') + (tag ? chalkTag(tag) : ''), msg));
     _log('done', tag, msg);
 };
 
-export const warn = (msg: string = '', tag?: string) => {
+/**
+ * 打印警告日志
+ * @param msg 日志信息
+ * @param tag 添加一个灰色标签
+ */
+export function warn (msg: string = '', tag?: string) {
     console.warn(format(chalk.bgYellow.black(' WARN ') + (tag ? chalkTag(tag) : ''), chalk.yellow(msg)));
     _log('warn', tag, msg);
 };
 
-export const error = (msg: string | Error = '', tag?: string) => {
+/**
+ * 打印错误日志
+ * @param msg 日志信息，可以为一个 Error 对象
+ * @param tag 添加一个灰色标签
+ */
+export function error (msg: string | Error = '', tag?: string) {
     console.error(format(chalk.bgRed(' ERROR ') + (tag ? chalkTag(tag) : ''), chalk.red(String(msg))));
     _log('error', tag, String(msg));
     if (msg instanceof Error) {
@@ -52,7 +77,11 @@ export const error = (msg: string | Error = '', tag?: string) => {
     }
 };
 
-export const clearConsole = (title: string) => {
+/**
+ * 清除控制台
+ * @param title 清除后打印一个标题
+ */
+export function clearConsole (title: string) {
     if (process.stdout.isTTY) {
         const blank = '\n'.repeat(process.stdout.rows);
         console.info(blank);
@@ -63,8 +92,3 @@ export const clearConsole = (title: string) => {
         }
     }
 };
-
-// // silent all logs except errors during tests and keep record
-// if (process.env.VUSION_TEST) {
-//     require('./_silence')('logs', exports);
-// }

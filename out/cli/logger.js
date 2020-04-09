@@ -20,31 +20,70 @@ const format = (label, msg) => msg.split('\n').map((line, i) => {
         return (line || '').padStart(chalk_1.default.reset(label).length);
 }).join('\n');
 const chalkTag = (msg) => chalk_1.default.bgBlackBright.white.dim(` ${msg} `);
-exports.log = (msg = '', tag) => {
+/**
+ * 打印普通日志
+ * @param msg 日志信息
+ * @param tag 添加一个灰色标签
+ */
+function log(msg = '', tag) {
     tag ? console.info(format(chalkTag(tag), msg)) : console.info(msg);
     _log('log', tag, msg);
-};
-exports.info = (msg = '', tag) => {
+}
+exports.log = log;
+;
+/**
+ * 打印信息日志
+ * @param msg 日志信息
+ * @param tag 添加一个灰色标签
+ */
+function info(msg = '', tag) {
     console.info(format(chalk_1.default.bgBlue.black(' INFO ') + (tag ? chalkTag(tag) : ''), msg));
     _log('info', tag, msg);
-};
-exports.done = (msg = '', tag) => {
+}
+exports.info = info;
+;
+/**
+ * 打印普通日志
+ * @param msg 日志信息
+ * @param tag 添加一个灰色标签
+ */
+function done(msg = '', tag) {
     console.info(format(chalk_1.default.bgGreen.black(' DONE ') + (tag ? chalkTag(tag) : ''), msg));
     _log('done', tag, msg);
-};
-exports.warn = (msg = '', tag) => {
+}
+exports.done = done;
+;
+/**
+ * 打印警告日志
+ * @param msg 日志信息
+ * @param tag 添加一个灰色标签
+ */
+function warn(msg = '', tag) {
     console.warn(format(chalk_1.default.bgYellow.black(' WARN ') + (tag ? chalkTag(tag) : ''), chalk_1.default.yellow(msg)));
     _log('warn', tag, msg);
-};
-exports.error = (msg = '', tag) => {
+}
+exports.warn = warn;
+;
+/**
+ * 打印错误日志
+ * @param msg 日志信息，可以为一个 Error 对象
+ * @param tag 添加一个灰色标签
+ */
+function error(msg = '', tag) {
     console.error(format(chalk_1.default.bgRed(' ERROR ') + (tag ? chalkTag(tag) : ''), chalk_1.default.red(String(msg))));
     _log('error', tag, String(msg));
     if (msg instanceof Error) {
         console.error(msg.stack);
         _log('error', tag, msg.stack);
     }
-};
-exports.clearConsole = (title) => {
+}
+exports.error = error;
+;
+/**
+ * 清除控制台
+ * @param title 清除后打印一个标题
+ */
+function clearConsole(title) {
     if (process.stdout.isTTY) {
         const blank = '\n'.repeat(process.stdout.rows);
         console.info(blank);
@@ -54,9 +93,7 @@ exports.clearConsole = (title) => {
             console.info(title);
         }
     }
-};
-// // silent all logs except errors during tests and keep record
-// if (process.env.VUSION_TEST) {
-//     require('./_silence')('logs', exports);
-// }
+}
+exports.clearConsole = clearConsole;
+;
 //# sourceMappingURL=logger.js.map
