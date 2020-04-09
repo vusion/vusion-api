@@ -15,7 +15,7 @@ const FSEntry_1 = require("./FSEntry");
 var ViewType;
 (function (ViewType) {
     ViewType["root"] = "root";
-    ViewType["page"] = "page";
+    ViewType["entry"] = "entry";
     ViewType["module"] = "module";
     ViewType["branch"] = "branch";
     ViewType["vue"] = "vue";
@@ -39,7 +39,7 @@ class View extends FSEntry_1.default {
             if (this.viewType === ViewType.root) {
                 this.routePath = '/';
             }
-            else if (this.viewType === ViewType.page) {
+            else if (this.viewType === ViewType.entry) {
                 this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
                 this.routePath = this.parent.routePath + this.baseName + '#/';
             }
@@ -100,8 +100,8 @@ class View extends FSEntry_1.default {
                 else if (fullPath.endsWith('.md'))
                     view.viewType = ViewType.md;
                 else if (this.viewType === ViewType.root)
-                    view.viewType = ViewType.page;
-                else if (this.viewType === ViewType.page && fileNames.includes('modules.js'))
+                    view.viewType = ViewType.entry;
+                else if (this.viewType === ViewType.entry && fileNames.includes('modules.js'))
                     view.viewType = ViewType.module;
                 view.parent = this;
                 // view.isChild = true;

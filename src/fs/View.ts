@@ -6,7 +6,7 @@ import VueFile from './VueFile';
 
 export enum ViewType {
     root = 'root',
-    page = 'page',
+    entry = 'entry',
     module = 'module',
     branch = 'branch',
     vue = 'vue', // leaf
@@ -40,7 +40,7 @@ export default class View extends FSEntry {
 
         if (this.viewType === ViewType.root) {
             this.routePath = '/';
-        } else if (this.viewType === ViewType.page) {
+        } else if (this.viewType === ViewType.entry) {
             this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
             this.routePath = this.parent.routePath + this.baseName + '#/';
         } else if (this.viewType === ViewType.module) {
@@ -105,8 +105,8 @@ export default class View extends FSEntry {
             else if (fullPath.endsWith('.md'))
                 view.viewType = ViewType.md;
             else if (this.viewType === ViewType.root)
-                view.viewType = ViewType.page;
-            else if (this.viewType === ViewType.page && fileNames.includes('modules.js'))
+                view.viewType = ViewType.entry;
+            else if (this.viewType === ViewType.entry && fileNames.includes('modules.js'))
                 view.viewType = ViewType.module;
 
             view.parent = this;

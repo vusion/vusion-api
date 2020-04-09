@@ -4,11 +4,13 @@ import * as designer from './designer';
 import * as rc from './rc';
 import * as config from './config';
 import * as utils from './utils';
+import * as cli from './cli';
 
-export { fs, ms, designer, rc, config, utils };
+export { fs, ms, designer, rc, config, utils, cli };
 export {
     FSEntry, File, Directory, JSFile,
     VueFile, VueFileExtendMode,
     Library, LibraryType,
     View, ViewType,
 } from './fs';
+export { default as PackageJSON } from './types/PackageJSON';
