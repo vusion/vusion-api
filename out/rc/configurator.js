@@ -13,7 +13,13 @@ var ManagerInstallSaveOptions;
     ManagerInstallSaveOptions["optional"] = "optional";
 })(ManagerInstallSaveOptions = exports.ManagerInstallSaveOptions || (exports.ManagerInstallSaveOptions = {}));
 exports.default = {
+    config: undefined,
     rcPath,
+    /**
+     * 从用户目录下的 .vusionrc 加载配置
+     * 如果已经加载，则会直接从缓存中读取
+     * 如果不存在，则会创建一个默认的 .vusionrc 文件
+     */
     load() {
         if (this.config)
             return this.config;
@@ -29,13 +35,22 @@ publish_manager: npm
         this.config = YAML.parse(this.yaml);
         return this.config;
     },
+    /**
+     * 保存配置
+     */
     save() {
         fs.writeFileSync(rcPath, YAML.stringify(this.config), 'utf8');
     },
+    /**
+     * 快速获取下载源地址
+     */
     getDownloadRegistry() {
         const config = this.load();
         return config.registries[config.download_manager] || 'https://registry.npmjs.org';
     },
+    /**
+     * 快速获取安装命令
+     */
     getInstallCommand(packageName, save = false) {
         const config = this.load();
         if (!packageName) {
