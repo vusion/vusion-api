@@ -20,9 +20,11 @@ const FSEntry_1 = require("./FSEntry");
 const TemplateHandler_1 = require("./TemplateHandler");
 const ScriptHandler_1 = require("./ScriptHandler");
 const StyleHandler_1 = require("./StyleHandler");
+const APIHandler_1 = require("./APIHandler");
+const ExamplesHandler_1 = require("./ExamplesHandler");
 const traverse_1 = require("@babel/traverse");
-const fetchPartialContent = (content, tag) => {
-    const reg = new RegExp(`<${tag}.*?>([\\s\\S]+)<\\/${tag}>`);
+const fetchPartialContent = (content, tag, attrs = '') => {
+    const reg = new RegExp(`<${tag}${attrs ? ' ' + attrs : ''}.*?>([\\s\\S]+)<\\/${tag}>`);
     const m = content.match(reg);
     return m ? m[1].replace(/^\n+/, '') : '';
 };
@@ -128,49 +130,138 @@ class VueFile extends FSEntry_1.default {
         this.template = undefined;
         this.script = undefined;
         this.style = undefined;
-        this.sample = undefined;
+        this.api = undefined;
+        this.examples = undefined;
         this.package = undefined;
         this.templateHandler = undefined;
         this.scriptHandler = undefined;
         this.styleHandler = undefined;
+        this.apiHandler = undefined;
+        this.examplesHandler = undefined;
         this.isOpen = false;
     }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.loadScript();
+            yield this.loadTemplate();
+            yield this.loadStyle();
+            yield this.loadPackage();
+            yield this.loadAPI();
+            yield this.loadExamples();
+            return this;
+        });
+    }
+    preload() {
+        return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
                 throw new Error(`Cannot find: ${this.fullPath}!`);
-            // const stats = fs.statSync(this.fullPath);
-            // this.isDirectory = stats.isDirectory();
+            if (!this.isDirectory)
+                this.content = yield fs.readFile(this.fullPath, 'utf8');
+        });
+    }
+    loadScript() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.preload();
             if (this.isDirectory) {
                 if (fs.existsSync(path.join(this.fullPath, 'index.js')))
                     this.script = yield fs.readFile(path.join(this.fullPath, 'index.js'), 'utf8');
                 else
                     throw new Error(`Cannot find 'index.js' in multifile Vue!`);
-                if (fs.existsSync(path.join(this.fullPath, 'index.html')))
-                    this.template = yield fs.readFile(path.join(this.fullPath, 'index.html'), 'utf8');
-                if (fs.existsSync(path.join(this.fullPath, 'module.css')))
-                    this.style = yield fs.readFile(path.join(this.fullPath, 'module.css'), 'utf8');
-                if (fs.existsSync(path.join(this.fullPath, 'sample.vue'))) {
-                    const sampleRaw = yield fs.readFile(path.join(this.fullPath, 'sample.vue'), 'utf8');
-                    const templateRE = /<template.*?>([\s\S]*?)<\/template>/i;
-                    const sample = sampleRaw.match(templateRE);
-                    this.sample = sample && sample[1].trim();
-                }
-                if (fs.existsSync(path.join(this.fullPath, 'package.json'))) {
-                    const content = yield fs.readFile(path.join(this.fullPath, 'package.json'), 'utf8');
-                    // try {
-                    this.package = JSON.parse(content);
-                    // } catch (e) {}
-                }
             }
             else {
-                this.content = yield fs.readFile(this.fullPath, 'utf8');
-                this.template = fetchPartialContent(this.content, 'template');
                 this.script = fetchPartialContent(this.content, 'script');
+            }
+        });
+    }
+    loadTemplate() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.preload();
+            if (this.isDirectory) {
+                if (fs.existsSync(path.join(this.fullPath, 'index.html')))
+                    this.template = yield fs.readFile(path.join(this.fullPath, 'index.html'), 'utf8');
+            }
+            else {
+                this.template = fetchPartialContent(this.content, 'template');
+            }
+        });
+    }
+    loadStyle() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.preload();
+            if (this.isDirectory) {
+                if (fs.existsSync(path.join(this.fullPath, 'module.css')))
+                    this.style = yield fs.readFile(path.join(this.fullPath, 'module.css'), 'utf8');
+            }
+            else {
                 this.style = fetchPartialContent(this.content, 'style');
             }
-            return this;
         });
+    }
+    loadPackage() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.preload();
+            if (this.isDirectory) {
+                if (fs.existsSync(path.join(this.fullPath, 'package.json'))) {
+                    const content = yield fs.readFile(path.join(this.fullPath, 'package.json'), 'utf8');
+                    this.package = JSON.parse(content);
+                }
+            }
+        });
+    }
+    loadAPI() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.preload();
+            if (this.isDirectory) {
+                if (fs.existsSync(path.join(this.fullPath, 'api.yaml')))
+                    this.api = yield fs.readFile(path.join(this.fullPath, 'api.yaml'), 'utf8');
+            }
+            else {
+                this.api = fetchPartialContent(this.content, 'api');
+            }
+        });
+    }
+    // @TODO
+    // loadDocs()
+    loadExamples() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.preload();
+            if (this.isDirectory) {
+                if (fs.existsSync(path.join(this.fullPath, 'docs/blocks.md')))
+                    this.api = yield fs.readFile(path.join(this.fullPath, 'docs/blocks.md'), 'utf8');
+                else if (fs.existsSync(path.join(this.fullPath, 'docs/examples.md')))
+                    this.api = yield fs.readFile(path.join(this.fullPath, 'docs/examples.md'), 'utf8');
+            }
+            else {
+                this.api = fetchPartialContent(this.content, 'doc', 'name="blocks"');
+                if (!this.api)
+                    this.api = fetchPartialContent(this.content, 'doc', 'name="examples"');
+            }
+        });
+    }
+    parseTemplate() {
+        if (this.templateHandler)
+            return;
+        this.templateHandler = new TemplateHandler_1.default(this.template);
+    }
+    parseScript() {
+        if (this.scriptHandler)
+            return;
+        this.scriptHandler = new ScriptHandler_1.default(this.script);
+    }
+    parseStyle() {
+        if (this.styleHandler)
+            return;
+        this.styleHandler = new StyleHandler_1.default(this.style);
+    }
+    parseAPI() {
+        if (this.apiHandler)
+            return;
+        this.apiHandler = new APIHandler_1.default(this.api, path.join(this.fullPath, 'api.yaml'));
+    }
+    parseExamples() {
+        if (this.examplesHandler)
+            return;
+        this.examplesHandler = new ExamplesHandler_1.default(this.examples);
     }
     save() {
         const _super = Object.create(null, {
@@ -178,6 +269,7 @@ class VueFile extends FSEntry_1.default {
         });
         return __awaiter(this, void 0, void 0, function* () {
             this.isSaving = true;
+            // 只有 isDirectory 不相同的时候才删除
             if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
                 shell.rm('-rf', this.fullPath);
             let template = this.template;
@@ -214,24 +306,12 @@ class VueFile extends FSEntry_1.default {
             return result;
         });
     }
-    parseTemplate() {
-        if (this.templateHandler)
-            return;
-        this.templateHandler = new TemplateHandler_1.default(this.template);
-    }
-    parseScript() {
-        if (this.scriptHandler)
-            return;
-        this.scriptHandler = new ScriptHandler_1.default(this.script);
-    }
-    parseStyle() {
-        if (this.styleHandler)
-            return;
-        this.styleHandler = new StyleHandler_1.default(this.style);
-    }
+    // @TODO
+    // async saveTemplate() {
+    // }
     checkTransform() {
         if (!this.isDirectory)
-            return true; // @TODO
+            return true;
         else {
             const files = fs.readdirSync(this.fullPath);
             const normalBlocks = ['index.html', 'index.js', 'module.css'];

@@ -9,22 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const chai_1 = require("chai");
 const path = require("path");
-const VueFile_1 = require("../../../fs/VueFile");
+const fs_1 = require("../../../fs");
 const BASE_PATH = 'src/test/units/VueFile';
-describe('fs.VueFile', () => {
-    function test(cas) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const vueFile = new VueFile_1.default(path.resolve(BASE_PATH, `./files/${cas}.vue`));
-            yield vueFile.open();
-            vueFile.parseTemplate();
-            const result = vueFile.templateHandler.generate();
-            chai_1.expect(result).to.equals(vueFile.template);
-        });
-    }
-    ;
-    const cases = ['simple', 'complex', 'overview']; //, 'u-table-view', 'comment'
-    cases.forEach((cas) => it('should generator correctly - ' + cas, () => test(cas)));
+describe('ExamplesHandler', () => {
+    it('should', () => __awaiter(void 0, void 0, void 0, function* () {
+        const vueFile = new fs_1.VueFile(path.resolve(BASE_PATH, './files/u-button.vue'));
+        yield vueFile.open();
+        // vueFile.examplesHandler
+    }));
 });
-//# sourceMappingURL=generate.js.map
+//# sourceMappingURL=ExamplesHandler.test.js.map

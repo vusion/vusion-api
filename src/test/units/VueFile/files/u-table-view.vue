@@ -4,7 +4,7 @@
         <slot name="title">{{ title }}</slot>
     </div>
     <div :class="$style.table" v-for="tableMeta in tableMetaList" :key="tableMeta.position" :position="tableMeta.position" :style="{ width: tableMeta.position !== 'static' && number2Pixel(tableMeta.width) }"
-         @scroll="onTableScroll" :shadow="(tableMeta.position === 'left' && !scrollXStart) || (tableMeta.position === 'right' && !scrollXEnd)">
+        @scroll="onTableScroll" :shadow="(tableMeta.position === 'left' && !scrollXStart) || (tableMeta.position === 'right' && !scrollXEnd)">
         <div v-if="showHead" :class="$style.head" ref="head" :style="{ width: number2Pixel(tableWidth) }">
             <u-table :class="$style['head-table']" v-bind="$attrs">
                 <colgroup>
@@ -26,7 +26,7 @@
                             </template>
                             <!-- Sortable -->
                             <span v-if="columnVM.sortable" :class="$style.sort" :sorting="currentSorting && currentSorting.field === columnVM.field" :order="currentSorting && currentSorting.order"
-                                  @click="sortTrigger === 'icon' && ($event.stopPropagation(), onClickSort(columnVM))"></span>
+                                @click="sortTrigger === 'icon' && ($event.stopPropagation(), onClickSort(columnVM))"></span>
                             <!-- Filterable -->
                             <span v-if="columnVM.filters" :class="$style.filter">
                                 <u-table-view-filters :value="getFiltersValue(columnVM.field)" @select="onSelectFilters(columnVM.field, $event)">
@@ -35,7 +35,7 @@
                             </span>
                             <!-- Resizable -->
                             <f-dragger v-if="resizable && columnIndex !== visibleColumnVMs.length - 1" axis="horizontal" @dragstart="onResizerDragStart($event, columnVM)"
-                                       @drag="onResizerDrag($event, columnVM, columnIndex)" @dragend="onResizerDragEnd($event, columnVM, columnIndex)">
+                                @drag="onResizerDrag($event, columnVM, columnIndex)" @dragend="onResizerDragEnd($event, columnVM, columnIndex)">
                                 <div :class="$style.resizer"></div>
                             </f-dragger>
                         </th>
@@ -98,8 +98,8 @@
         </div>
     </div>
     <u-combo-pagination :class="$style.pagination" v-if="pageable && currentDataSource.totalPage > 1" :total-items="currentDataSource.total" :page="currentDataSource.paging.number"
-                        :page-size="currentDataSource.paging.size" :page-size-options="pageSizeOptions" :show-total="showTotal" :show-sizer="showSizer"
-                        :show-jumper="showJumper" @change="page($event.page)" @change-page-size="page(currentDataSource.paging.number, $event.pageSize)"></u-combo-pagination>
+        :page-size="currentDataSource.paging.size" :page-size-options="pageSizeOptions" :show-total="showTotal" :show-sizer="showSizer"
+        :show-jumper="showJumper" @change="page($event.page)" @change-page-size="page(currentDataSource.paging.number, $event.pageSize)"></u-combo-pagination>
     <div>
         <slot></slot>
     </div>
