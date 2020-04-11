@@ -238,30 +238,37 @@ class VueFile extends FSEntry_1.default {
             }
         });
     }
+    parse() {
+        this.parseTemplate();
+        this.parseScript();
+        this.parseStyle();
+        this.parseAPI();
+        this.parseExamples();
+    }
     parseTemplate() {
         if (this.templateHandler)
             return;
-        this.templateHandler = new TemplateHandler_1.default(this.template);
+        return this.templateHandler = new TemplateHandler_1.default(this.template);
     }
     parseScript() {
         if (this.scriptHandler)
             return;
-        this.scriptHandler = new ScriptHandler_1.default(this.script);
+        return this.scriptHandler = new ScriptHandler_1.default(this.script);
     }
     parseStyle() {
         if (this.styleHandler)
             return;
-        this.styleHandler = new StyleHandler_1.default(this.style);
+        return this.styleHandler = new StyleHandler_1.default(this.style);
     }
     parseAPI() {
         if (this.apiHandler)
             return;
-        this.apiHandler = new APIHandler_1.default(this.api, path.join(this.fullPath, 'api.yaml'));
+        return this.apiHandler = new APIHandler_1.default(this.api, path.join(this.fullPath, 'api.yaml'));
     }
     parseExamples() {
         if (this.examplesHandler)
             return;
-        this.examplesHandler = new ExamplesHandler_1.default(this.examples);
+        return this.examplesHandler = new ExamplesHandler_1.default(this.examples);
     }
     save() {
         const _super = Object.create(null, {

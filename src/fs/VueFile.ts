@@ -257,39 +257,47 @@ export default class VueFile extends FSEntry {
         }
     }
 
+    parse() {
+        this.parseTemplate();
+        this.parseScript();
+        this.parseStyle();
+        this.parseAPI();
+        this.parseExamples();
+    }
+
     parseTemplate() {
         if (this.templateHandler)
             return;
 
-        this.templateHandler = new TemplateHandler(this.template);
+        return this.templateHandler = new TemplateHandler(this.template);
     }
 
     parseScript() {
         if (this.scriptHandler)
             return;
 
-        this.scriptHandler = new ScriptHandler(this.script);
+        return this.scriptHandler = new ScriptHandler(this.script);
     }
 
     parseStyle() {
         if (this.styleHandler)
             return;
 
-        this.styleHandler = new StyleHandler(this.style);
+        return this.styleHandler = new StyleHandler(this.style);
     }
 
     parseAPI() {
         if (this.apiHandler)
             return;
 
-        this.apiHandler = new APIHandler(this.api, path.join(this.fullPath, 'api.yaml'));
+        return this.apiHandler = new APIHandler(this.api, path.join(this.fullPath, 'api.yaml'));
     }
 
     parseExamples() {
         if (this.examplesHandler)
             return;
 
-        this.examplesHandler = new ExamplesHandler(this.examples);
+        return this.examplesHandler = new ExamplesHandler(this.examples);
     }
 
     async save() {
