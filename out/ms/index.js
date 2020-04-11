@@ -252,6 +252,23 @@ function getBlocks() {
     });
 }
 exports.getBlocks = getBlocks;
+function getComponent(packageName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.get('component/info', {
+            params: {
+                name: packageName,
+            },
+        }).then((res) => {
+            const component = res.data.result;
+            const fileName = path.basename(component.name);
+            component.tagName = path.basename(fileName, path.extname(fileName));
+            component.componentName = utils.kebab2Camel(component.tagName);
+            return component;
+        });
+    });
+}
+exports.getComponent = getComponent;
 function getComponents() {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();

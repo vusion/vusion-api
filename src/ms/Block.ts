@@ -21,5 +21,6 @@ export default interface Block {
     operatorId: string;
     ownerId: string;
     teamId: string;
+    team: string;
     access: string;
 }

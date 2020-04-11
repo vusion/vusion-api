@@ -18,8 +18,10 @@ export default interface Block {
     base: string;
     ui: string;
     screenshots: string;
+    blocks: string;
     operatorId: string;
     ownerId: string;
     teamId: string;
+    team: string;
     access: string;
 }

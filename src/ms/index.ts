@@ -292,6 +292,21 @@ export async function getBlocks(): Promise<Block[]> {
         });
 }
 
+export async function getComponent(packageName: string): Promise<Component> {
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.get('component/info', {
+        params: {
+            name: packageName,
+        },
+    }).then((res) => {
+        const component = res.data.result;
+        const fileName = path.basename(component.name);
+        component.tagName = path.basename(fileName, path.extname(fileName));
+        component.componentName = utils.kebab2Camel(component.tagName);
+        return component;
+    });
+}
+
 export async function getComponents(): Promise<Component[]> {
     const pfAxios = await getPlatformAxios();
     return pfAxios.get('component/list')
