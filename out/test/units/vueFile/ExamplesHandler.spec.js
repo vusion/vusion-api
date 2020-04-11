@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
 const path = require("path");
 const fs_1 = require("../../../fs");
-const BASE_PATH = 'src/test/units/VueFile/files';
+const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/VueFile/files');
 describe('ExamplesHandler', () => {
     it('should', () => __awaiter(void 0, void 0, void 0, function* () {
         const vueFile = new fs_1.VueFile(path.resolve(BASE_PATH, 'u-button.vue'));

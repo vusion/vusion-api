@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import * as path from 'path';
 import { VueFile } from '../../../fs';
 
-const BASE_PATH = 'src/test/units/VueFile/files';
+const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/VueFile/files');
 
 describe('ExamplesHandler', () => {
     it('should', async () => {

@@ -14,7 +14,7 @@ const chai_1 = require("chai");
 const path = require("path");
 const shell = require("shelljs");
 const fs = require("fs-extra");
-const BASE_PATH = path.resolve(__dirname, '../../../../src/test/cases/VueFile/files');
+const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/cases/VueFile/files');
 describe('transform', () => {
     shell.cd(BASE_PATH);
     function test(cas) {

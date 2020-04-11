@@ -335,10 +335,8 @@ class VueFile extends FSEntry_1.default {
         if (!isDirectory && !this.script) {
             this.script = 'export default {};\n';
         }
-        console.log(this.template.match(/^ */)[0]);
         if (!isDirectory && this.template) {
             const tabs = this.template.match(/^ */)[0];
-            console.log(tabs.length);
             if (tabs)
                 this.template = this.template.replace(new RegExp('^' + tabs, 'mg'), '');
         }

@@ -2,11 +2,11 @@ import { expect } from 'chai';
 import * as path from 'path';
 import VueFile from '../../../fs/VueFile';
 
-const BASE_PATH = 'src/test/units/VueFile';
+const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/VueFile/files');
 
 describe('fs.VueFile', () => {
     async function test(cas: string) {
-        const vueFile = new VueFile(path.resolve(BASE_PATH, `./files/${cas}.vue`));
+        const vueFile = new VueFile(path.resolve(BASE_PATH, `${cas}.vue`));
         await vueFile.open();
         vueFile.parseTemplate();
 

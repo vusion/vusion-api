@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as shell from 'shelljs';
 import * as fs from 'fs-extra';
 
-const BASE_PATH = path.resolve(__dirname, '../../../../src/test/cases/VueFile/files');
+const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/cases/VueFile/files');
 
 describe('transform', () => {
     shell.cd(BASE_PATH);

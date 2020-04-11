@@ -12,11 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
 const path = require("path");
 const VueFile_1 = require("../../../fs/VueFile");
-const BASE_PATH = 'src/test/units/VueFile';
+const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/VueFile/files');
 describe('fs.VueFile', () => {
     function test(cas) {
         return __awaiter(this, void 0, void 0, function* () {
-            const vueFile = new VueFile_1.default(path.resolve(BASE_PATH, `./files/${cas}.vue`));
+            const vueFile = new VueFile_1.default(path.resolve(BASE_PATH, `${cas}.vue`));
             yield vueFile.open();
             vueFile.parseTemplate();
             const result = vueFile.templateHandler.generate();
