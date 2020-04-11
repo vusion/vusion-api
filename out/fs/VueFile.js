@@ -227,14 +227,14 @@ class VueFile extends FSEntry_1.default {
             yield this.preload();
             if (this.isDirectory) {
                 if (fs.existsSync(path.join(this.fullPath, 'docs/blocks.md')))
-                    this.api = yield fs.readFile(path.join(this.fullPath, 'docs/blocks.md'), 'utf8');
+                    this.examples = yield fs.readFile(path.join(this.fullPath, 'docs/blocks.md'), 'utf8');
                 else if (fs.existsSync(path.join(this.fullPath, 'docs/examples.md')))
-                    this.api = yield fs.readFile(path.join(this.fullPath, 'docs/examples.md'), 'utf8');
+                    this.examples = yield fs.readFile(path.join(this.fullPath, 'docs/examples.md'), 'utf8');
             }
             else {
-                this.api = fetchPartialContent(this.content, 'doc', 'name="blocks"');
-                if (!this.api)
-                    this.api = fetchPartialContent(this.content, 'doc', 'name="examples"');
+                this.examples = fetchPartialContent(this.content, 'doc', 'name="blocks"');
+                if (!this.examples)
+                    this.examples = fetchPartialContent(this.content, 'doc', 'name="examples"');
             }
         });
     }

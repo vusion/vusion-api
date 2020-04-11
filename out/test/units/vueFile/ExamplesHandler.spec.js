@@ -25,4 +25,4 @@ describe('ExamplesHandler', () => {
         chai_1.expect(json[6].description).to.equal('一般在页面局部使用。\n一般在页面局部使用。\n');
     }));
 });
-//# sourceMappingURL=ExamplesHandler.test.js.map
+//# sourceMappingURL=ExamplesHandler.spec.js.map
