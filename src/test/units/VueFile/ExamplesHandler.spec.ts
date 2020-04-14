@@ -13,7 +13,7 @@ describe('ExamplesHandler', () => {
         const json = vueFile.examplesHandler.toJSON();
         expect(json.length).to.equal(7);
         expect(json[0].title).to.equal('主要按钮 ~~test~~');
-        expect(json[1].code).to.equal('<template><u-button>次要按钮</u-button>\n</template>\n');
+        expect(json[1].code).to.equal('<template>\n<u-button>次要按钮</u-button>\n</template>\n');
         expect(json[6].description).to.equal('一般在页面局部使用。\n一般在页面局部使用。\n');
     });
 })

@@ -28,6 +28,19 @@ function addLayout(fullPath, route, type) {
     });
 }
 exports.addLayout = addLayout;
+function addCode(fullPath, route, tpl) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const vueFile = new vfs.VueFile(fullPath);
+        yield vueFile.open();
+        vueFile.parseTemplate();
+        tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '');
+        const rootEl = vueFile.templateHandler.ast;
+        const selectedEl = vueFile.templateHandler.findByRoute(route, rootEl);
+        selectedEl.children.push(compiler.compile(tpl).ast);
+        yield vueFile.save();
+    });
+}
+exports.addCode = addCode;
 // export async function mergeBlock(fullPath: string, type: string) {
 //     const vueFile = new vfs.VueFile(fullPath);
 //     await vueFile.open();

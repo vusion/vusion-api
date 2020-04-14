@@ -19,6 +19,20 @@ export async function addLayout(fullPath: string, route: string, type: string) {
     await vueFile.save();
 }
 
+export async function addCode(fullPath: string, route: string, tpl: string) {
+    const vueFile = new vfs.VueFile(fullPath);
+    await vueFile.open();
+
+    vueFile.parseTemplate();
+
+    tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '');
+    const rootEl = vueFile.templateHandler.ast;
+    const selectedEl = vueFile.templateHandler.findByRoute(route, rootEl) as compiler.ASTElement;
+    selectedEl.children.push(compiler.compile(tpl).ast);
+
+    await vueFile.save();
+}
+
 // export async function mergeBlock(fullPath: string, type: string) {
 //     const vueFile = new vfs.VueFile(fullPath);
 //     await vueFile.open();

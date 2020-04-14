@@ -21,7 +21,7 @@ describe('ExamplesHandler', () => {
         const json = vueFile.examplesHandler.toJSON();
         chai_1.expect(json.length).to.equal(7);
         chai_1.expect(json[0].title).to.equal('主要按钮 ~~test~~');
-        chai_1.expect(json[1].code).to.equal('<template><u-button>次要按钮</u-button>\n</template>\n');
+        chai_1.expect(json[1].code).to.equal('<template>\n<u-button>次要按钮</u-button>\n</template>\n');
         chai_1.expect(json[6].description).to.equal('一般在页面局部使用。\n一般在页面局部使用。\n');
     }));
 });

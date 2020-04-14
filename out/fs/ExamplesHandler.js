@@ -36,7 +36,7 @@ class ExamplesHandler {
                     examples.push({
                         title,
                         description,
-                        code: `<template>${token.content}</template>\n`,
+                        code: `<template>\n${token.content}</template>\n`,
                     });
                 }
                 else if (lang === 'vue') {

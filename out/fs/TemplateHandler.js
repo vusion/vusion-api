@@ -71,7 +71,7 @@ class TemplateHandler {
     }
     traverse(func) {
         let queue = [];
-        queue = queue.concat(new ASTNodePath(this.ast, null));
+        queue = queue.concat(new ASTNodePath(this.ast, null, ''));
         let nodePath;
         while ((nodePath = queue.shift())) {
             if (nodePath.node.type === 1) {
