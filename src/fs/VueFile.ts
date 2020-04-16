@@ -50,8 +50,20 @@ export default class VueFile extends FSEntry {
     package: PackageJSON;
 
     templateHandler: TemplateHandler; // 为`undefined`表示还未解析
+    /**
+     * Alias of templateHandler
+     */
+    $html: TemplateHandler;
     scriptHandler: ScriptHandler; // 为`undefined`表示还未解析
+    /**
+     * Alias of scriptHandler
+     */
+    $js: ScriptHandler;
     styleHandler: StyleHandler; // 为`undefined`表示还未解析
+    /**
+     * Alias of styleHandler
+     */
+    $css: StyleHandler;
     apiHandler: APIHandler;
     examplesHandler: ExamplesHandler;
 
@@ -156,8 +168,11 @@ export default class VueFile extends FSEntry {
         this.package = undefined;
 
         this.templateHandler = undefined;
+        this.$html = undefined;
         this.scriptHandler = undefined;
+        this.$js = undefined;
         this.styleHandler = undefined;
+        this.$css = undefined;
         this.apiHandler = undefined;
         this.examplesHandler = undefined;
 
@@ -269,21 +284,21 @@ export default class VueFile extends FSEntry {
         if (this.templateHandler)
             return;
 
-        return this.templateHandler = new TemplateHandler(this.template);
+        return this.$html = this.templateHandler = new TemplateHandler(this.template);
     }
 
     parseScript() {
         if (this.scriptHandler)
             return;
 
-        return this.scriptHandler = new ScriptHandler(this.script);
+        return this.$js = this.scriptHandler = new ScriptHandler(this.script);
     }
 
     parseStyle() {
         if (this.styleHandler)
             return;
 
-        return this.styleHandler = new StyleHandler(this.style);
+        return this.$css = this.styleHandler = new StyleHandler(this.style);
     }
 
     parseAPI() {

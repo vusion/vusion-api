@@ -134,8 +134,11 @@ class VueFile extends FSEntry_1.default {
         this.examples = undefined;
         this.package = undefined;
         this.templateHandler = undefined;
+        this.$html = undefined;
         this.scriptHandler = undefined;
+        this.$js = undefined;
         this.styleHandler = undefined;
+        this.$css = undefined;
         this.apiHandler = undefined;
         this.examplesHandler = undefined;
         this.isOpen = false;
@@ -248,17 +251,17 @@ class VueFile extends FSEntry_1.default {
     parseTemplate() {
         if (this.templateHandler)
             return;
-        return this.templateHandler = new TemplateHandler_1.default(this.template);
+        return this.$html = this.templateHandler = new TemplateHandler_1.default(this.template);
     }
     parseScript() {
         if (this.scriptHandler)
             return;
-        return this.scriptHandler = new ScriptHandler_1.default(this.script);
+        return this.$js = this.scriptHandler = new ScriptHandler_1.default(this.script);
     }
     parseStyle() {
         if (this.styleHandler)
             return;
-        return this.styleHandler = new StyleHandler_1.default(this.style);
+        return this.$css = this.styleHandler = new StyleHandler_1.default(this.style);
     }
     parseAPI() {
         if (this.apiHandler)

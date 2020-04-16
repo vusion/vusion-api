@@ -422,6 +422,41 @@ export function checkBlockOnlyHasTemplate(blockPath: string) {
     return true;
 }
 
+/**
+ * 添加代码为外部区块
+ * @param code 源码
+ * @param target 目标路径
+ * @param name 区块名称
+ */
+export async function addExternalCode(code: string, target: string, name: string) {
+    /* 调用前先保证 vueFile 已保存 */
+
+    const vueFile = new vfs.VueFile(target);
+    await vueFile.open();
+
+    /* 写区块文件 */
+    const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
+    const dest = path.join(localBlocksPath, name + '.vue');
+    if (fs.existsSync(dest))
+        throw new vfs.FileExistsError(dest);
+    await fs.ensureDir(localBlocksPath);
+    await fs.writeFile(dest, code, 'utf8');
+
+    const relativePath = `./${vueFile.baseName}.blocks/${name}.vue`;
+    const { componentName } = utils.normalizeName(name);
+
+    /* 添加 import */
+    vueFile.parseScript();
+    vueFile.$js.import(componentName).from(relativePath);
+    vueFile.$js.export('default').object()
+        .after(['el','name','parent','functional','delimiters','comments'])
+        .ensure('components', '{}')
+        .get('components')
+        .set(componentName, componentName);
+
+    await vueFile.save();
+}
+
 // export async function addBlockTag
 
 export async function addBlock(options: MaterialOptions) {

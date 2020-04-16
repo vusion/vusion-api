@@ -52,6 +52,7 @@
     "form-data": "^3.0.0",
     "fs-extra": "^8.1.0",
     "globby": "^10.0.1",
+    "javascript-stringify": "^2.0.1",
     "line-reader": "^0.4.0",
     "lodash": "^4.17.15",
     "markdown-it": "^10.0.0",

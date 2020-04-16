@@ -19,6 +19,7 @@ class FileExistsError extends Error {
     constructor(fullPath) {
         super(fullPath);
         this.name = 'FileExistsError';
+        this.message = `文件"${fullPath}"已经存在！`;
     }
 }
 exports.FileExistsError = FileExistsError;
