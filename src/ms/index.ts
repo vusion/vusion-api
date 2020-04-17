@@ -404,49 +404,13 @@ export async function fetchBlock(options: MaterialOptions) {
     }, blockCacheDir);
 }
 
-
-/**
- * 区块的复杂程度类型
- */
-export const enum BlockComplexity {
-    onlyTemplate, // Just add
-    hasScriptOrStyle, // Can merge
-    hasAssetsOrExtra, // Must external
-}
-
-export function checkCodeComplexity(code: string): BlockComplexity {
-    const hasScriptOrStyle = /<script>[\s\S]+<\/script>|<style>[\s\S]+<\/style>/gi.test(code);
-    return hasScriptOrStyle ? BlockComplexity.hasScriptOrStyle : BlockComplexity.onlyTemplate;
-}
-
-export function checkBlockComplexity(blockPath: string): BlockComplexity {
-    const files = fs.readdirSync(blockPath);
-    const WHITE_LIST = ['README.md', 'index.html', 'index.js', 'module.css', 'pacakge.json', 'public', 'screenshots'];
-    if (files.some((file) => file[0] !== '.' && !WHITE_LIST.includes(file)))
-        return BlockComplexity.hasAssetsOrExtra;
-
-    const scriptPath = path.resolve(blockPath, 'index.js');
-    const script = fs.readFileSync(scriptPath, 'utf8');
-    if (script && script.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== 'export default {};')
-        return BlockComplexity.hasScriptOrStyle;
-
-    const moduleCSSPath = path.resolve(blockPath, 'module.css');
-    if (!fs.existsSync(moduleCSSPath))
-        return BlockComplexity.onlyTemplate;
-    const style = fs.readFileSync(moduleCSSPath, 'utf8');
-    if (style && style.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== '.root {}')
-        return BlockComplexity.hasScriptOrStyle;
-
-    return BlockComplexity.onlyTemplate;
-}
-
 /**
  * 添加代码为外部区块
  * @param code 源码
  * @param target 目标路径
  * @param name 区块名称
  */
-export async function addExternalCode(code: string, target: string, name: string) {
+export async function addBlockExternally(blockVue: vfs.VueFile, target: string, name: string) {
     /* 调用前先保证 vueFile 已保存 */
 
     const vueFile = new vfs.VueFile(target);
@@ -455,15 +419,12 @@ export async function addExternalCode(code: string, target: string, name: string
     /* 写区块文件 */
     const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
     const dest = path.join(localBlocksPath, name + '.vue');
-    if (fs.existsSync(dest))
-        throw new vfs.FileExistsError(dest);
     await fs.ensureDir(localBlocksPath);
-    await fs.writeFile(dest, code, 'utf8');
-
-    const relativePath = `./${vueFile.baseName}.blocks/${name}.vue`;
-    const { componentName } = utils.normalizeName(name);
+    blockVue = await blockVue.saveAs(dest);
 
     /* 添加 import */
+    const relativePath = `./${vueFile.baseName}.blocks/${name}.vue`;
+    const { componentName } = utils.normalizeName(name);
     vueFile.parseScript();
     vueFile.$js.import(componentName).from(relativePath);
     vueFile.$js.export('default').object()
@@ -500,136 +461,20 @@ export async function addBlock(options: MaterialOptions) {
     await fs.remove(path.join(dest, 'package.json'));
     await fs.remove(path.join(dest, 'README.md'));
 
-    vueFile.parseScript();
-    vueFile.parseTemplate();
-
     const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
     const { componentName } = utils.normalizeName(opts.name);
 
-    const body = vueFile.scriptHandler.ast.program.body;
-    for (let i = 0; i < body.length; i++) {
-        const node = body[i];
-        if (node.type !== 'ImportDeclaration') {
-            const importDeclaration = babel.template(`import ${componentName} from '${relativePath}'`)() as babel.types.ImportDeclaration;
-            body.splice(i, 0, importDeclaration);
-            break;
-        }
-    }
-    babel.traverse(vueFile.scriptHandler.ast, {
-        ExportDefaultDeclaration(nodePath) {
-            const declaration = nodePath.node.declaration;
-            if (declaration && declaration.type === 'ObjectExpression') {
-                let pos = 0;
-                const propertiesBefore = [
-                    'el',
-                    'name',
-                    'parent',
-                    'functional',
-                    'delimiters',
-                    'comments',
-                ]
-                let componentsProperty = declaration.properties.find((property, index) => {
-                    if (property.type === 'ObjectProperty' && propertiesBefore.includes(property.key.name))
-                        pos = index;
-                    return property.type === 'ObjectProperty' && property.key.name === 'components';
-                }) as babel.types.ObjectProperty;
+    vueFile.parseScript();
+    vueFile.$js.import(componentName).from(relativePath);
+    vueFile.$js.export('default').object()
+        .after(['el','name','parent','functional','delimiters','comments'])
+        .ensure('components', '{}')
+        .get('components')
+        .set(componentName, componentName);
 
-                const blockProperty = babel.types.objectProperty(babel.types.identifier(componentName), babel.types.identifier(componentName));
-
-                if (!componentsProperty) {
-                    componentsProperty = babel.types.objectProperty(babel.types.identifier('components'), babel.types.objectExpression([]));
-                    declaration.properties.splice(pos, 0, componentsProperty);
-                }
-
-                const componentsProperties = (componentsProperty.value as babel.types.ObjectExpression).properties;
-                // 判断有没有重复的项，如果有则忽略，不覆盖
-                if (componentsProperties.find((property) => property.type === 'ObjectProperty' && property.key.name === componentName))
-                    return;
-                componentsProperties.push(blockProperty);
-            }
-        },
-    });
-
+    vueFile.parseTemplate();
     const rootEl = vueFile.templateHandler.ast;
     rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
-
-    await vueFile.save();
-}
-
-export async function addBlockOnlyScripts(options: MaterialOptions, tempPath: string) {
-    const opts = processOptions(options);
-
-    // if (opts.source.type === 'npm')
-    // const blockCacheDir = getCacheDir('blocks');
-    // const tempPath = await download.npm({
-    //     registry: opts.source.registry,
-    //     name: opts.source.name,
-    // }, blockCacheDir);
-
-    const vueFile = new vfs.VueFile(opts.target);
-    await vueFile.open();
-
-    const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
-    const dest = path.join(localBlocksPath, opts.name + '.vue');
-    await fs.ensureDir(localBlocksPath);
-    await fs.copy(tempPath, dest);
-    await fs.remove(path.join(dest, 'public'));
-    await fs.remove(path.join(dest, 'screenshots'));
-    await fs.remove(path.join(dest, 'package.json'));
-    await fs.remove(path.join(dest, 'README.md'));
-
-    vueFile.parseScript();
-    vueFile.parseTemplate();
-
-    const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
-    const { componentName } = utils.normalizeName(opts.name);
-
-    const body = vueFile.scriptHandler.ast.program.body;
-    for (let i = 0; i < body.length; i++) {
-        const node = body[i];
-        if (node.type !== 'ImportDeclaration') {
-            const importDeclaration = babel.template(`import ${componentName} from '${relativePath}'`)() as babel.types.ImportDeclaration;
-            body.splice(i, 0, importDeclaration);
-            break;
-        }
-    }
-    babel.traverse(vueFile.scriptHandler.ast, {
-        ExportDefaultDeclaration(nodePath) {
-            const declaration = nodePath.node.declaration;
-            if (declaration && declaration.type === 'ObjectExpression') {
-                let pos = 0;
-                const propertiesBefore = [
-                    'el',
-                    'name',
-                    'parent',
-                    'functional',
-                    'delimiters',
-                    'comments',
-                ]
-                let componentsProperty = declaration.properties.find((property, index) => {
-                    if (property.type === 'ObjectProperty' && propertiesBefore.includes(property.key.name))
-                        pos = index;
-                    return property.type === 'ObjectProperty' && property.key.name === 'components';
-                }) as babel.types.ObjectProperty;
-
-                const blockProperty = babel.types.objectProperty(babel.types.identifier(componentName), babel.types.identifier(componentName));
-
-                if (!componentsProperty) {
-                    componentsProperty = babel.types.objectProperty(babel.types.identifier('components'), babel.types.objectExpression([]));
-                    declaration.properties.splice(pos, 0, componentsProperty);
-                }
-
-                const componentsProperties = (componentsProperty.value as babel.types.ObjectExpression).properties;
-                // 判断有没有重复的项，如果有则忽略，不覆盖
-                if (componentsProperties.find((property) => property.type === 'ObjectProperty' && property.key.name === componentName))
-                    return;
-                componentsProperties.push(blockProperty);
-            }
-        },
-    });
-
-    // const rootEl = vueFile.templateHandler.ast;
-    // rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
 
     await vueFile.save();
 }

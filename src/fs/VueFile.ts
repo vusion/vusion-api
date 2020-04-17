@@ -15,6 +15,7 @@ import ExamplesHandler from './ExamplesHandler';
 
 import traverse from '@babel/traverse';
 import PackageJSON from '../types/PackageJSON';
+import { FileExistsError } from './service';
 
 const fetchPartialContent = (content: string, tag: string, attrs: string = '') => {
     const reg = new RegExp(`<${tag}${attrs ? ' ' + attrs : ''}.*?>([\\s\\S]+)<\\/${tag}>`);
@@ -402,10 +403,48 @@ export default class VueFile extends FSEntry {
         return this.examplesHandler = new ExamplesHandler(this.examples);
     }
 
+    /**
+     * 克隆 VueFile 对象
+     * 克隆所有参数，但 handler 引用会被排除
+     */
+    clone() {
+        const vueFile = new VueFile(this.fullPath);
+
+        this.fullPath = this.fullPath;
+        this.fileName = this.fileName;
+        this.extName = this.extName;
+        this.baseName = this.baseName;
+        this.title = this.title;
+        this.isDirectory = this.isDirectory;
+        this.isVue = this.isVue;
+        this.isOpen = this.isOpen;
+        this.isSaving = this.isSaving;
+        this.tagName = this.tagName;
+        this.componentName = this.componentName;
+        this.alias = this.alias;
+        this.subfiles = this.subfiles && Array.from(this.subfiles);
+        this.children = this.children && Array.from(this.children);
+        this.content = this.content;
+        this.template = this.template;
+        this.script = this.script;
+        this.style = this.style;
+        this.api = this.api;
+        this.examples = this.examples;
+        this.package = this.package && Object.assign({}, this.package);
+
+        return vueFile;
+    }
+
+    /**
+     * await vueFile.save();
+     * 仅依赖 this.fullPath 和 this.isDirectory 两个变量
+     * - 如果有解析，先根据解析器生成内容，再保存
+     * - 根据 isDirectory 判断是否保存单多文件
+     */
     async save() {
         this.isSaving = true;
 
-        // 只有 isDirectory 不相同的时候才删除
+        // 只有 isDirectory 不相同的时候才删除，因为可能有其它额外的文件
         if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
             shell.rm('-rf', this.fullPath);
 
@@ -423,7 +462,6 @@ export default class VueFile extends FSEntry {
         if (this.styleHandler)
             this.style = style = this.styleHandler.generate();
 
-        let result;
         if (this.isDirectory) {
             fs.ensureDirSync(this.fullPath);
 
@@ -434,18 +472,69 @@ export default class VueFile extends FSEntry {
             if (this.package && typeof this.package === 'object')
                 promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), JSON.stringify(this.package, null, 2)));
 
-            result = await Promise.all(promises);
+            await Promise.all(promises);
         } else {
             const contents = [];
             template && contents.push(`<template>\n${template}</template>`);
             script && contents.push(`<script>\n${script}</script>`);
             style && contents.push(`<style module>\n${style}</style>`);
 
-            result = await fs.writeFile(this.fullPath, contents.join('\n\n') + '\n');
+            await fs.writeFile(this.fullPath, contents.join('\n\n') + '\n');
         }
 
         super.save();
-        return result;
+        return this;
+    }
+
+    /**
+     * 另存为，保存到另一个路径
+     * 会克隆所有内容参数，但 handler 引用会被排除
+     * @param fullPath
+     */
+    async saveAs(fullPath: string) {
+        if (fs.existsSync(fullPath))
+            throw new FileExistsError(fullPath);
+
+        if (this.templateHandler) {
+            if (!this.isDirectory)
+                this.templateHandler.options.startLevel = 1;
+            this.template = this.templateHandler.generate();
+        }
+        if (this.scriptHandler)
+            this.script = this.scriptHandler.generate();
+        if (this.styleHandler)
+            this.style = this.styleHandler.generate();
+
+        const newFile = new VueFile(fullPath);
+        // this.fullPath = this.fullPath;
+        // this.fileName = this.fileName;
+        // this.extName = this.extName;
+        // this.baseName = this.baseName;
+        // this.title = this.title;
+        this.isDirectory = this.isDirectory;
+        this.isVue = this.isVue;
+        this.isOpen = this.isOpen;
+        this.isSaving = this.isSaving;
+        // this.tagName = this.tagName;
+        // this.componentName = this.componentName;
+        this.alias = this.alias;
+        this.subfiles = this.subfiles && Array.from(this.subfiles);
+        this.children = this.children && Array.from(this.children);
+        this.content = this.content;
+        this.template = this.template;
+        this.script = this.script;
+        this.style = this.style;
+        this.api = this.api;
+        this.examples = this.examples;
+        this.package = this.package && Object.assign({}, this.package);
+
+
+        // 只有 isDirectory 相同的时候会拷贝原文件，否则重新生成
+        if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
+            await fs.copy(this.fullPath, fullPath);
+        newFile.save();
+
+        return newFile;
     }
 
     // @TODO
@@ -618,6 +707,7 @@ export default ${vueFile.componentName};
     static from(code: string, fileName: string = 'temp.vue') {
         const vueFile = new VueFile('temp.vue');
         vueFile.isOpen = true;
+        vueFile.isDirectory = false;
         vueFile.subfiles = [];
         vueFile.children = [];
         vueFile.content = code;
