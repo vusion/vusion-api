@@ -29,6 +29,38 @@ export enum VueFileExtendMode {
     all = 'all',
 };
 
+export const SUBFILE_LIST = [
+    'index.html',
+    'index.js',
+    'module.css',
+    'README.md',
+    'CHANGELOG.md',
+    'api.yaml',
+    'package.json',
+    'node_modules',
+    'assets',
+    'docs',
+    'i18n',
+    'dist',
+    'public',
+    'screenshots',
+    'vetur',
+];
+
+/**
+ * 单多 Vue 文件处理类
+ *
+ * 打开一般分为四个阶段
+ * - const vueFile = new VueFile(fullPath); // 根据路径创建对象，可以为虚拟路径。
+ * - await vueFile.preOpen(); // 异步方法。获取 isDirectory，获取子组件，获取标题
+ * - await vueFile.open(); // 异步方法。获取常用操作的内容块：script, template, style, api, examples, package。
+ * - vueFile.parseAll(); // 解析全部内容块
+ *
+ * 保存。
+ * await vueFile.save();
+ * - 如果有解析，先根据解析器生成内容，再保存
+ * - 根据 isDirectory 判断是否保存单多文件
+ */
 export default class VueFile extends FSEntry {
     tagName: string; // 中划线名称
     componentName: string; // 驼峰名称
@@ -36,6 +68,7 @@ export default class VueFile extends FSEntry {
     // 子组件
     // 为`undefined`表示未打开过，为数组表示已经打开。
     parent: VueFile;
+    subfiles: string[];
     children: VueFile[];
     isChild: boolean;
 
@@ -86,7 +119,11 @@ export default class VueFile extends FSEntry {
         const stats = fs.statSync(this.fullPath);
         this.isDirectory = stats.isDirectory();
         if (this.isDirectory)
-            this.children = await this.loadDirectory();
+            await this.loadDirectory();
+        else {
+            this.subfiles = [];
+            this.children = [];
+        }
 
         this.alias = await this.readTitleInReadme();
     }
@@ -126,9 +163,9 @@ export default class VueFile extends FSEntry {
             throw new Error(`Cannot find: ${this.fullPath}`);
 
         const children: Array<VueFile> = [];
-        const fileNames = await fs.readdir(this.fullPath);
+        this.subfiles = await fs.readdir(this.fullPath);
 
-        fileNames.forEach((name) => {
+        this.subfiles.forEach((name) => {
             if (!name.endsWith('.vue'))
                 return;
 
@@ -143,7 +180,7 @@ export default class VueFile extends FSEntry {
             children.push(vueFile);
         });
 
-        return children;
+        return this.children = children;
     }
 
     async forceOpen() {
@@ -156,6 +193,7 @@ export default class VueFile extends FSEntry {
     close() {
         this.isDirectory = undefined;
         this.alias = undefined;
+        this.subfiles = undefined;
         this.children = undefined;
 
         // 单文件内容
@@ -272,7 +310,56 @@ export default class VueFile extends FSEntry {
         }
     }
 
-    parse() {
+    hasAssets() {
+        return !!this.subfiles && this.subfiles.includes('assets');
+    }
+
+    /**
+     * 是否有额外的
+     */
+    hasExtra() {
+        return !!this.subfiles && this.subfiles.some((file) => file[0] !== '.' && !SUBFILE_LIST.includes(file));
+    }
+
+    /**
+     * 是否有模板
+     * @param simplify 简化模式。在此模式下，`<div></div>`视为没有模板
+     */
+    hasTemplate(simplify: boolean) {
+        const template = this.template;
+        if (!simplify)
+            return !!template;
+        else
+            return !!template && template.trim() !== '<div></div>';
+    }
+
+    /**
+     * 是否有 JS 脚本
+     * @param simplify 简化模式。在此模式下，`export default {};`视为没有 JS 脚本
+     */
+    hasScript(simplify: boolean) {
+        const script = this.script;
+        if (!simplify)
+            return !!script;
+        else
+            return !!script && script.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== 'export default {};';
+    }
+
+    /**
+     * 是否有 CSS 样式
+     * @param simplify 简化模式。在此模式下，`.root {}`视为没有 CSS 样式
+     */
+    hasStyle(simplify: boolean) {
+        const style = this.style;
+        if (!simplify)
+            return !!style;
+        else
+            return !!style && style.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== '.root {}';
+    }
+
+    // @TODO 其它 has 需要吗？
+
+    parseAll() {
         this.parseTemplate();
         this.parseScript();
         this.parseStyle();
@@ -521,5 +608,26 @@ export default ${vueFile.componentName};
 
     static fetch(fullPath: string) {
         return super.fetch(fullPath) as VueFile;
+    }
+
+    /**
+     * 从代码创建临时的 VueFile 文件
+     * 相关于跳过 preOpen 和 open 阶段，但路径是虚拟的
+     * @param code 代码
+     */
+    static from(code: string, fileName: string = 'temp.vue') {
+        const vueFile = new VueFile('temp.vue');
+        vueFile.isOpen = true;
+        vueFile.subfiles = [];
+        vueFile.children = [];
+        vueFile.content = code;
+        vueFile.script = fetchPartialContent(vueFile.content, 'script');
+        vueFile.template = fetchPartialContent(vueFile.content, 'template');
+        vueFile.style = fetchPartialContent(vueFile.content, 'style');
+        vueFile.api = fetchPartialContent(vueFile.content, 'api');
+        vueFile.examples = fetchPartialContent(vueFile.content, 'doc', 'name="blocks"');
+        if (!vueFile.examples)
+            vueFile.examples = fetchPartialContent(vueFile.content, 'doc', 'name="examples"');
+        return vueFile;
     }
 }

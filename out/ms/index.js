@@ -372,22 +372,29 @@ function fetchBlock(options) {
     });
 }
 exports.fetchBlock = fetchBlock;
-function checkBlockOnlyHasTemplate(blockPath) {
-    // const vueFile = new vfs.VueFile(blockPath);
-    // await vueFile.open();
+function checkCodeComplexity(code) {
+    const hasScriptOrStyle = /<script>[\s\S]+<\/script>|<style>[\s\S]+<\/style>/gi.test(code);
+    return hasScriptOrStyle ? 1 /* hasScriptOrStyle */ : 0 /* onlyTemplate */;
+}
+exports.checkCodeComplexity = checkCodeComplexity;
+function checkBlockComplexity(blockPath) {
+    const files = fs.readdirSync(blockPath);
+    const WHITE_LIST = ['README.md', 'index.html', 'index.js', 'module.css', 'pacakge.json', 'public', 'screenshots'];
+    if (files.some((file) => file[0] !== '.' && !WHITE_LIST.includes(file)))
+        return 2 /* hasAssetsOrExtra */;
     const scriptPath = path.resolve(blockPath, 'index.js');
     const script = fs.readFileSync(scriptPath, 'utf8');
     if (script && script.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== 'export default {};')
-        return false;
+        return 1 /* hasScriptOrStyle */;
     const moduleCSSPath = path.resolve(blockPath, 'module.css');
     if (!fs.existsSync(moduleCSSPath))
-        return true;
+        return 0 /* onlyTemplate */;
     const style = fs.readFileSync(moduleCSSPath, 'utf8');
     if (style && style.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== '.root {}')
-        return false;
-    return true;
+        return 1 /* hasScriptOrStyle */;
+    return 0 /* onlyTemplate */;
 }
-exports.checkBlockOnlyHasTemplate = checkBlockOnlyHasTemplate;
+exports.checkBlockComplexity = checkBlockComplexity;
 /**
  * 添加代码为外部区块
  * @param code 源码
@@ -420,7 +427,9 @@ function addExternalCode(code, target, name) {
     });
 }
 exports.addExternalCode = addExternalCode;
-// export async function addBlockTag
+/**
+ * For vusion cli
+ */
 function addBlock(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = processOptions(options);

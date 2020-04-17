@@ -36,6 +36,37 @@ var VueFileExtendMode;
     VueFileExtendMode["all"] = "all";
 })(VueFileExtendMode = exports.VueFileExtendMode || (exports.VueFileExtendMode = {}));
 ;
+exports.SUBFILE_LIST = [
+    'index.html',
+    'index.js',
+    'module.css',
+    'README.md',
+    'CHANGELOG.md',
+    'api.yaml',
+    'package.json',
+    'node_modules',
+    'assets',
+    'docs',
+    'i18n',
+    'dist',
+    'public',
+    'screenshots',
+    'vetur',
+];
+/**
+ * 单多 Vue 文件处理类
+ *
+ * 打开一般分为四个阶段
+ * - const vueFile = new VueFile(fullPath); // 根据路径创建对象，可以为虚拟路径。
+ * - await vueFile.preOpen(); // 异步方法。获取 isDirectory，获取子组件，获取标题
+ * - await vueFile.open(); // 异步方法。获取常用操作的内容块：script, template, style, api, examples, package。
+ * - vueFile.parseAll(); // 解析全部内容块
+ *
+ * 保存。
+ * await vueFile.save();
+ * - 如果有解析，先根据解析器生成内容，再保存
+ * - 根据 isDirectory 判断是否保存单多文件
+ */
 class VueFile extends FSEntry_1.default {
     constructor(fullPath) {
         if (!fullPath.endsWith('.vue'))
@@ -56,7 +87,11 @@ class VueFile extends FSEntry_1.default {
             const stats = fs.statSync(this.fullPath);
             this.isDirectory = stats.isDirectory();
             if (this.isDirectory)
-                this.children = yield this.loadDirectory();
+                yield this.loadDirectory();
+            else {
+                this.subfiles = [];
+                this.children = [];
+            }
             this.alias = yield this.readTitleInReadme();
         });
     }
@@ -96,8 +131,8 @@ class VueFile extends FSEntry_1.default {
             if (!fs.existsSync(this.fullPath))
                 throw new Error(`Cannot find: ${this.fullPath}`);
             const children = [];
-            const fileNames = yield fs.readdir(this.fullPath);
-            fileNames.forEach((name) => {
+            this.subfiles = yield fs.readdir(this.fullPath);
+            this.subfiles.forEach((name) => {
                 if (!name.endsWith('.vue'))
                     return;
                 const fullPath = path.join(this.fullPath, name);
@@ -110,7 +145,7 @@ class VueFile extends FSEntry_1.default {
                 vueFile.isChild = true;
                 children.push(vueFile);
             });
-            return children;
+            return this.children = children;
         });
     }
     forceOpen() {
@@ -124,6 +159,7 @@ class VueFile extends FSEntry_1.default {
     close() {
         this.isDirectory = undefined;
         this.alias = undefined;
+        this.subfiles = undefined;
         this.children = undefined;
         // 单文件内容
         this.content = undefined;
@@ -241,7 +277,50 @@ class VueFile extends FSEntry_1.default {
             }
         });
     }
-    parse() {
+    hasAssets() {
+        return !!this.subfiles && this.subfiles.includes('assets');
+    }
+    /**
+     * 是否有额外的
+     */
+    hasExtra() {
+        return !!this.subfiles && this.subfiles.some((file) => file[0] !== '.' && !exports.SUBFILE_LIST.includes(file));
+    }
+    /**
+     * 是否有模板
+     * @param simplify 简化模式。在此模式下，`<div></div>`视为没有模板
+     */
+    hasTemplate(simplify) {
+        const template = this.template;
+        if (!simplify)
+            return !!template;
+        else
+            return !!template && template.trim() !== '<div></div>';
+    }
+    /**
+     * 是否有 JS 脚本
+     * @param simplify 简化模式。在此模式下，`export default {};`视为没有 JS 脚本
+     */
+    hasScript(simplify) {
+        const script = this.script;
+        if (!simplify)
+            return !!script;
+        else
+            return !!script && script.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== 'export default {};';
+    }
+    /**
+     * 是否有 CSS 样式
+     * @param simplify 简化模式。在此模式下，`.root {}`视为没有 CSS 样式
+     */
+    hasStyle(simplify) {
+        const style = this.style;
+        if (!simplify)
+            return !!style;
+        else
+            return !!style && style.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== '.root {}';
+    }
+    // @TODO 其它 has 需要吗？
+    parseAll() {
         this.parseTemplate();
         this.parseScript();
         this.parseStyle();
@@ -450,6 +529,26 @@ export default ${vueFile.componentName};
     }
     static fetch(fullPath) {
         return super.fetch(fullPath);
+    }
+    /**
+     * 从代码创建临时的 VueFile 文件
+     * 相关于跳过 preOpen 和 open 阶段，但路径是虚拟的
+     * @param code 代码
+     */
+    static from(code, fileName = 'temp.vue') {
+        const vueFile = new VueFile('temp.vue');
+        vueFile.isOpen = true;
+        vueFile.subfiles = [];
+        vueFile.children = [];
+        vueFile.content = code;
+        vueFile.script = fetchPartialContent(vueFile.content, 'script');
+        vueFile.template = fetchPartialContent(vueFile.content, 'template');
+        vueFile.style = fetchPartialContent(vueFile.content, 'style');
+        vueFile.api = fetchPartialContent(vueFile.content, 'api');
+        vueFile.examples = fetchPartialContent(vueFile.content, 'doc', 'name="blocks"');
+        if (!vueFile.examples)
+            vueFile.examples = fetchPartialContent(vueFile.content, 'doc', 'name="examples"');
+        return vueFile;
     }
 }
 exports.default = VueFile;

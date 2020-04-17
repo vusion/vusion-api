@@ -404,22 +404,40 @@ export async function fetchBlock(options: MaterialOptions) {
     }, blockCacheDir);
 }
 
-export function checkBlockOnlyHasTemplate(blockPath: string) {
-    // const vueFile = new vfs.VueFile(blockPath);
-    // await vueFile.open();
+
+/**
+ * 区块的复杂程度类型
+ */
+export const enum BlockComplexity {
+    onlyTemplate, // Just add
+    hasScriptOrStyle, // Can merge
+    hasAssetsOrExtra, // Must external
+}
+
+export function checkCodeComplexity(code: string): BlockComplexity {
+    const hasScriptOrStyle = /<script>[\s\S]+<\/script>|<style>[\s\S]+<\/style>/gi.test(code);
+    return hasScriptOrStyle ? BlockComplexity.hasScriptOrStyle : BlockComplexity.onlyTemplate;
+}
+
+export function checkBlockComplexity(blockPath: string): BlockComplexity {
+    const files = fs.readdirSync(blockPath);
+    const WHITE_LIST = ['README.md', 'index.html', 'index.js', 'module.css', 'pacakge.json', 'public', 'screenshots'];
+    if (files.some((file) => file[0] !== '.' && !WHITE_LIST.includes(file)))
+        return BlockComplexity.hasAssetsOrExtra;
+
     const scriptPath = path.resolve(blockPath, 'index.js');
     const script = fs.readFileSync(scriptPath, 'utf8');
     if (script && script.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== 'export default {};')
-        return false;
+        return BlockComplexity.hasScriptOrStyle;
+
     const moduleCSSPath = path.resolve(blockPath, 'module.css');
     if (!fs.existsSync(moduleCSSPath))
-        return true;
-
+        return BlockComplexity.onlyTemplate;
     const style = fs.readFileSync(moduleCSSPath, 'utf8');
     if (style && style.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== '.root {}')
-        return false;
+        return BlockComplexity.hasScriptOrStyle;
 
-    return true;
+    return BlockComplexity.onlyTemplate;
 }
 
 /**
@@ -457,8 +475,9 @@ export async function addExternalCode(code: string, target: string, name: string
     await vueFile.save();
 }
 
-// export async function addBlockTag
-
+/**
+ * For vusion cli
+ */
 export async function addBlock(options: MaterialOptions) {
     const opts = processOptions(options);
 
