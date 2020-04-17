@@ -359,27 +359,27 @@ class VueFile extends FSEntry_1.default {
      */
     clone() {
         const vueFile = new VueFile(this.fullPath);
-        this.fullPath = this.fullPath;
-        this.fileName = this.fileName;
-        this.extName = this.extName;
-        this.baseName = this.baseName;
-        this.title = this.title;
-        this.isDirectory = this.isDirectory;
-        this.isVue = this.isVue;
-        this.isOpen = this.isOpen;
-        this.isSaving = this.isSaving;
-        this.tagName = this.tagName;
-        this.componentName = this.componentName;
-        this.alias = this.alias;
-        this.subfiles = this.subfiles && Array.from(this.subfiles);
-        this.children = this.children && Array.from(this.children);
-        this.content = this.content;
-        this.template = this.template;
-        this.script = this.script;
-        this.style = this.style;
-        this.api = this.api;
-        this.examples = this.examples;
-        this.package = this.package && Object.assign({}, this.package);
+        vueFile.fullPath = this.fullPath;
+        vueFile.fileName = this.fileName;
+        vueFile.extName = this.extName;
+        vueFile.baseName = this.baseName;
+        vueFile.title = this.title;
+        vueFile.isDirectory = this.isDirectory;
+        vueFile.isVue = this.isVue;
+        vueFile.isOpen = this.isOpen;
+        vueFile.isSaving = this.isSaving;
+        vueFile.tagName = this.tagName;
+        vueFile.componentName = this.componentName;
+        vueFile.alias = this.alias;
+        vueFile.subfiles = this.subfiles && Array.from(this.subfiles);
+        vueFile.children = this.children && Array.from(this.children);
+        vueFile.content = this.content;
+        vueFile.template = this.template;
+        vueFile.script = this.script;
+        vueFile.style = this.style;
+        vueFile.api = this.api;
+        vueFile.examples = this.examples;
+        vueFile.package = this.package && Object.assign({}, this.package);
         return vueFile;
     }
     /**
@@ -448,33 +448,33 @@ class VueFile extends FSEntry_1.default {
                 this.script = this.scriptHandler.generate();
             if (this.styleHandler)
                 this.style = this.styleHandler.generate();
-            const newFile = new VueFile(fullPath);
-            // this.fullPath = this.fullPath;
-            // this.fileName = this.fileName;
-            // this.extName = this.extName;
-            // this.baseName = this.baseName;
-            // this.title = this.title;
-            this.isDirectory = this.isDirectory;
-            this.isVue = this.isVue;
-            this.isOpen = this.isOpen;
-            this.isSaving = this.isSaving;
-            // this.tagName = this.tagName;
-            // this.componentName = this.componentName;
-            this.alias = this.alias;
-            this.subfiles = this.subfiles && Array.from(this.subfiles);
-            this.children = this.children && Array.from(this.children);
-            this.content = this.content;
-            this.template = this.template;
-            this.script = this.script;
-            this.style = this.style;
-            this.api = this.api;
-            this.examples = this.examples;
-            this.package = this.package && Object.assign({}, this.package);
+            const vueFile = new VueFile(fullPath);
+            // vueFile.fullPath = this.fullPath;
+            // vueFile.fileName = this.fileName;
+            // vueFile.extName = this.extName;
+            // vueFile.baseName = this.baseName;
+            // vueFile.title = this.title;
+            vueFile.isDirectory = this.isDirectory;
+            vueFile.isVue = this.isVue;
+            vueFile.isOpen = this.isOpen;
+            vueFile.isSaving = this.isSaving;
+            // vueFile.tagName = this.tagName;
+            // vueFile.componentName = this.componentName;
+            vueFile.alias = this.alias;
+            vueFile.subfiles = this.subfiles && Array.from(this.subfiles);
+            vueFile.children = this.children && Array.from(this.children);
+            vueFile.content = this.content;
+            vueFile.template = this.template;
+            vueFile.script = this.script;
+            vueFile.style = this.style;
+            vueFile.api = this.api;
+            vueFile.examples = this.examples;
+            vueFile.package = this.package && Object.assign({}, this.package);
             // 只有 isDirectory 相同的时候会拷贝原文件，否则重新生成
             if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
                 yield fs.copy(this.fullPath, fullPath);
-            newFile.save();
-            return newFile;
+            vueFile.save();
+            return vueFile;
         });
     }
     // @TODO
