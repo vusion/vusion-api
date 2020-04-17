@@ -404,6 +404,16 @@ export async function fetchBlock(options: MaterialOptions) {
     }, blockCacheDir);
 }
 
+const BLOCK_REMOVING_LIST = [
+    'package.json',
+    'node_modules',
+    'assets',
+    'docs',
+    'public',
+    'screenshots',
+    'vetur',
+];
+
 /**
  * 添加代码为外部区块
  * @param code 源码
@@ -421,6 +431,8 @@ export async function addBlockExternally(blockVue: vfs.VueFile, target: string, 
     const dest = path.join(localBlocksPath, name + '.vue');
     await fs.ensureDir(localBlocksPath);
     blockVue = await blockVue.saveAs(dest);
+
+    await Promise.all(BLOCK_REMOVING_LIST.map((file) => fs.remove(path.join(dest, file))));
 
     /* 添加 import */
     const relativePath = `./${vueFile.baseName}.blocks/${name}.vue`;
@@ -456,10 +468,7 @@ export async function addBlock(options: MaterialOptions) {
     const dest = path.join(localBlocksPath, opts.name + '.vue');
     await fs.ensureDir(localBlocksPath);
     await fs.copy(tempPath, dest);
-    await fs.remove(path.join(dest, 'public'));
-    await fs.remove(path.join(dest, 'screenshots'));
-    await fs.remove(path.join(dest, 'package.json'));
-    await fs.remove(path.join(dest, 'README.md'));
+    await Promise.all(BLOCK_REMOVING_LIST.map((file) => fs.remove(path.join(dest, file))));
 
     const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
     const { componentName } = utils.normalizeName(opts.name);

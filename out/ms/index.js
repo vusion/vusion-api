@@ -372,6 +372,15 @@ function fetchBlock(options) {
     });
 }
 exports.fetchBlock = fetchBlock;
+const BLOCK_REMOVING_LIST = [
+    'package.json',
+    'node_modules',
+    'assets',
+    'docs',
+    'public',
+    'screenshots',
+    'vetur',
+];
 /**
  * 添加代码为外部区块
  * @param code 源码
@@ -388,6 +397,7 @@ function addBlockExternally(blockVue, target, name) {
         const dest = path.join(localBlocksPath, name + '.vue');
         yield fs.ensureDir(localBlocksPath);
         blockVue = yield blockVue.saveAs(dest);
+        yield Promise.all(BLOCK_REMOVING_LIST.map((file) => fs.remove(path.join(dest, file))));
         /* 添加 import */
         const relativePath = `./${vueFile.baseName}.blocks/${name}.vue`;
         const { componentName } = utils.normalizeName(name);
@@ -420,10 +430,7 @@ function addBlock(options) {
         const dest = path.join(localBlocksPath, opts.name + '.vue');
         yield fs.ensureDir(localBlocksPath);
         yield fs.copy(tempPath, dest);
-        yield fs.remove(path.join(dest, 'public'));
-        yield fs.remove(path.join(dest, 'screenshots'));
-        yield fs.remove(path.join(dest, 'package.json'));
-        yield fs.remove(path.join(dest, 'README.md'));
+        yield Promise.all(BLOCK_REMOVING_LIST.map((file) => fs.remove(path.join(dest, file))));
         const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
         const { componentName } = utils.normalizeName(opts.name);
         vueFile.parseScript();
