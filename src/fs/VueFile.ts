@@ -360,7 +360,14 @@ export default class VueFile extends FSEntry {
 
     // @TODO 其它 has 需要吗？
 
+    warnIfNotOpen() {
+        if (!this.isOpen)
+            console.warn(`[vusion.VueFile] File ${this.fileName} seems not open.`);
+    }
+
     parseAll() {
+        this.warnIfNotOpen();
+
         this.parseTemplate();
         this.parseScript();
         this.parseStyle();
@@ -408,6 +415,7 @@ export default class VueFile extends FSEntry {
      * 克隆所有参数，但 handler 引用会被排除
      */
     clone() {
+        this.warnIfNotOpen();
         const vueFile = new VueFile(this.fullPath);
 
         vueFile.fullPath = this.fullPath;
@@ -442,6 +450,7 @@ export default class VueFile extends FSEntry {
      * - 根据 isDirectory 判断是否保存单多文件
      */
     async save() {
+        this.warnIfNotOpen();
         this.isSaving = true;
 
         // 只有 isDirectory 不相同的时候才删除，因为可能有其它额外的文件
@@ -470,7 +479,7 @@ export default class VueFile extends FSEntry {
             script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), script));
             style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), style));
             if (this.package && typeof this.package === 'object')
-                promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), JSON.stringify(this.package, null, 2)));
+                promises.push(fs.writeFile(path.resolve(this.fullPath, 'package.json'), JSON.stringify(this.package, null, 2) + '\n'));
 
             await Promise.all(promises);
         } else {
@@ -492,6 +501,7 @@ export default class VueFile extends FSEntry {
      * @param fullPath
      */
     async saveAs(fullPath: string) {
+        this.warnIfNotOpen();
         if (fs.existsSync(fullPath))
             throw new FileExistsError(fullPath);
 
@@ -504,6 +514,10 @@ export default class VueFile extends FSEntry {
             this.script = this.scriptHandler.generate();
         if (this.styleHandler)
             this.style = this.styleHandler.generate();
+
+        // 只有 isDirectory 相同的时候会拷贝原文件，否则重新生成
+        if (this.isDirectory && fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory())
+            await fs.copy(this.fullPath, fullPath);
 
         const vueFile = new VueFile(fullPath);
         // vueFile.fullPath = this.fullPath;
@@ -528,10 +542,6 @@ export default class VueFile extends FSEntry {
         vueFile.examples = this.examples;
         vueFile.package = this.package && Object.assign({}, this.package);
 
-
-        // 只有 isDirectory 相同的时候会拷贝原文件，否则重新生成
-        if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
-            await fs.copy(this.fullPath, fullPath);
         vueFile.save();
 
         return vueFile;

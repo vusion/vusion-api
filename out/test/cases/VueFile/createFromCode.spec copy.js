@@ -24,5 +24,13 @@ describe('createFromCode', () => {
         chai_1.expect(vueFile.content).to.equal(content);
         chai_1.expect(vueFile.template).to.equal('<div :class="$style.root"></div>\n');
     }));
+    it('saveAs', () => __awaiter(void 0, void 0, void 0, function* () {
+        const content = fs.readFileSync(path.resolve(BASE_PATH, 'template-script-module/single.vue'), 'utf8');
+        const vueFile = VueFile_1.default.from(content);
+        const tempPath = path.resolve(TMP_PATH, 'temp.vue');
+        yield fs.remove(tempPath);
+        yield vueFile.saveAs(tempPath);
+        chai_1.expect(yield fs.readFile(tempPath, 'utf8')).to.equal(content);
+    }));
 });
-//# sourceMappingURL=createFromCode.spec.js.map
+//# sourceMappingURL=createFromCode.spec copy.js.map

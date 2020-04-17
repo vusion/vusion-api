@@ -321,7 +321,12 @@ class VueFile extends FSEntry_1.default {
             return !!style && style.trim().replace(/\s+/g, ' ').replace(/\{ \}/g, '{}') !== '.root {}';
     }
     // @TODO 其它 has 需要吗？
+    warnIfNotOpen() {
+        if (!this.isOpen)
+            console.warn(`[vusion.VueFile] File ${this.fileName} seems not open.`);
+    }
     parseAll() {
+        this.warnIfNotOpen();
         this.parseTemplate();
         this.parseScript();
         this.parseStyle();
@@ -358,6 +363,7 @@ class VueFile extends FSEntry_1.default {
      * 克隆所有参数，但 handler 引用会被排除
      */
     clone() {
+        this.warnIfNotOpen();
         const vueFile = new VueFile(this.fullPath);
         vueFile.fullPath = this.fullPath;
         vueFile.fileName = this.fileName;
@@ -393,6 +399,7 @@ class VueFile extends FSEntry_1.default {
             save: { get: () => super.save }
         });
         return __awaiter(this, void 0, void 0, function* () {
+            this.warnIfNotOpen();
             this.isSaving = true;
             // 只有 isDirectory 不相同的时候才删除，因为可能有其它额外的文件
             if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
@@ -416,7 +423,7 @@ class VueFile extends FSEntry_1.default {
                 script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), script));
                 style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), style));
                 if (this.package && typeof this.package === 'object')
-                    promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), JSON.stringify(this.package, null, 2)));
+                    promises.push(fs.writeFile(path.resolve(this.fullPath, 'package.json'), JSON.stringify(this.package, null, 2) + '\n'));
                 yield Promise.all(promises);
             }
             else {
@@ -437,6 +444,7 @@ class VueFile extends FSEntry_1.default {
      */
     saveAs(fullPath) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.warnIfNotOpen();
             if (fs.existsSync(fullPath))
                 throw new service_1.FileExistsError(fullPath);
             if (this.templateHandler) {
@@ -448,6 +456,9 @@ class VueFile extends FSEntry_1.default {
                 this.script = this.scriptHandler.generate();
             if (this.styleHandler)
                 this.style = this.styleHandler.generate();
+            // 只有 isDirectory 相同的时候会拷贝原文件，否则重新生成
+            if (this.isDirectory && fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory())
+                yield fs.copy(this.fullPath, fullPath);
             const vueFile = new VueFile(fullPath);
             // vueFile.fullPath = this.fullPath;
             // vueFile.fileName = this.fileName;
@@ -470,9 +481,6 @@ class VueFile extends FSEntry_1.default {
             vueFile.api = this.api;
             vueFile.examples = this.examples;
             vueFile.package = this.package && Object.assign({}, this.package);
-            // 只有 isDirectory 相同的时候会拷贝原文件，否则重新生成
-            if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
-                yield fs.copy(this.fullPath, fullPath);
             vueFile.save();
             return vueFile;
         });
