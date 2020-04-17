@@ -99,13 +99,26 @@ class DeclarationHandler {
 
         return objectProperty && new DeclarationHandler(objectProperty.value);
     }
+
+    delete(key: string) {
+        if (this.node.type !== 'ObjectExpression')
+            throw new Error('get method can only be called on an objectExpression');
+
+        let index = this.node.properties.findIndex((property, index) => {
+            return property.type === 'ObjectProperty' && property.key.name === key;
+        });
+
+        ~index && this.node.properties.splice(index, 1);
+
+        return this;
+    }
 }
 
 class ScriptHandler {
     code: string;
     ast: babel.types.File;
     dirty: boolean = false;
-    state: { [name: string]: string | Array<string> };
+    state: { [name: string]: string | number | Array<string> };
 
     constructor(code: string = '', options?: Object) {
         this.code = code;
@@ -167,9 +180,10 @@ class ScriptHandler {
         if (!importString)
             throw new Error('No import called before from');
         const importDeclaration = babel.template(`import ${importString} from '${source}'`)() as babel.types.ImportDeclaration;
-        if (~existingIndex)
+        if (~existingIndex) {
             body.splice(existingIndex, 1, importDeclaration);
-        else {
+            this.state.lastIndex = existingIndex;
+        } else {
             let i;
             for (i = body.length - 1; i >= 0; i--) {
                 const node = body[i];
@@ -178,9 +192,11 @@ class ScriptHandler {
             }
             i++;
             body.splice(i, 0, importDeclaration);
+            this.state.lastIndex = i;
         }
 
-        this.resetState();
+        // this.resetState();
+        return this;
     }
 
     export(identifier: string) {
@@ -194,6 +210,18 @@ class ScriptHandler {
         }
 
         return result;
+    }
+
+    delete() {
+        if (this.state.lastIndex === undefined)
+            return;
+            // throw new Error('Import node index Required!');
+
+        const body = this.ast.program.body;
+        body.splice(this.state.lastIndex as number, 1);
+        this.state.lastIndex = undefined;
+
+        return this;
     }
 }
 

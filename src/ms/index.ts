@@ -624,46 +624,10 @@ export async function removeBlock(vueFilePath: string, baseName: string) {
     const relativePath = `./${vueFile.baseName}.blocks/${baseName}.vue`;
     const { componentName } = utils.normalizeName(baseName);
 
-    const body = vueFile.scriptHandler.ast.program.body;
-    for (let i = 0; i < body.length; i++) {
-        const node = body[i];
-        if (node.type === 'ImportDeclaration' && node.source.value === relativePath) {
-            body.splice(i--, 1);
-        }
-    }
-    babel.traverse(vueFile.scriptHandler.ast, {
-        ExportDefaultDeclaration(nodePath) {
-            const declaration = nodePath.node.declaration;
-            if (declaration && declaration.type === 'ObjectExpression') {
-                let pos = 0;
-                const propertiesBefore = [
-                    'el',
-                    'name',
-                    'parent',
-                    'functional',
-                    'delimiters',
-                    'comments',
-                ]
-                let componentsProperty = declaration.properties.find((property, index) => {
-                    if (property.type === 'ObjectProperty' && propertiesBefore.includes(property.key.name))
-                        pos = index;
-                    return property.type === 'ObjectProperty' && property.key.name === 'components';
-                }) as babel.types.ObjectProperty;
-                if (!componentsProperty)
-                    return;
+    vueFile.$js.import(componentName).from(relativePath).delete();
+    const obj = vueFile.$js.export('default').object().get('components');
+    obj && obj.delete(componentName);
 
-                const properties = (componentsProperty.value as babel.types.ObjectExpression).properties;
-                for (let i = 0; i < properties.length; i++) {
-                    const property = properties[i];
-                    if (property.type === 'ObjectProperty' && property.key.name === componentName)
-                        properties.splice(i, 1);
-                }
-            }
-        },
-    });
-
-    // const rootEl = vueFile.templateHandler.ast;
-    // rootEl
     vueFile.templateHandler.traverse((nodePath) => {
         if ((nodePath.node as compiler.ASTElement).tag === baseName)
             nodePath.remove();
