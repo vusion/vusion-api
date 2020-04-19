@@ -639,6 +639,14 @@ export default class VueFile extends FSEntry {
         this.isDirectory = !this.isDirectory;
     }
 
+    /**
+     * 与另一个 Vue 文件合并模板、逻辑和样式
+     * 两个 VueFile 必须先 parseAll()
+     */
+    merge(vueFile: VueFile) {
+        // vueFile.
+    }
+
     extend(mode: VueFileExtendMode, fullPath: string, fromPath: string) {
         const vueFile = new VueFile(fullPath);
         vueFile.isDirectory = true;

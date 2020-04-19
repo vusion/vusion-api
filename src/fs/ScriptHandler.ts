@@ -42,7 +42,7 @@ class DeclarationHandler {
         return this;
     }
 
-    _set(key: string, value: string, force?: boolean) {
+    private _set(key: string, value: string, force?: boolean) {
         if (this.node.type !== 'ObjectExpression')
             throw new Error(`${force ? 'set' : 'ensure'} method can only be called on an objectExpression`);
 

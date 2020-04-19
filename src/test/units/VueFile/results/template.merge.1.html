@@ -1,0 +1,8 @@
+<div :class="$style.root">
+    <div v-for="item in list" :key="item.id">{{ var1 }}</div>
+    <u-linear-layout>
+        <u-button @click="test()"></u-button>
+        <u-pagination></u-pagination>
+    </u-linear-layout>
+    <u-transfer :source="source" :target="target"></u-transfer>
+</div>

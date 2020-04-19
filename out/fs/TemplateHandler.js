@@ -54,8 +54,12 @@ class TemplateHandler {
         }).join('');
         if (!content)
             shouldFormat = false;
-        const attrs = Object.keys(el.attrsMap).map((key) => {
-            return `${key}="${el.attrsMap[key]}"`;
+        const attrs = Object.keys(el.rawAttrsMap).map((name) => {
+            const attr = el.rawAttrsMap[name];
+            if (attr.start !== undefined && attr.end !== undefined && attr.end - attr.start === attr.name.length)
+                return attr.name;
+            else
+                return `${attr.name}="${attr.value}"`;
         });
         let attrsLength = 0;
         let attrsString = '';
@@ -83,13 +87,34 @@ class TemplateHandler {
                 return result;
         }
     }
+    /**
+     * 根据路径查找子节点
+     * @param route 节点路径，/1/2 表示根节点的第1个子节点的第2个子节点
+     * @param node 查找的起始节点
+     */
     findByRoute(route, node) {
-        route = route.slice(1);
+        if (route[0] === '/')
+            route = route.slice(1);
         const arr = route.split('/');
         if (!route || !arr.length)
             return node;
         else
             return this.findByRoute(arr.slice(1).join('/'), node.children[+arr[0]]);
+    }
+    /**
+     * 将另一个 handler 的模板合并到当前模板中
+     * @param handler 另一个 TemplateHandler
+     * @param route 插入的父节点路径，/1/2 表示根节点的第1个子节点的第2个子节点
+     * @param index 插入到的位置
+     */
+    merge(handler, route, index) {
+        const el = this.findByRoute(route, this.ast);
+        if (!el.children)
+            throw new Error(`Not an element node! route: ${route}`);
+        if (index === undefined)
+            index = el.children.length;
+        el.children.splice(index, 0, handler.ast);
+        return this;
     }
 }
 exports.default = TemplateHandler;

@@ -568,6 +568,13 @@ class VueFile extends FSEntry_1.default {
         });
         this.isDirectory = !this.isDirectory;
     }
+    /**
+     * 与另一个 Vue 文件合并模板、逻辑和样式
+     * 两个 VueFile 必须先 parseAll()
+     */
+    merge(vueFile) {
+        // vueFile.
+    }
     extend(mode, fullPath, fromPath) {
         const vueFile = new VueFile(fullPath);
         vueFile.isDirectory = true;

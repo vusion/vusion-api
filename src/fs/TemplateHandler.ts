@@ -13,9 +13,17 @@ export class ASTNodePath {
     }
 }
 
+
+type Attr = { name: string, value: any, start?: number, end?: number };
+type ASTElement = compiler.ASTElement & {
+    rawAttrsMap: {
+        [name: string]: Attr,
+    }
+}
+
 class TemplateHandler {
     code: string;
-    ast: compiler.ASTElement;
+    ast: ASTElement;
     options: {
         tabLength: number,
         startLevel: number,
@@ -46,7 +54,7 @@ class TemplateHandler {
         // return this.code;
     }
 
-    generateElement(el: compiler.ASTElement, level: number) {
+    generateElement(el: ASTElement, level: number) {
         const tabs = ' '.repeat(this.options.tabLength*level);
         const insideTabs = ' '.repeat(this.options.tabLength*(level + 1));
 
@@ -55,7 +63,7 @@ class TemplateHandler {
             let text = '';
 
             if (node.type === 1)
-                text = (shouldFormat ? '\n' + insideTabs : '') + this.generateElement(node as compiler.ASTElement, level + 1);
+                text = (shouldFormat ? '\n' + insideTabs : '') + this.generateElement(node as ASTElement, level + 1);
             else if (node.type === 2)
                 text = node.text;
             else if (node.type === 3)
@@ -70,8 +78,12 @@ class TemplateHandler {
         if (!content)
             shouldFormat = false;
 
-        const attrs = Object.keys(el.attrsMap).map((key) => {
-            return `${key}="${el.attrsMap[key]}"`;
+        const attrs = Object.keys(el.rawAttrsMap).map((name) => {
+            const attr = el.rawAttrsMap[name];
+            if (attr.start !== undefined && attr.end !== undefined && attr.end - attr.start === attr.name.length)
+                return attr.name;
+            else
+                return `${attr.name}="${attr.value}"`;
         });
 
         let attrsLength = 0;
@@ -95,7 +107,7 @@ class TemplateHandler {
         let nodePath: ASTNodePath;
         while ((nodePath = queue.shift())) {
             if (nodePath.node.type === 1) {
-                const parent = nodePath.node as compiler.ASTElement;
+                const parent = nodePath.node as ASTElement;
                 queue = queue.concat(parent.children.map((node, index) => new ASTNodePath(node, parent, nodePath.route + '/' + index)));
             }
             const result = func(nodePath);
@@ -104,13 +116,37 @@ class TemplateHandler {
         }
     }
 
+    /**
+     * 根据路径查找子节点
+     * @param route 节点路径，/1/2 表示根节点的第1个子节点的第2个子节点
+     * @param node 查找的起始节点
+     */
     findByRoute(route: string, node: compiler.ASTNode): compiler.ASTNode {
-        route = route.slice(1);
+        if (route[0] === '/')
+            route = route.slice(1);
         const arr = route.split('/');
         if (!route || !arr.length)
             return node;
         else
             return this.findByRoute(arr.slice(1).join('/'), (node as compiler.ASTElement).children[+arr[0]]);
+    }
+
+    /**
+     * 将另一个 handler 的模板合并到当前模板中
+     * @param handler 另一个 TemplateHandler
+     * @param route 插入的父节点路径，/1/2 表示根节点的第1个子节点的第2个子节点
+     * @param index 插入到的位置
+     */
+    merge(handler: TemplateHandler, route: string, index?: number) {
+        const el = this.findByRoute(route, this.ast) as compiler.ASTElement;
+        if (!el.children)
+            throw new Error(`Not an element node! route: ${route}`);
+
+        if (index === undefined)
+            index = el.children.length;
+        el.children.splice(index, 0, handler.ast);
+
+        return this;
     }
 }
 
