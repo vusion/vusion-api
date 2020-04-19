@@ -114,7 +114,7 @@ export default class VueFile extends FSEntry {
      * 提前检测 VueFile 文件类型，以及子组件等
      * 需要异步，否则可能会比较慢
      */
-    async preOpen() {
+    async preOpen(): Promise<void> {
         if (!fs.existsSync(this.fullPath))
             return;
         const stats = fs.statSync(this.fullPath);
@@ -184,14 +184,14 @@ export default class VueFile extends FSEntry {
         return this.children = children;
     }
 
-    async forceOpen() {
+    async forceOpen(): Promise<void> {
         this.close();
         await this.preOpen();
         await this.load();
         this.isOpen = true;
     }
 
-    close() {
+    close(): void {
         this.isDirectory = undefined;
         this.alias = undefined;
         this.subfiles = undefined;
@@ -218,15 +218,13 @@ export default class VueFile extends FSEntry {
         this.isOpen = false;
     }
 
-    protected async load() {
+    protected async load(): Promise<void> {
         await this.loadScript();
         await this.loadTemplate();
         await this.loadStyle();
         await this.loadPackage();
         await this.loadAPI();
         await this.loadExamples();
-
-        return this;
     }
 
     async preload() {
@@ -234,7 +232,7 @@ export default class VueFile extends FSEntry {
             throw new Error(`Cannot find: ${this.fullPath}!`);
 
         if (!this.isDirectory)
-            this.content = await fs.readFile(this.fullPath, 'utf8');
+            return this.content = await fs.readFile(this.fullPath, 'utf8');
     }
 
     async loadScript() {
@@ -242,11 +240,11 @@ export default class VueFile extends FSEntry {
 
         if (this.isDirectory) {
             if (fs.existsSync(path.join(this.fullPath, 'index.js')))
-                this.script = await fs.readFile(path.join(this.fullPath, 'index.js'), 'utf8');
+                return this.script = await fs.readFile(path.join(this.fullPath, 'index.js'), 'utf8');
             else
                 throw new Error(`Cannot find 'index.js' in multifile Vue!`);
         } else {
-            this.script = fetchPartialContent(this.content, 'script');
+            return this.script = fetchPartialContent(this.content, 'script');
         }
     }
 
@@ -255,9 +253,9 @@ export default class VueFile extends FSEntry {
 
         if (this.isDirectory) {
             if (fs.existsSync(path.join(this.fullPath, 'index.html')))
-                this.template = await fs.readFile(path.join(this.fullPath, 'index.html'), 'utf8');
+                return this.template = await fs.readFile(path.join(this.fullPath, 'index.html'), 'utf8');
         } else {
-            this.template = fetchPartialContent(this.content, 'template');
+            return this.template = fetchPartialContent(this.content, 'template');
         }
     }
 
@@ -266,9 +264,9 @@ export default class VueFile extends FSEntry {
 
         if (this.isDirectory) {
             if (fs.existsSync(path.join(this.fullPath, 'module.css')))
-                this.style = await fs.readFile(path.join(this.fullPath, 'module.css'), 'utf8');
+                return this.style = await fs.readFile(path.join(this.fullPath, 'module.css'), 'utf8');
         } else {
-            this.style = fetchPartialContent(this.content, 'style');
+            return this.style = fetchPartialContent(this.content, 'style');
         }
     }
 
@@ -278,7 +276,7 @@ export default class VueFile extends FSEntry {
         if (this.isDirectory) {
             if (fs.existsSync(path.join(this.fullPath, 'package.json'))) {
                 const content = await fs.readFile(path.join(this.fullPath, 'package.json'), 'utf8');
-                this.package = JSON.parse(content);
+                return this.package = JSON.parse(content);
             }
         }
     }
@@ -288,9 +286,9 @@ export default class VueFile extends FSEntry {
 
         if (this.isDirectory) {
             if (fs.existsSync(path.join(this.fullPath, 'api.yaml')))
-                this.api = await fs.readFile(path.join(this.fullPath, 'api.yaml'), 'utf8');
+                return this.api = await fs.readFile(path.join(this.fullPath, 'api.yaml'), 'utf8');
         } else {
-            this.api = fetchPartialContent(this.content, 'api');
+            return this.api = fetchPartialContent(this.content, 'api');
         }
     }
 
@@ -301,13 +299,15 @@ export default class VueFile extends FSEntry {
 
         if (this.isDirectory) {
             if (fs.existsSync(path.join(this.fullPath, 'docs/blocks.md')))
-                this.examples = await fs.readFile(path.join(this.fullPath, 'docs/blocks.md'), 'utf8');
+                return this.examples = await fs.readFile(path.join(this.fullPath, 'docs/blocks.md'), 'utf8');
             else if (fs.existsSync(path.join(this.fullPath, 'docs/examples.md')))
-                this.examples = await fs.readFile(path.join(this.fullPath, 'docs/examples.md'), 'utf8');
+                return this.examples = await fs.readFile(path.join(this.fullPath, 'docs/examples.md'), 'utf8');
         } else {
             this.examples = fetchPartialContent(this.content, 'doc', 'name="blocks"');
             if (!this.examples)
                 this.examples = fetchPartialContent(this.content, 'doc', 'name="examples"');
+            else
+                return this.examples;
         }
     }
 
@@ -365,7 +365,7 @@ export default class VueFile extends FSEntry {
             console.warn(`[vusion.VueFile] File ${this.fileName} seems not open.`);
     }
 
-    parseAll() {
+    parseAll(): void {
         this.warnIfNotOpen();
 
         this.parseTemplate();
@@ -377,37 +377,37 @@ export default class VueFile extends FSEntry {
 
     parseTemplate() {
         if (this.templateHandler)
-            return;
-
-        return this.$html = this.templateHandler = new TemplateHandler(this.template);
+            return this.templateHandler;
+        else
+            return this.$html = this.templateHandler = new TemplateHandler(this.template);
     }
 
     parseScript() {
         if (this.scriptHandler)
-            return;
-
-        return this.$js = this.scriptHandler = new ScriptHandler(this.script);
+            return this.scriptHandler;
+        else
+            return this.$js = this.scriptHandler = new ScriptHandler(this.script);
     }
 
     parseStyle() {
         if (this.styleHandler)
-            return;
-
-        return this.$css = this.styleHandler = new StyleHandler(this.style);
+            return this.styleHandler;
+        else
+            return this.$css = this.styleHandler = new StyleHandler(this.style);
     }
 
     parseAPI() {
         if (this.apiHandler)
-            return;
-
-        return this.apiHandler = new APIHandler(this.api, path.join(this.fullPath, 'api.yaml'));
+            return this.apiHandler;
+        else
+            return this.apiHandler = new APIHandler(this.api, path.join(this.fullPath, 'api.yaml'));
     }
 
     parseExamples() {
         if (this.examplesHandler)
-            return;
-
-        return this.examplesHandler = new ExamplesHandler(this.examples);
+            return this.examplesHandler;
+        else
+            return this.examplesHandler = new ExamplesHandler(this.examples);
     }
 
     /**
@@ -449,7 +449,7 @@ export default class VueFile extends FSEntry {
      * - 如果有解析，先根据解析器生成内容，再保存
      * - 根据 isDirectory 判断是否保存单多文件
      */
-    async save() {
+    async save(): Promise<void> {
         this.warnIfNotOpen();
         this.isSaving = true;
 
@@ -492,7 +492,6 @@ export default class VueFile extends FSEntry {
         }
 
         super.save();
-        return this;
     }
 
     /**

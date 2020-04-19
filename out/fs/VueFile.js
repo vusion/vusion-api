@@ -188,7 +188,6 @@ class VueFile extends FSEntry_1.default {
             yield this.loadPackage();
             yield this.loadAPI();
             yield this.loadExamples();
-            return this;
         });
     }
     preload() {
@@ -196,7 +195,7 @@ class VueFile extends FSEntry_1.default {
             if (!fs.existsSync(this.fullPath))
                 throw new Error(`Cannot find: ${this.fullPath}!`);
             if (!this.isDirectory)
-                this.content = yield fs.readFile(this.fullPath, 'utf8');
+                return this.content = yield fs.readFile(this.fullPath, 'utf8');
         });
     }
     loadScript() {
@@ -204,12 +203,12 @@ class VueFile extends FSEntry_1.default {
             yield this.preload();
             if (this.isDirectory) {
                 if (fs.existsSync(path.join(this.fullPath, 'index.js')))
-                    this.script = yield fs.readFile(path.join(this.fullPath, 'index.js'), 'utf8');
+                    return this.script = yield fs.readFile(path.join(this.fullPath, 'index.js'), 'utf8');
                 else
                     throw new Error(`Cannot find 'index.js' in multifile Vue!`);
             }
             else {
-                this.script = fetchPartialContent(this.content, 'script');
+                return this.script = fetchPartialContent(this.content, 'script');
             }
         });
     }
@@ -218,10 +217,10 @@ class VueFile extends FSEntry_1.default {
             yield this.preload();
             if (this.isDirectory) {
                 if (fs.existsSync(path.join(this.fullPath, 'index.html')))
-                    this.template = yield fs.readFile(path.join(this.fullPath, 'index.html'), 'utf8');
+                    return this.template = yield fs.readFile(path.join(this.fullPath, 'index.html'), 'utf8');
             }
             else {
-                this.template = fetchPartialContent(this.content, 'template');
+                return this.template = fetchPartialContent(this.content, 'template');
             }
         });
     }
@@ -230,10 +229,10 @@ class VueFile extends FSEntry_1.default {
             yield this.preload();
             if (this.isDirectory) {
                 if (fs.existsSync(path.join(this.fullPath, 'module.css')))
-                    this.style = yield fs.readFile(path.join(this.fullPath, 'module.css'), 'utf8');
+                    return this.style = yield fs.readFile(path.join(this.fullPath, 'module.css'), 'utf8');
             }
             else {
-                this.style = fetchPartialContent(this.content, 'style');
+                return this.style = fetchPartialContent(this.content, 'style');
             }
         });
     }
@@ -243,7 +242,7 @@ class VueFile extends FSEntry_1.default {
             if (this.isDirectory) {
                 if (fs.existsSync(path.join(this.fullPath, 'package.json'))) {
                     const content = yield fs.readFile(path.join(this.fullPath, 'package.json'), 'utf8');
-                    this.package = JSON.parse(content);
+                    return this.package = JSON.parse(content);
                 }
             }
         });
@@ -253,10 +252,10 @@ class VueFile extends FSEntry_1.default {
             yield this.preload();
             if (this.isDirectory) {
                 if (fs.existsSync(path.join(this.fullPath, 'api.yaml')))
-                    this.api = yield fs.readFile(path.join(this.fullPath, 'api.yaml'), 'utf8');
+                    return this.api = yield fs.readFile(path.join(this.fullPath, 'api.yaml'), 'utf8');
             }
             else {
-                this.api = fetchPartialContent(this.content, 'api');
+                return this.api = fetchPartialContent(this.content, 'api');
             }
         });
     }
@@ -267,14 +266,16 @@ class VueFile extends FSEntry_1.default {
             yield this.preload();
             if (this.isDirectory) {
                 if (fs.existsSync(path.join(this.fullPath, 'docs/blocks.md')))
-                    this.examples = yield fs.readFile(path.join(this.fullPath, 'docs/blocks.md'), 'utf8');
+                    return this.examples = yield fs.readFile(path.join(this.fullPath, 'docs/blocks.md'), 'utf8');
                 else if (fs.existsSync(path.join(this.fullPath, 'docs/examples.md')))
-                    this.examples = yield fs.readFile(path.join(this.fullPath, 'docs/examples.md'), 'utf8');
+                    return this.examples = yield fs.readFile(path.join(this.fullPath, 'docs/examples.md'), 'utf8');
             }
             else {
                 this.examples = fetchPartialContent(this.content, 'doc', 'name="blocks"');
                 if (!this.examples)
                     this.examples = fetchPartialContent(this.content, 'doc', 'name="examples"');
+                else
+                    return this.examples;
             }
         });
     }
@@ -335,28 +336,33 @@ class VueFile extends FSEntry_1.default {
     }
     parseTemplate() {
         if (this.templateHandler)
-            return;
-        return this.$html = this.templateHandler = new TemplateHandler_1.default(this.template);
+            return this.templateHandler;
+        else
+            return this.$html = this.templateHandler = new TemplateHandler_1.default(this.template);
     }
     parseScript() {
         if (this.scriptHandler)
-            return;
-        return this.$js = this.scriptHandler = new ScriptHandler_1.default(this.script);
+            return this.scriptHandler;
+        else
+            return this.$js = this.scriptHandler = new ScriptHandler_1.default(this.script);
     }
     parseStyle() {
         if (this.styleHandler)
-            return;
-        return this.$css = this.styleHandler = new StyleHandler_1.default(this.style);
+            return this.styleHandler;
+        else
+            return this.$css = this.styleHandler = new StyleHandler_1.default(this.style);
     }
     parseAPI() {
         if (this.apiHandler)
-            return;
-        return this.apiHandler = new APIHandler_1.default(this.api, path.join(this.fullPath, 'api.yaml'));
+            return this.apiHandler;
+        else
+            return this.apiHandler = new APIHandler_1.default(this.api, path.join(this.fullPath, 'api.yaml'));
     }
     parseExamples() {
         if (this.examplesHandler)
-            return;
-        return this.examplesHandler = new ExamplesHandler_1.default(this.examples);
+            return this.examplesHandler;
+        else
+            return this.examplesHandler = new ExamplesHandler_1.default(this.examples);
     }
     /**
      * 克隆 VueFile 对象
@@ -434,7 +440,6 @@ class VueFile extends FSEntry_1.default {
                 yield fs.writeFile(this.fullPath, contents.join('\n\n') + '\n');
             }
             _super.save.call(this);
-            return this;
         });
     }
     /**

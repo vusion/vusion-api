@@ -10,13 +10,13 @@ export default class File extends FSEntry {
         super(fullPath, false);
     }
 
-    async forceOpen() {
+    async forceOpen(): Promise<void> {
         this.close();
         await this.load();
         this.isOpen = true;
     }
 
-    close() {
+    close(): void {
         this.content = undefined;
         this.isOpen = false;
     }
@@ -28,11 +28,10 @@ export default class File extends FSEntry {
         return this.content = await fs.readFile(this.fullPath);
     }
 
-    async save() {
+    async save(): Promise<void> {
         this.isSaving = true;
-        const result = await fs.writeFile(this.fullPath, this.content !== undefined ? this.content : '');
+        await fs.writeFile(this.fullPath, this.content !== undefined ? this.content : '');
         super.save();
-        return result;
     }
 
     static fetch(fullPath: string) {

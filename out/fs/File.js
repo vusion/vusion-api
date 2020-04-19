@@ -39,9 +39,8 @@ class File extends FSEntry_1.default {
         });
         return __awaiter(this, void 0, void 0, function* () {
             this.isSaving = true;
-            const result = yield fs.writeFile(this.fullPath, this.content !== undefined ? this.content : '');
+            yield fs.writeFile(this.fullPath, this.content !== undefined ? this.content : '');
             _super.save.call(this);
-            return result;
         });
     }
     static fetch(fullPath) {

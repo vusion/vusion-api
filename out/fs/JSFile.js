@@ -14,8 +14,9 @@ const ScriptHandler_1 = require("./ScriptHandler");
 class JSFile extends File_1.default {
     parse() {
         if (this.handler)
-            return;
-        this.handler = new ScriptHandler_1.default(String(this.content));
+            return this.handler;
+        else
+            return this.handler = new ScriptHandler_1.default(String(this.content));
     }
     close() {
         this.handler = undefined;

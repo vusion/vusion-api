@@ -35,22 +35,22 @@ export default class FSEntry {
         this._miniChangeListeners = [];
     }
 
-    open() {
+    open(): void | Promise<void> {
         if (this.isOpen)
             return;
         return this.forceOpen();
     }
 
-    forceOpen() {
+    forceOpen(): void | Promise<void> {
         this.close();
         this.isOpen = true;
     }
 
-    close() {
+    close(): void {
         this.isOpen = false;
     }
 
-    save() {
+    save(): void | Promise<void> {
         this.isSaving = true;
         setTimeout(() => this.isSaving = false, 1200); // 避免自身保存引发 watch
     }

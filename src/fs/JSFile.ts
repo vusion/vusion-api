@@ -5,17 +5,17 @@ export default class JSFile extends File {
     handler: ScriptHandler;
     parse() {
         if (this.handler)
-            return;
-
-        this.handler = new ScriptHandler(String(this.content));
+            return this.handler;
+        else
+            return this.handler = new ScriptHandler(String(this.content));
     }
 
-    close() {
+    close(): void {
         this.handler = undefined;
         this.isOpen = false;
     }
 
-    async save() {
+    async save(): Promise<void> {
         if (this.handler)
             this.content = this.handler.generate();
 

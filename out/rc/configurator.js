@@ -51,9 +51,9 @@ publish_manager: npm
     /**
      * 快速获取安装命令
      */
-    getInstallCommand(packageName, save = false) {
+    getInstallCommand(packagesName, save = false) {
         const config = this.load();
-        if (!packageName) {
+        if (!packagesName) {
             if (config.download_manager === 'yarn')
                 return 'yarn';
             else
@@ -61,9 +61,9 @@ publish_manager: npm
         }
         else {
             if (config.download_manager === 'yarn')
-                return `yarn add ${packageName}${save === false ? '' : (save === true ? '' : ' --' + save)}`;
+                return `yarn add ${packagesName}${save === false ? '' : (save === true ? '' : ' --' + save)}`;
             else
-                return `${config.download_manager} install ${packageName}${save === false ? '' : (save === true ? ' --save' : ' --save-' + save)}`;
+                return `${config.download_manager} install ${packagesName}${save === false ? '' : (save === true ? ' --save' : ' --save-' + save)}`;
         }
     },
 };

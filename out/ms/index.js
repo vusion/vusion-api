@@ -383,7 +383,7 @@ const BLOCK_REMOVING_LIST = [
 ];
 /**
  * 添加代码为外部区块
- * @param code 源码
+ * @param blockVue 刚下载后的 Block Vue 文件
  * @param target 目标路径
  * @param name 区块名称
  */
@@ -401,14 +401,15 @@ function addBlockExternally(blockVue, target, name) {
         /* 添加 import */
         const relativePath = `./${vueFile.baseName}.blocks/${name}.vue`;
         const { componentName } = utils.normalizeName(name);
-        vueFile.parseScript();
-        vueFile.$js.import(componentName).from(relativePath);
-        vueFile.$js.export('default').object()
+        const $js = vueFile.parseScript();
+        $js.import(componentName).from(relativePath);
+        $js.export().default().object()
             .after(['el', 'name', 'parent', 'functional', 'delimiters', 'comments'])
             .ensure('components', '{}')
             .get('components')
             .set(componentName, componentName);
         yield vueFile.save();
+        return blockVue;
     });
 }
 exports.addBlockExternally = addBlockExternally;
@@ -433,9 +434,9 @@ function addBlock(options) {
         yield Promise.all(BLOCK_REMOVING_LIST.map((file) => fs.remove(path.join(dest, file))));
         const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
         const { componentName } = utils.normalizeName(opts.name);
-        vueFile.parseScript();
-        vueFile.$js.import(componentName).from(relativePath);
-        vueFile.$js.export('default').object()
+        const $js = vueFile.parseScript();
+        $js.import(componentName).from(relativePath);
+        $js.export().default().object()
             .after(['el', 'name', 'parent', 'functional', 'delimiters', 'comments'])
             .ensure('components', '{}')
             .get('components')
@@ -451,13 +452,13 @@ function removeBlock(vueFilePath, baseName) {
     return __awaiter(this, void 0, void 0, function* () {
         const vueFile = new vfs.VueFile(vueFilePath);
         yield vueFile.open();
-        vueFile.parseScript();
-        vueFile.parseTemplate();
+        const $js = vueFile.parseScript();
         const relativePath = `./${vueFile.baseName}.blocks/${baseName}.vue`;
         const { componentName } = utils.normalizeName(baseName);
-        vueFile.$js.import(componentName).from(relativePath).delete();
-        const obj = vueFile.$js.export('default').object().get('components');
+        $js.froms().delete(relativePath);
+        const obj = vueFile.$js.export().default().object().get('components');
         obj && obj.delete(componentName);
+        vueFile.parseTemplate();
         vueFile.templateHandler.traverse((nodePath) => {
             if (nodePath.node.tag === baseName)
                 nodePath.remove();

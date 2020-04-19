@@ -114,6 +114,25 @@ class DeclarationHandler {
     }
 }
 
+class FromsHandler {
+    constructor(public body: babel.types.Statement[]) {}
+
+    has(source: string) {
+        let existingIndex = this.body.findIndex((node) => {
+            return (node.type === 'ImportDeclaration' || node.type === 'ExportAllDeclaration' || node.type === 'ExportNamedDeclaration') && node.source && node.source.value === source;
+        });
+
+        return !!~existingIndex;
+    }
+
+    delete(source: string) {
+        let existingIndex = this.body.findIndex((node) => {
+            return (node.type === 'ImportDeclaration' || node.type === 'ExportAllDeclaration' || node.type === 'ExportNamedDeclaration') && node.source && node.source.value === source;
+        });
+        ~existingIndex && this.body.splice(existingIndex, 1);
+    }
+}
+
 class ScriptHandler {
     code: string;
     ast: babel.types.File;
@@ -158,12 +177,35 @@ class ScriptHandler {
 
     /**
      * 引入
-     * @param identifier 唯一标识
+     * @param specifier 指示符
      * @example
+     * $js.import('*').from('./u-button.vue');
      * $js.import('UButton').from('./u-button.vue');
+     * $js.import({ default: 'UButton', UButton2: '', UButton3: 'UButton3' }).from('./u-button.vue');
      */
-    import(identifier: string) {
-        this.state.identifier = identifier;
+    import(specifier: string | { [imported: string]: string }) {
+        if (typeof specifier === 'object') {
+            const insideString = Object.keys(specifier).map((imported) => {
+                const identifer = (specifier as { [imported: string]: string })[imported];
+                return imported + (identifer === imported || identifer === '' ? '' : ' as ' + identifer);
+            }).join(', ');
+            specifier = `{ ${insideString} }`;
+        }
+        this.state.declaration = 'import';
+        this.state.specifier = specifier;
+        return this;
+    }
+
+    export(specifier?: string | { [imported: string]: string }) {
+        if (typeof specifier === 'object') {
+            const insideString = Object.keys(specifier).map((imported) => {
+                const identifer = (specifier as { [imported: string]: string })[imported];
+                return imported + (identifer === imported || identifer === '' ? '' : ' as ' + identifer);
+            }).join(', ');
+            specifier = `{ ${insideString} }`;
+        }
+        this.state.declaration = 'export';
+        this.state.specifier = specifier;
         return this;
     }
 
@@ -174,55 +216,84 @@ class ScriptHandler {
      */
     from(source: string) {
         const body = this.ast.program.body;
-        let existingIndex = body.findIndex((node) => node.type === 'ImportDeclaration' && node.source.value === source);
+        if (this.state.declaration === 'import') {
+            let existingIndex = body.findIndex((node) => node.type === 'ImportDeclaration' && node.source && node.source.value === source);
 
-        const importString = this.state.identifier;
-        if (!importString)
-            throw new Error('No import called before from');
-        const importDeclaration = babel.template(`import ${importString} from '${source}'`)() as babel.types.ImportDeclaration;
-        if (~existingIndex) {
-            body.splice(existingIndex, 1, importDeclaration);
-            this.state.lastIndex = existingIndex;
-        } else {
-            let i;
-            for (i = body.length - 1; i >= 0; i--) {
-                const node = body[i];
-                if (node.type === 'ImportDeclaration')
-                    break;
+            const importString = this.state.specifier;
+            if (!importString)
+                throw new Error('No import called before from');
+            const importDeclaration = babel.template(`import ${importString} from '${source}'`)() as babel.types.ImportDeclaration;
+            if (~existingIndex) {
+                body.splice(existingIndex, 1, importDeclaration);
+                this.state.lastIndex = existingIndex;
+            } else {
+                let i;
+                for (i = body.length - 1; i >= 0; i--) {
+                    const node = body[i];
+                    if (node.type === 'ImportDeclaration')
+                        break;
+                }
+                i++;
+                body.splice(i, 0, importDeclaration);
+                this.state.lastIndex = i;
             }
-            i++;
-            body.splice(i, 0, importDeclaration);
-            this.state.lastIndex = i;
+        } else if (this.state.declaration === 'export') {
+            let existingIndex = body.findIndex((node) => (node.type === 'ExportAllDeclaration' || node.type === 'ExportNamedDeclaration') && node.source && node.source.value === source);
+
+            const exportString = this.state.specifier;
+            if (!exportString)
+                throw new Error('No export called before from');
+            const exportDeclaration = babel.template(`export ${exportString} from '${source}'`)() as babel.types.ExportNamedDeclaration;
+            if (~existingIndex) {
+                body.splice(existingIndex, 1, exportDeclaration);
+                this.state.lastIndex = existingIndex;
+            } else {
+                let i;
+                for (i = body.length - 1; i >= 0; i--) {
+                    const node = body[i];
+                    if (node.type === 'ExportAllDeclaration' || node.type === 'ExportNamedDeclaration')
+                        break;
+                }
+                i++;
+                body.splice(i, 0, exportDeclaration);
+                this.state.lastIndex = i;
+            }
+        } else {
+            throw new Error('You must call import or export before from');
         }
 
-        // this.resetState();
+        this.resetState();
         return this;
     }
 
-    export(identifier: string) {
-        let result: DeclarationHandler;
-        if (identifier === 'default') {
-            babel.traverse(this.ast, {
-                ExportDefaultDeclaration(nodePath) {
-                    result = new DeclarationHandler(nodePath.node.declaration);
-                },
-            });
-        }
+    /**
+     * 获取所有包含 from 的 import 和 export 声明
+     * import xxx from 'source'/export xxx from 'source'
+     * 一般用于判断存在或删除
+     */
+    froms() {
+        return new FromsHandler(this.ast.program.body);
+    }
 
+    default() {
+        let result: DeclarationHandler;
+        babel.traverse(this.ast, {
+            ExportDefaultDeclaration(nodePath) {
+                result = new DeclarationHandler(nodePath.node.declaration);
+            },
+        });
         return result;
     }
 
-    delete() {
-        if (this.state.lastIndex === undefined)
-            return;
-            // throw new Error('Import node index Required!');
+    // delete() {
+    //     if (this.state.lastIndex === undefined)
+    //         return;
+    //         // throw new Error('Import node index Required!');
 
-        const body = this.ast.program.body;
-        body.splice(this.state.lastIndex as number, 1);
-        this.state.lastIndex = undefined;
-
-        return this;
-    }
+    //     const body = this.ast.program.body;
+    //     body.splice(this.state.lastIndex as number, 1);
+    //     this.state.lastIndex = undefined;
+    // }
 }
 
 export default ScriptHandler;
