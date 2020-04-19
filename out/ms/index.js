@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const babel = require("@babel/core");
-const compiler = require("vue-template-compiler");
 const fs = require("fs-extra");
 const os = require("os");
 const vfs = require("../fs");
@@ -396,8 +395,14 @@ function addBlockExternally(blockVue, target, name) {
         const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
         const dest = path.join(localBlocksPath, name + '.vue');
         yield fs.ensureDir(localBlocksPath);
-        blockVue = yield blockVue.saveAs(dest);
-        yield Promise.all(BLOCK_REMOVING_LIST.map((file) => fs.remove(path.join(dest, file))));
+        const isDirectory = blockVue.hasAssets() || blockVue.hasExtra();
+        blockVue = yield blockVue.saveAs(dest, isDirectory);
+        if (isDirectory) {
+            const files = yield fs.readdir(dest);
+            yield Promise.all(files.filter((file) => {
+                return file[0] === '.' || BLOCK_REMOVING_LIST.includes(file);
+            }).map((file) => fs.remove(path.join(dest, file))));
+        }
         /* 添加 import */
         const relativePath = `./${vueFile.baseName}.blocks/${name}.vue`;
         const { componentName } = utils.normalizeName(name);
@@ -419,32 +424,11 @@ exports.addBlockExternally = addBlockExternally;
 function addBlock(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = processOptions(options);
-        // if (opts.source.type === 'npm')
-        const blockCacheDir = getCacheDir('blocks');
-        const tempPath = yield download.npm({
-            registry: opts.source.registry,
-            name: opts.source.name,
-        }, blockCacheDir);
-        const vueFile = new vfs.VueFile(opts.target);
-        yield vueFile.open();
-        const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
-        const dest = path.join(localBlocksPath, opts.name + '.vue');
-        yield fs.ensureDir(localBlocksPath);
-        yield fs.copy(tempPath, dest);
-        yield Promise.all(BLOCK_REMOVING_LIST.map((file) => fs.remove(path.join(dest, file))));
-        const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
-        const { componentName } = utils.normalizeName(opts.name);
-        const $js = vueFile.parseScript();
-        $js.import(componentName).from(relativePath);
-        $js.export().default().object()
-            .after(['el', 'name', 'parent', 'functional', 'delimiters', 'comments'])
-            .ensure('components', '{}')
-            .get('components')
-            .set(componentName, componentName);
-        vueFile.parseTemplate();
-        const rootEl = vueFile.templateHandler.ast;
-        rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
-        yield vueFile.save();
+        const blockPath = yield fetchBlock(options);
+        let blockVue = new vfs.VueFile(blockPath.replace(/\.vue@.+$/, '.vue'));
+        blockVue.fullPath = blockPath;
+        yield blockVue.open();
+        addBlockExternally(blockVue, opts.target, opts.name);
     });
 }
 exports.addBlock = addBlock;

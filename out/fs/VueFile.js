@@ -447,7 +447,7 @@ class VueFile extends FSEntry_1.default {
      * 会克隆所有内容参数，但 handler 引用会被排除
      * @param fullPath
      */
-    saveAs(fullPath) {
+    saveAs(fullPath, isDirectory) {
         return __awaiter(this, void 0, void 0, function* () {
             this.warnIfNotOpen();
             if (fs.existsSync(fullPath))
@@ -470,7 +470,7 @@ class VueFile extends FSEntry_1.default {
             // vueFile.extName = this.extName;
             // vueFile.baseName = this.baseName;
             // vueFile.title = this.title;
-            vueFile.isDirectory = this.isDirectory;
+            vueFile.isDirectory = isDirectory === undefined ? this.isDirectory : isDirectory;
             vueFile.isVue = this.isVue;
             vueFile.isOpen = this.isOpen;
             vueFile.isSaving = this.isSaving;

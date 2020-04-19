@@ -430,9 +430,15 @@ export async function addBlockExternally(blockVue: vfs.VueFile, target: string, 
     const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
     const dest = path.join(localBlocksPath, name + '.vue');
     await fs.ensureDir(localBlocksPath);
-    blockVue = await blockVue.saveAs(dest);
+    const isDirectory = blockVue.hasAssets() || blockVue.hasExtra();
+    blockVue = await blockVue.saveAs(dest, isDirectory);
 
-    await Promise.all(BLOCK_REMOVING_LIST.map((file) => fs.remove(path.join(dest, file))));
+    if (isDirectory) {
+        const files = await fs.readdir(dest);
+        await Promise.all(files.filter((file) => {
+            return file[0] === '.' || BLOCK_REMOVING_LIST.includes(file);
+        }).map((file) => fs.remove(path.join(dest, file))));
+    }
 
     /* 添加 import */
     const relativePath = `./${vueFile.baseName}.blocks/${name}.vue`;
@@ -456,38 +462,12 @@ export async function addBlockExternally(blockVue: vfs.VueFile, target: string, 
 export async function addBlock(options: MaterialOptions) {
     const opts = processOptions(options);
 
-    // if (opts.source.type === 'npm')
-    const blockCacheDir = getCacheDir('blocks');
-    const tempPath = await download.npm({
-        registry: opts.source.registry,
-        name: opts.source.name,
-    }, blockCacheDir);
+    const blockPath = await fetchBlock(options);
+    let blockVue = new vfs.VueFile(blockPath.replace(/\.vue@.+$/, '.vue'));
+    blockVue.fullPath = blockPath;
+    await blockVue.open();
 
-    const vueFile = new vfs.VueFile(opts.target);
-    await vueFile.open();
-
-    const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
-    const dest = path.join(localBlocksPath, opts.name + '.vue');
-    await fs.ensureDir(localBlocksPath);
-    await fs.copy(tempPath, dest);
-    await Promise.all(BLOCK_REMOVING_LIST.map((file) => fs.remove(path.join(dest, file))));
-
-    const relativePath = `./${vueFile.baseName}.blocks/${opts.name}.vue`;
-    const { componentName } = utils.normalizeName(opts.name);
-
-    const $js =vueFile.parseScript();
-    $js.import(componentName).from(relativePath);
-    $js.export().default().object()
-        .after(['el','name','parent','functional','delimiters','comments'])
-        .ensure('components', '{}')
-        .get('components')
-        .set(componentName, componentName);
-
-    vueFile.parseTemplate();
-    const rootEl = vueFile.templateHandler.ast;
-    rootEl.children.unshift(compiler.compile(`<${opts.name}></${opts.name}>`).ast);
-
-    await vueFile.save();
+    addBlockExternally(blockVue, opts.target, opts.name);
 }
 
 export async function removeBlock(vueFilePath: string, baseName: string) {

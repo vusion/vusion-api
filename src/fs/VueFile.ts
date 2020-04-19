@@ -499,7 +499,7 @@ export default class VueFile extends FSEntry {
      * 会克隆所有内容参数，但 handler 引用会被排除
      * @param fullPath
      */
-    async saveAs(fullPath: string) {
+    async saveAs(fullPath: string, isDirectory?: boolean) {
         this.warnIfNotOpen();
         if (fs.existsSync(fullPath))
             throw new FileExistsError(fullPath);
@@ -524,7 +524,7 @@ export default class VueFile extends FSEntry {
         // vueFile.extName = this.extName;
         // vueFile.baseName = this.baseName;
         // vueFile.title = this.title;
-        vueFile.isDirectory = this.isDirectory;
+        vueFile.isDirectory = isDirectory === undefined ? this.isDirectory : isDirectory;
         vueFile.isVue = this.isVue;
         vueFile.isOpen = this.isOpen;
         vueFile.isSaving = this.isSaving;
