@@ -237,9 +237,9 @@ class TemplateHandler {
                                         if (directive) {
                                             directive.value = newExpr;
                                             if (directive.name === 'model') {
-                                                el.model.value = `(${newExpr})`;
-                                                el.model.expression = `"${newExpr}"`;
-                                                el.model.callback // = `"${newExpr}"`;
+                                                node.model.value = `(${newExpr})`;
+                                                node.model.expression = `"${newExpr}"`;
+                                                node.model.callback // = `"${newExpr}"`;
                                             }
                                         }
                                     }

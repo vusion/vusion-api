@@ -5,7 +5,7 @@
         <u-button @click="test()"></u-button>
         <u-pagination></u-pagination>
     </u-linear-layout>
-    <u-transfer :class="$style.root" :source="source" :target="target">
+    <u-transfer :class="$style.root1" :source="source" :target="target">
         <div v-for="item in list1" :key="item.id" :title="var2">{{ var2 }}</div>
     </u-transfer>
 </div>

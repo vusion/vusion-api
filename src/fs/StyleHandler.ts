@@ -49,7 +49,7 @@ class StyleHandler {
             while(cap = re.exec(rule.selector)) {
                 let cls = uniqueInMap(cap[0], thisClasses);
                 if (cls !== cap[0]) {
-                    classMap[cap[0]] = cls;
+                    classMap[cap[0].slice(1)] = cls.slice(1);
                     rule.selector = rule.selector.slice(0, cap.index) + cls + rule.selector.slice(cap.index + cap[0].length);
                 }
             }
