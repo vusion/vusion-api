@@ -384,18 +384,18 @@ class ScriptHandler {
             if (element.type === 'Identifier')
                 thisIdentifiers.set(element.name, true);
         });
-        const result = {};
+        const replacements = {};
         thatArray.elements.forEach((element) => {
             if (element.type === 'Identifier') {
                 if (thisIdentifiers.has(element.name))
                     return;
                 // const newName = uniqueInMap(element.name, thisIdentifiers);
                 // if (newName !== element.name)
-                //     element.name = result[element.name] = newName;
+                //     element.name = replacements[element.name] = newName;
             }
             thisArray.elements.push(element);
         });
-        return result;
+        return replacements;
     }
     mergeObject(thisObject, thatObject) {
         const thisKeys = new Map();
@@ -403,16 +403,16 @@ class ScriptHandler {
             if (property.type !== 'SpreadElement')
                 thisKeys.set(property.key.name, true);
         });
-        const result = {};
+        const replacements = {};
         thatObject.properties.forEach((property) => {
             if (property.type !== 'SpreadElement') {
                 const newName = utils_1.uniqueInMap(property.key.name, thisKeys);
                 if (newName !== property.key.name)
-                    property.key.name = result[property.key.name] = newName;
+                    property.key.name = replacements[property.key.name] = newName;
             }
             thisObject.properties.push(property);
         });
-        return result;
+        return replacements;
     }
     /**
      * 没有管 params 不相同的情况
@@ -431,20 +431,20 @@ class ScriptHandler {
                 thisVariables.set(declarator.id.name, true);
             // else @TODO: 处理其它析构等情形
         });
-        let result = { variables: {}, return: {} };
+        let replacements = { variables: {}, return: {} };
         thatBody.forEach((node) => {
             if (node.type === 'VariableDeclaration') {
                 node.declarations.forEach((declarator) => {
                     if (declarator.id.type === 'Identifier') {
                         const newName = utils_1.uniqueInMap(declarator.id.name, thisVariables);
                         if (newName !== declarator.id.name)
-                            declarator.id.name = result['variables'][declarator.id.name] = newName;
+                            declarator.id.name = replacements['variables'][declarator.id.name] = newName;
                     }
                 });
             }
             else if (thisReturn && node.type === 'ReturnStatement') {
                 if (thisReturn.argument.type === 'ObjectExpression' && node.argument.type === 'ObjectExpression') {
-                    result['return'] = this.mergeObject(thisReturn.argument, node.argument);
+                    replacements['return'] = this.mergeObject(thisReturn.argument, node.argument);
                     return;
                 }
                 else {
@@ -453,7 +453,7 @@ class ScriptHandler {
             }
             thisBody.splice(thisReturnIndex, 0, node);
         });
-        return result;
+        return replacements;
     }
     mergeVueObject(thisObject, thatObject) {
         const thisProperties = thisObject.properties;
@@ -468,7 +468,7 @@ class ScriptHandler {
             return index === undefined ? lastIndex : index;
         };
         const OBJECT_OPTIONS = ['components', 'directives', 'filters', 'props', 'propsData', 'computed', 'watch', 'methods'];
-        const result = {};
+        const replacements = {};
         thatObject.properties.forEach((thatProperty) => {
             // 直接合并 { ...obj } 的情况
             if (thatProperty.type === 'SpreadElement')
@@ -478,11 +478,11 @@ class ScriptHandler {
             if (thisPropertiesMap[thatKey]) {
                 const thisProperty = thisPropertiesMap[thatKey];
                 if (OBJECT_OPTIONS.includes(thatKey)) {
-                    result[thatKey] = this.mergeObject(thisProperty.value, thatProperty.value);
+                    replacements[thatKey] = this.mergeObject(thisProperty.value, thatProperty.value);
                     return;
                 }
                 else if (thatKey === 'mixins') {
-                    result['mixins'] = this.mergeArray(thisProperty.value, thatProperty.value);
+                    replacements['mixins'] = this.mergeArray(thisProperty.value, thatProperty.value);
                     return;
                 }
                 else if (exports.LIFECYCLE_HOOKS.includes(thatKey)) {
@@ -521,7 +521,7 @@ class ScriptHandler {
                      * data: Object 的情况不处理
                      */
                     const dataResult = this.mergeFunction(thisFunction, thatFunction);
-                    result['data'] = dataResult.return;
+                    replacements['data'] = dataResult.return;
                     return;
                 }
                 else {
@@ -565,7 +565,7 @@ class ScriptHandler {
             }
             thisProperties.splice(insertIndex, 0, thatProperty);
         });
-        return result;
+        return replacements;
     }
     /**
      * 将另一个 that 的脚本合并到当前样式中
@@ -588,7 +588,7 @@ class ScriptHandler {
                 thisVariables.set(declarator.id.name, true);
             // else @TODO: 处理其它析构等情形
         });
-        let result = { variables: {} };
+        let replacements = { variables: {} };
         thatBody.forEach((node) => {
             if (node.type === 'ImportDeclaration') { // @TODO 暂时不去重 import identifier，block 的这种情况比较少。因为 import 周边文件就变成 external() 了
                 const index = imports.findIndex(node.source.value);
@@ -602,7 +602,7 @@ class ScriptHandler {
                     if (declarator.id.type === 'Identifier') {
                         const newName = utils_1.uniqueInMap(declarator.id.name, thisVariables);
                         if (newName !== declarator.id.name)
-                            declarator.id.name = result['variables'][declarator.id.name] = newName;
+                            declarator.id.name = replacements['variables'][declarator.id.name] = newName;
                     }
                 });
                 thisBody.splice(exportDefaultIndex++, 0, node);
@@ -619,13 +619,13 @@ class ScriptHandler {
                 const thatExportDefault = that.export().default();
                 if (!thatExportDefault.is('object')) // 如果不是 object 不处理了
                     return thisBody.splice(exportDefaultIndex++, 0, node);
-                result = this.mergeVueObject(thisExportDefault.node, thatExportDefault.node);
+                replacements = this.mergeVueObject(thisExportDefault.node, thatExportDefault.node);
             }
             else { // 默认插入到 export default 的位置或最后
                 thisBody.splice(exportDefaultIndex++, 0, node);
             }
         });
-        return result;
+        return replacements;
     }
 }
 exports.default = ScriptHandler;

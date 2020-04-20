@@ -364,6 +364,25 @@ class VueFile extends FSEntry_1.default {
         else
             return this.examplesHandler = new ExamplesHandler_1.default(this.examples);
     }
+    generate(options) {
+        let template = this.template;
+        let script = this.script;
+        let style = this.style;
+        if (this.templateHandler) {
+            if (!this.isDirectory)
+                this.templateHandler.options.startLevel = 1;
+            this.template = template = this.templateHandler.generate(options);
+        }
+        if (this.scriptHandler)
+            this.script = script = this.scriptHandler.generate();
+        if (this.styleHandler)
+            this.style = style = this.styleHandler.generate();
+        const contents = [];
+        template && contents.push(`<template>\n${template}</template>`);
+        script && contents.push(`<script>\n${script}</script>`);
+        style && contents.push(`<style module>\n${style}</style>`);
+        return this.content = contents.join('\n\n') + '\n';
+    }
     /**
      * 克隆 VueFile 对象
      * 克隆所有参数，但 handler 引用会被排除
@@ -410,34 +429,19 @@ class VueFile extends FSEntry_1.default {
             // 只有 isDirectory 不相同的时候才删除，因为可能有其它额外的文件
             if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
                 shell.rm('-rf', this.fullPath);
-            let template = this.template;
-            let script = this.script;
-            let style = this.style;
-            if (this.templateHandler) {
-                if (!this.isDirectory)
-                    this.templateHandler.options.startLevel = 1;
-                this.template = template = this.templateHandler.generate();
-            }
-            if (this.scriptHandler)
-                this.script = script = this.scriptHandler.generate();
-            if (this.styleHandler)
-                this.style = style = this.styleHandler.generate();
+            this.generate();
             if (this.isDirectory) {
                 fs.ensureDirSync(this.fullPath);
                 const promises = [];
-                template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), template));
-                script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), script));
-                style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), style));
+                this.template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), this.template));
+                this.script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), this.script));
+                this.style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), this.style));
                 if (this.package && typeof this.package === 'object')
                     promises.push(fs.writeFile(path.resolve(this.fullPath, 'package.json'), JSON.stringify(this.package, null, 2) + '\n'));
                 yield Promise.all(promises);
             }
             else {
-                const contents = [];
-                template && contents.push(`<template>\n${template}</template>`);
-                script && contents.push(`<script>\n${script}</script>`);
-                style && contents.push(`<style module>\n${style}</style>`);
-                yield fs.writeFile(this.fullPath, contents.join('\n\n') + '\n');
+                yield fs.writeFile(this.fullPath, this.content);
             }
             _super.save.call(this);
         });
@@ -571,9 +575,18 @@ class VueFile extends FSEntry_1.default {
     /**
      * 与另一个 Vue 文件合并模板、逻辑和样式
      * 两个 VueFile 必须先 parseAll()
+     * @param that 另一个 VueFile
+     * @param route 插入的节点路径，最后一位表示节点位置，为空表示最后，比如 /1/2/1 表示插入到根节点的第1个子节点的第2个子节点的第1个位置
+     * - merge(that, '') 指根节点本身
+     * - merge(that, '/') 指根节点本身
+     * - merge(that, '/0') 指第0个子节点
+     * - merge(that, '/2/1') 指第2个子节点的第1个子节点
+     * - merge(that, '/2/') 指第2个子节点的最后
      */
-    merge(vueFile) {
-        // vueFile.
+    merge(that, route = '') {
+        const scriptResult = this.scriptHandler.merge(that.scriptHandler);
+        const styleResult = this.styleHandler.merge(that.styleHandler);
+        this.templateHandler.merge(that.templateHandler, route, Object.assign(Object.assign({}, scriptResult), styleResult));
     }
     extend(mode, fullPath, fromPath) {
         const vueFile = new VueFile(fullPath);

@@ -1,5 +1,18 @@
+<template>
+<div :class="$style.root">
+    <div v-for="item in list" :key="item.id">{{ var1 }}</div>
+    <u-linear-layout>
+        <u-button @click="test()"></u-button>
+        <u-pagination></u-pagination>
+    </u-linear-layout>
+    <u-transfer :class="$style.root" :source="source" :target="target">
+        <div v-for="item in list1" :key="item.id" :title="var2">{{ var2 }}</div>
+    </u-transfer>
+</div>
+</template>
+
+<script>
 import UWorkflow from '@cloud-ui/u-workflow.vue';
-import service from './service';
 const source = [
     { text: 'C', value: 'c' },
     { text: 'C#', value: 'csharp' },
@@ -35,45 +48,66 @@ const target = [
 export default {
     components: { UWorkflow },
     data() {
-        const list = [];
         return {
             var1: undefined,
             list: [],
             model: { instance: {} },
             source,
             target,
-            model1: {
-                chargeType: '0',
-                name: '',
-                spec: '0101',
-                type: 'SSD',
-                port: '',
-                bandwidth: 10,
-                description: '',
-            },
+            var2: 123,
+            list1: ['aaa'],
         };
     },
     computed: {
         showButton() {
             return false;
         },
-        buttonDisabled() {
-            return false;
-        },
     },
     created() {
         console.log('created1');
-        console.log('created2');
     },
     methods: {
         test() {
             console.info('aaa');
         },
-        submit() {
-            this.$refs.form
-                .validate()
-                .then(() => this.$toast.show('验证通过，提交成功！'))
-                .catch(() => this.$toast.show('验证失败！'));
-        },
     },
 };
+</script>
+
+<style module>
+.root {
+    width: 100%;
+}
+
+.root .item {
+    color: blue;
+}
+
+:global .red {
+    background: red;
+}
+
+@media (max-width: 600px) {
+    .test {
+        width: 30%;
+    }
+}
+
+.root1 {
+    height: 300px;
+}
+
+:global .white {
+    color: white;
+}
+
+.root1 .item1 {
+    color: black;
+}
+
+@media (max-width: 600px) {
+    .root1 {
+        width: 50%;
+    }
+}
+</style>

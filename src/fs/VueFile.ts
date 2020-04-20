@@ -7,7 +7,7 @@ import * as pluralize from 'pluralize';
 import { kebab2Camel, Camel2kebab } from '../utils';
 
 import FSEntry from './FSEntry';
-import TemplateHandler from './TemplateHandler';
+import { default as TemplateHandler, TemplateOptions } from './TemplateHandler';
 import ScriptHandler from './ScriptHandler';
 import StyleHandler from './StyleHandler';
 import APIHandler from './APIHandler';
@@ -410,6 +410,29 @@ export default class VueFile extends FSEntry {
             return this.examplesHandler = new ExamplesHandler(this.examples);
     }
 
+    generate(options?: TemplateOptions) {
+        let template = this.template;
+        let script = this.script;
+        let style = this.style;
+
+        if (this.templateHandler) {
+            if (!this.isDirectory)
+                this.templateHandler.options.startLevel = 1;
+            this.template = template = this.templateHandler.generate(options);
+        }
+        if (this.scriptHandler)
+            this.script = script = this.scriptHandler.generate();
+        if (this.styleHandler)
+            this.style = style = this.styleHandler.generate();
+
+        const contents = [];
+        template && contents.push(`<template>\n${template}</template>`);
+        script && contents.push(`<script>\n${script}</script>`);
+        style && contents.push(`<style module>\n${style}</style>`);
+
+        return this.content = contents.join('\n\n') + '\n';
+    }
+
     /**
      * 克隆 VueFile 对象
      * 克隆所有参数，但 handler 引用会被排除
@@ -457,38 +480,21 @@ export default class VueFile extends FSEntry {
         if (fs.existsSync(this.fullPath) && fs.statSync(this.fullPath).isDirectory() !== this.isDirectory)
             shell.rm('-rf', this.fullPath);
 
-        let template = this.template;
-        let script = this.script;
-        let style = this.style;
-
-        if (this.templateHandler) {
-            if (!this.isDirectory)
-                this.templateHandler.options.startLevel = 1;
-            this.template = template = this.templateHandler.generate();
-        }
-        if (this.scriptHandler)
-            this.script = script = this.scriptHandler.generate();
-        if (this.styleHandler)
-            this.style = style = this.styleHandler.generate();
+        this.generate();
 
         if (this.isDirectory) {
             fs.ensureDirSync(this.fullPath);
 
             const promises = [];
-            template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), template));
-            script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), script));
-            style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), style));
+            this.template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), this.template));
+            this.script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), this.script));
+            this.style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), this.style));
             if (this.package && typeof this.package === 'object')
                 promises.push(fs.writeFile(path.resolve(this.fullPath, 'package.json'), JSON.stringify(this.package, null, 2) + '\n'));
 
             await Promise.all(promises);
         } else {
-            const contents = [];
-            template && contents.push(`<template>\n${template}</template>`);
-            script && contents.push(`<script>\n${script}</script>`);
-            style && contents.push(`<style module>\n${style}</style>`);
-
-            await fs.writeFile(this.fullPath, contents.join('\n\n') + '\n');
+            await fs.writeFile(this.fullPath, this.content);
         }
 
         super.save();
@@ -642,9 +648,21 @@ export default class VueFile extends FSEntry {
     /**
      * 与另一个 Vue 文件合并模板、逻辑和样式
      * 两个 VueFile 必须先 parseAll()
+     * @param that 另一个 VueFile
+     * @param route 插入的节点路径，最后一位表示节点位置，为空表示最后，比如 /1/2/1 表示插入到根节点的第1个子节点的第2个子节点的第1个位置
+     * - merge(that, '') 指根节点本身
+     * - merge(that, '/') 指根节点本身
+     * - merge(that, '/0') 指第0个子节点
+     * - merge(that, '/2/1') 指第2个子节点的第1个子节点
+     * - merge(that, '/2/') 指第2个子节点的最后
      */
-    merge(vueFile: VueFile) {
-        // vueFile.
+    merge(that: VueFile, route: string = '') {
+        const scriptResult = this.scriptHandler.merge(that.scriptHandler);
+        const styleResult = this.styleHandler.merge(that.styleHandler);
+        this.templateHandler.merge(that.templateHandler, route, {
+            ...scriptResult,
+            ...styleResult,
+        });
     }
 
     extend(mode: VueFileExtendMode, fullPath: string, fromPath: string) {

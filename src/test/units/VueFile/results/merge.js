@@ -40,6 +40,8 @@ export default {
             model: { instance: {} },
             source,
             target,
+            var2: 123,
+            list1: ['aaa'],
         };
     },
     computed: {

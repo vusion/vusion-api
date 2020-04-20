@@ -444,19 +444,19 @@ class ScriptHandler {
                 thisIdentifiers.set(element.name, true);
         });
 
-        const result: { [old: string]: string } = {};
+        const replacements: { [old: string]: string } = {};
         thatArray.elements.forEach((element) => {
             if (element.type === 'Identifier') {
                 if (thisIdentifiers.has(element.name))
                     return;
                 // const newName = uniqueInMap(element.name, thisIdentifiers);
                 // if (newName !== element.name)
-                //     element.name = result[element.name] = newName;
+                //     element.name = replacements[element.name] = newName;
             }
             thisArray.elements.push(element);
         });
 
-        return result;
+        return replacements;
     }
 
     mergeObject(thisObject: babel.types.ObjectExpression, thatObject: babel.types.ObjectExpression) {
@@ -466,17 +466,17 @@ class ScriptHandler {
                 thisKeys.set(property.key.name, true);
         });
 
-        const result: { [old: string]: string } = {};
+        const replacements: { [old: string]: string } = {};
         thatObject.properties.forEach((property) => {
             if (property.type !== 'SpreadElement') {
                 const newName = uniqueInMap(property.key.name, thisKeys);
                 if (newName !== property.key.name)
-                    property.key.name = result[property.key.name] = newName;
+                    property.key.name = replacements[property.key.name] = newName;
             }
             thisObject.properties.push(property);
         });
 
-        return result;
+        return replacements;
     }
 
     /**
@@ -498,19 +498,19 @@ class ScriptHandler {
             // else @TODO: 处理其它析构等情形
         });
 
-        let result: { [key: string]: { [old: string]: string } } = { variables: {}, return: {} };
+        let replacements: { [key: string]: { [old: string]: string } } = { variables: {}, return: {} };
         thatBody.forEach((node) => {
             if (node.type === 'VariableDeclaration') {
                 node.declarations.forEach((declarator) => {
                     if (declarator.id.type === 'Identifier') {
                         const newName = uniqueInMap(declarator.id.name, thisVariables);
                         if (newName !== declarator.id.name)
-                            declarator.id.name = result['variables'][declarator.id.name] = newName;
+                            declarator.id.name = replacements['variables'][declarator.id.name] = newName;
                     }
                 });
             } else if (thisReturn && node.type === 'ReturnStatement') {
                 if (thisReturn.argument.type === 'ObjectExpression' && node.argument.type === 'ObjectExpression') {
-                    result['return'] = this.mergeObject(
+                    replacements['return'] = this.mergeObject(
                         thisReturn.argument,
                         node.argument,
                     );
@@ -522,7 +522,7 @@ class ScriptHandler {
             thisBody.splice(thisReturnIndex, 0, node);
         });
 
-        return result;
+        return replacements;
     }
 
     mergeVueObject(thisObject: babel.types.ObjectExpression, thatObject: babel.types.ObjectExpression) {
@@ -539,7 +539,7 @@ class ScriptHandler {
             return index === undefined ? lastIndex : index;
         }
         const OBJECT_OPTIONS = ['components', 'directives', 'filters', 'props', 'propsData', 'computed', 'watch', 'methods'];
-        const result: { [key: string]: { [old: string]: string } } = {};
+        const replacements: { [key: string]: { [old: string]: string } } = {};
         thatObject.properties.forEach((thatProperty) => {
             // 直接合并 { ...obj } 的情况
             if (thatProperty.type === 'SpreadElement')
@@ -550,13 +550,13 @@ class ScriptHandler {
             if (thisPropertiesMap[thatKey]) {
                 const thisProperty = thisPropertiesMap[thatKey];
                 if (OBJECT_OPTIONS.includes(thatKey)) {
-                    result[thatKey] = this.mergeObject(
+                    replacements[thatKey] = this.mergeObject(
                         (thisProperty as babel.types.ObjectProperty).value as babel.types.ObjectExpression,
                         (thatProperty as babel.types.ObjectProperty).value as babel.types.ObjectExpression,
                     );
                     return;
                 } else if (thatKey === 'mixins') {
-                    result['mixins'] = this.mergeArray(
+                    replacements['mixins'] = this.mergeArray(
                         (thisProperty as babel.types.ObjectProperty).value as babel.types.ArrayExpression,
                         (thatProperty as babel.types.ObjectProperty).value as babel.types.ArrayExpression,
                     );
@@ -602,7 +602,7 @@ class ScriptHandler {
                      * data: Object 的情况不处理
                      */
                     const dataResult = this.mergeFunction(thisFunction, thatFunction);
-                    result['data'] = dataResult.return;
+                    replacements['data'] = dataResult.return;
                     return;
                 } else {
                     // [
@@ -644,7 +644,7 @@ class ScriptHandler {
             thisProperties.splice(insertIndex, 0, thatProperty);
         });
 
-        return result;
+        return replacements;
     }
 
     /**
@@ -671,7 +671,7 @@ class ScriptHandler {
             // else @TODO: 处理其它析构等情形
         });
 
-        let result: { [key: string]: { [old: string]: string } } = { variables: {} };
+        let replacements: { [key: string]: { [old: string]: string } } = { variables: {} };
         thatBody.forEach((node) => {
             if (node.type === 'ImportDeclaration') { // @TODO 暂时不去重 import identifier，block 的这种情况比较少。因为 import 周边文件就变成 external() 了
                 const index = imports.findIndex(node.source.value);
@@ -684,7 +684,7 @@ class ScriptHandler {
                     if (declarator.id.type === 'Identifier') {
                         const newName = uniqueInMap(declarator.id.name, thisVariables);
                         if (newName !== declarator.id.name)
-                            declarator.id.name = result['variables'][declarator.id.name] = newName;
+                            declarator.id.name = replacements['variables'][declarator.id.name] = newName;
                     }
                 });
                 thisBody.splice(exportDefaultIndex++, 0, node);
@@ -701,7 +701,7 @@ class ScriptHandler {
                 if (!thatExportDefault.is('object')) // 如果不是 object 不处理了
                     return thisBody.splice(exportDefaultIndex++, 0, node);
 
-                result = this.mergeVueObject(
+                replacements = this.mergeVueObject(
                     thisExportDefault.node as babel.types.ObjectExpression,
                     thatExportDefault.node as babel.types.ObjectExpression,
                 );
@@ -710,7 +710,7 @@ class ScriptHandler {
             }
         });
 
-        return result;
+        return replacements;
     }
 }
 
