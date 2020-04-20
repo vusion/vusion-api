@@ -39,4 +39,18 @@ export default {
 .root {
     width: 100%;
 }
+
+.root .item {
+    color: blue;
+}
+
+:global .red {
+    background: red;
+}
+
+@media (max-width: 600px) {
+    .test {
+        width: 30%;
+    }
+}
 </style>

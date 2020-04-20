@@ -1,7 +1,5 @@
-<template>
-<u-transfer :class="$style.root" :source="source" :target="target"></u-transfer>
-</template>
-<script>
+import UWorkflow from '@cloud-ui/u-workflow.vue';
+import service from './service';
 const source = [
     { text: 'C', value: 'c' },
     { text: 'C#', value: 'csharp' },
@@ -34,36 +32,48 @@ const target = [
     { text: 'JavaScript', value: 'javascript' },
     { text: 'Vue', value: 'vue' },
 ];
-
 export default {
+    components: { UWorkflow },
     data() {
+        const list = [];
         return {
+            var1: undefined,
+            list: [],
+            model: { instance: {} },
             source,
             target,
+            model1: {
+                chargeType: '0',
+                name: '',
+                spec: '0101',
+                type: 'SSD',
+                port: '',
+                bandwidth: 10,
+                description: '',
+            },
         };
+    },
+    computed: {
+        showButton() {
+            return false;
+        },
+        buttonDisabled() {
+            return false;
+        },
     },
     created() {
         console.log('created1');
+        console.log('created2');
+    },
+    methods: {
+        test() {
+            console.info('aaa');
+        },
+        submit() {
+            this.$refs.form
+                .validate()
+                .then(() => this.$toast.show('验证通过，提交成功！'))
+                .catch(() => this.$toast.show('验证失败！'));
+        },
     },
 };
-</script>
-
-<style module>
-.root {
-    height: 300px;
-}
-
-:global .white {
-    color: white;
-}
-
-.root .item {
-    color: black;
-}
-
-@media (max-width: 600px) {
-    .root {
-        width: 50%;
-    }
-}
-</style>

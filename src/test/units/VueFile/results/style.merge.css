@@ -1,0 +1,35 @@
+.root {
+    width: 100%;
+}
+
+.root .item {
+    color: blue;
+}
+
+:global .red {
+    background: red;
+}
+
+@media (max-width: 600px) {
+    .test {
+        width: 30%;
+    }
+}
+
+.root1 {
+    height: 300px;
+}
+
+:global .white {
+    color: white;
+}
+
+.root1 .item1 {
+    color: black;
+}
+
+@media (max-width: 600px) {
+    .root1 {
+        width: 50%;
+    }
+}

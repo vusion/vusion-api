@@ -1,7 +1,4 @@
-<template>
-<u-transfer :class="$style.root" :source="source" :target="target"></u-transfer>
-</template>
-<script>
+import UWorkflow from '@cloud-ui/u-workflow.vue';
 const source = [
     { text: 'C', value: 'c' },
     { text: 'C#', value: 'csharp' },
@@ -34,36 +31,28 @@ const target = [
     { text: 'JavaScript', value: 'javascript' },
     { text: 'Vue', value: 'vue' },
 ];
-
 export default {
+    components: { UWorkflow },
     data() {
         return {
+            var1: undefined,
+            list: [],
+            model: { instance: {} },
             source,
             target,
         };
     },
+    computed: {
+        showButton() {
+            return false;
+        },
+    },
     created() {
         console.log('created1');
     },
+    methods: {
+        test() {
+            console.info('aaa');
+        },
+    },
 };
-</script>
-
-<style module>
-.root {
-    height: 300px;
-}
-
-:global .white {
-    color: white;
-}
-
-.root .item {
-    color: black;
-}
-
-@media (max-width: 600px) {
-    .root {
-        width: 50%;
-    }
-}
-</style>

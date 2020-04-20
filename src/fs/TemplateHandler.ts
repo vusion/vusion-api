@@ -31,7 +31,7 @@ class TemplateHandler {
 
     constructor(code: string = '', options?: Object) {
         this.code = code;
-        this.ast = this.parse(code);
+        this.ast = this.parse(code) as ASTElement;
         this.options = {
             tabLength: 4,
             startLevel: 0,
@@ -120,9 +120,14 @@ class TemplateHandler {
      * 根据路径查找子节点
      * @param route 节点路径，/1/2 表示根节点的第1个子节点的第2个子节点
      * @param node 查找的起始节点
+     * @examples
+     * - findByRoute('', root) 指根节点本身
+     * - findByRoute('/', root) 指根节点本身
+     * - findByRoute('/0', root) 指第0个子节点
+     * - findByRoute('/2/1', root) 指第2个子节点的第1个子节点
      */
     findByRoute(route: string, node: compiler.ASTNode): compiler.ASTNode {
-        if (route[0] === '/')
+        if (route[0] === '/') // 这个里边相对和绝对是一样的
             route = route.slice(1);
         const arr = route.split('/');
         if (!route || !arr.length)
@@ -132,21 +137,28 @@ class TemplateHandler {
     }
 
     /**
-     * 将另一个 handler 的模板合并到当前模板中
-     * @param handler 另一个 TemplateHandler
-     * @param route 插入的父节点路径，/1/2 表示根节点的第1个子节点的第2个子节点
-     * @param index 插入到的位置
+     * 将另一个 that 的模板合并到当前模板中
+     * @param that 另一个 TemplateHandler
+     * @param route 插入的节点路径，最后一位表示节点位置，为空表示最后，比如 /1/2/1 表示插入到根节点的第1个子节点的第2个子节点的第1个位置
+     * - merge(that, '') 指根节点本身
+     * - merge(that, '/') 指根节点本身
+     * - merge(that, '/0') 指第0个子节点
+     * - merge(that, '/2/1') 指第2个子节点的第1个子节点
+     * - merge(that, '/2/') 指第2个子节点的最后
      */
-    merge(handler: TemplateHandler, route: string, index?: number) {
-        const el = this.findByRoute(route, this.ast) as compiler.ASTElement;
+    merge(that: TemplateHandler, route: string) {
+        if (route[0] === '/') // 这个里边相对和绝对是一样的
+            route = route.slice(1);
+        const arr = route.split('/');
+        const last = arr[arr.length - 1];
+
+        const parentRoute = arr.slice(0, -1).join('/');
+        const el = this.findByRoute(parentRoute, this.ast) as compiler.ASTElement;
         if (!el.children)
             throw new Error(`Not an element node! route: ${route}`);
 
-        if (index === undefined)
-            index = el.children.length;
-        el.children.splice(index, 0, handler.ast);
-
-        return this;
+        const index = last === undefined || last === '' ? el.children.length : +last;
+        el.children.splice(index, 0, that.ast);
     }
 }
 

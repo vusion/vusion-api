@@ -24,7 +24,7 @@ describe('ScriptHandler', () => {
     it('import(specifiers)', () => __awaiter(void 0, void 0, void 0, function* () {
         const content = fs.readFileSync(path.resolve(BASE_PATH, 'u-button.vue/index.js'), 'utf8');
         const $js = new ScriptHandler_1.default(content);
-        $js.import({ default: 'UButton', ULink: 'ULink', ULabel: '' }).from('./library');
+        $js.import({ default: 'UBadge', UImage: 'UImage', ULabel: '' }).from('./library');
         chai_1.expect($js.generate()).to.equal(yield fs.readFile(path.resolve(BASE_PATH, '../results/import.specifiers.js'), 'utf8'));
     }));
     it('froms().has()', () => __awaiter(void 0, void 0, void 0, function* () {

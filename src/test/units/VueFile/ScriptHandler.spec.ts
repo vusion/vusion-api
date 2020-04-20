@@ -17,7 +17,7 @@ describe('ScriptHandler', () => {
     it('import(specifiers)', async () => {
         const content = fs.readFileSync(path.resolve(BASE_PATH, 'u-button.vue/index.js'), 'utf8');
         const $js = new ScriptHandler(content);
-        $js.import({ default: 'UButton', ULink: 'ULink', ULabel: '' }).from('./library');
+        $js.import({ default: 'UBadge', UImage: 'UImage', ULabel: '' }).from('./library');
         expect($js.generate()).to.equal(await fs.readFile(path.resolve(BASE_PATH, '../results/import.specifiers.js'), 'utf8'));
     });
 

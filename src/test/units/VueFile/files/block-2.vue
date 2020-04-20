@@ -34,8 +34,10 @@
 <script>
 import service from './service';
 
-export const UBlock2 = {
+export default {
     data() {
+        const list = [];
+
         return {
             model: {
                 chargeType: '0',
@@ -53,6 +55,9 @@ export const UBlock2 = {
             return false;
         },
     },
+    created() {
+        console.log('created2');
+    },
     methods: {
         submit() {
             this.$refs.form.validate()
@@ -61,8 +66,6 @@ export const UBlock2 = {
         },
     },
 };
-
-export default UBlock2;
 </script>
 <style module>
 .root {

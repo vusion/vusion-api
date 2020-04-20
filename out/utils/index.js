@@ -45,4 +45,10 @@ function normalizeName(componentName) {
         return { baseName: 'u-sample', componentName: 'USample' };
 }
 exports.normalizeName = normalizeName;
+function uniqueInMap(key, map, start = 1) {
+    while (map.has(key))
+        key = key.replace(/\d*$/, (m) => String(m === '' ? start : +m + 1));
+    return key;
+}
+exports.uniqueInMap = uniqueInMap;
 //# sourceMappingURL=index.js.map
