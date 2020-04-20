@@ -148,6 +148,32 @@ class TemplateHandler {
     }
 
     /**
+     * 该函数处理一个试用阶段
+     * @param position
+     */
+    findByPosition(position: number | { line: number, character: number }): compiler.ASTNode {
+        if (typeof position === 'object') {
+            let pos = 0;
+            const lines = this.code.split('\n');
+            for (let i = 0; i < position.line - 1; i++)
+                pos += lines[i].length + 1;
+            pos += position.character - this.options.tabLength * this.options.startLevel;
+            position = pos;
+        }
+
+        let found: compiler.ASTNode;
+        this.traverse((nodePath) => {
+            const node = nodePath.node as any;
+            if (node.start <= position && position < node.end)
+                found = node as compiler.ASTNode;
+        });
+
+        if (!found)
+            return this.ast;
+        return found;
+    }
+
+    /**
      * 将另一个 that 的模板合并到当前模板中
      * @param that 另一个 TemplateHandler
      * @param route 插入的节点路径，最后一位表示节点位置，为空表示最后，比如 /1/2/1 表示插入到根节点的第1个子节点的第2个子节点的第1个位置
@@ -158,7 +184,7 @@ class TemplateHandler {
      * - merge(that, '/2/') 指第2个子节点的最后
      * @param replacements 需要跟着替换的样式和变量
      */
-    merge(that: TemplateHandler, route: string, replacements?: { [key: string]: { [old: string]: string } }) {
+    merge(that: TemplateHandler, route: string | number | { line: number, character: number }, replacements?: { [key: string]: { [old: string]: string } }) {
         if (replacements) {
             const classKeys = Object.keys(replacements['class']);
             // @TODO: 'directives', 'filters'
@@ -170,7 +196,7 @@ class TemplateHandler {
                 // 替换是个小概率事件，而且主要是替换 Block，因此不用考虑太多情况
                 babel.traverse(ast, {
                     Identifier(nodePath) {
-                        if (nodePath.parent.type === 'MemberExpression' && nodePath.parent.property === nodePath.node)
+                        if (nodePath.parent.type === 'MemberExpression' && nodePath.parent.object.type !== 'ThisExpression' && nodePath.parent.property === nodePath.node)
                             return nodePath.skip();
                         if (identifierMap[nodePath.node.name]) {
                             nodePath.node.name = identifierMap[nodePath.node.name];
@@ -200,7 +226,7 @@ class TemplateHandler {
                                 });
                         });
                     }
-                    if (identifierKeys.length && node.hasBindings) {
+                    if (identifierKeys.length) {
                         /* attrsList 里有绑定属性、事件和指令，没有 v-if, v-for 和 class */
                         node.attrsList.forEach((attr, index) => {
                             if (attr.name.startsWith(':') || attr.name.startsWith('@') || attr.name.startsWith('v-')) {
@@ -291,17 +317,23 @@ class TemplateHandler {
             });
         }
 
-        if (route[0] === '/') // 这个里边相对和绝对是一样的
-            route = route.slice(1);
-        const arr = route.split('/');
-        const last = arr[arr.length - 1];
+        let el: compiler.ASTElement;
+        let index: number = 0;
+        if (typeof route === 'string') {
+            if (route[0] === '/') // 这个里边相对和绝对是一样的
+                route = route.slice(1);
+            const arr = route.split('/');
+            const last = arr[arr.length - 1];
 
-        const parentRoute = arr.slice(0, -1).join('/');
-        const el = this.findByRoute(parentRoute, this.ast) as compiler.ASTElement;
+            const parentRoute = arr.slice(0, -1).join('/');
+            el = this.findByRoute(parentRoute, this.ast) as compiler.ASTElement;
+            index = last === undefined || last === '' ? el.children.length : +last;
+        } else {
+            el = this.findByPosition(route) as compiler.ASTElement;
+            index = el.children.length;
+        }
         if (!el.children)
             throw new Error(`Not an element node! route: ${route}`);
-
-        const index = last === undefined || last === '' ? el.children.length : +last;
         el.children.splice(index, 0, that.ast);
     }
 }

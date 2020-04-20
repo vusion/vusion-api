@@ -282,8 +282,9 @@ class ScriptHandler {
 
     generate() {
         const code = generate(this.ast, {
-            // retainLines: true,
+            retainLines: true,
             concise: true,
+            compact: true,
         }).code;
         let formatted = prettier.format(code, Object.assign({
             parser: 'babel',
@@ -708,6 +709,17 @@ class ScriptHandler {
             } else { // 默认插入到 export default 的位置或最后
                 thisBody.splice(exportDefaultIndex++, 0, node);
             }
+        });
+
+        /* 处理代码中的 this */
+        const identifierMap = { ...replacements['props'], ...replacements['data'], ...replacements['computed'], ...replacements['method'] };
+        babel.traverse(that.ast, {
+            Identifier(nodePath) {
+                if (nodePath.parent.type === 'MemberExpression' && nodePath.parent.object.type === 'ThisExpression') {
+                    if (identifierMap[nodePath.node.name])
+                        nodePath.node.name = identifierMap[nodePath.node.name];
+                }
+            },
         });
 
         return replacements;

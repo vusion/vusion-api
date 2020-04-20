@@ -70,7 +70,9 @@ describe('merge', () => {
         const $js2 = vueFile2.parseScript();
 
         const result = $js.merge($js1);
-        expect($js.generate()).to.equal(await fs.readFile(path.resolve(BASE_PATH, '../results/merge.js'), 'utf8'));
+        const resultContent = $js.generate();
+        await fs.writeFile(path.resolve(BASE_PATH, '../results/merge-result.js'),resultContent, 'utf8');
+        expect(resultContent).to.equal(await fs.readFile(path.resolve(BASE_PATH, '../results/merge.js'), 'utf8'));
         expect(Object.keys(result.data).length).to.equal(2);
         expect(result.data['var1']).to.equal('var2');
         expect(result.data['list']).to.equal('list1');

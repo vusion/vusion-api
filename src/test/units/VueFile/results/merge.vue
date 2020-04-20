@@ -6,7 +6,10 @@
         <u-pagination></u-pagination>
     </u-linear-layout>
     <u-transfer :class="$style.root1" :source="source" :target="target">
-        <div v-for="item in list1" :key="item.id" :title="var2">{{ var2 }}</div>
+        <div v-for="(item, index) in list1" :key="item.id" :title="var2">{{ var2 }}</div>
+        <tr v-for="(item, index) in list1" :key="index">
+            <u-input size="huge full" placeholder="请输入区域" v-model="item.region"></u-input>
+        </tr>
     </u-transfer>
 </div>
 </template>
@@ -39,6 +42,7 @@ const source = [
     { text: 'XML', value: 'xml' },
     { text: 'YAML', value: 'yaml' },
 ];
+
 const target = [
     { text: 'CSS', value: 'css' },
     { text: 'HTML', value: 'html' },
@@ -52,6 +56,7 @@ export default {
             var1: undefined,
             list: [],
             model: { instance: {} },
+
             source,
             target,
             var2: 123,
@@ -63,7 +68,10 @@ export default {
             return false;
         },
     },
+
     created() {
+        this.var2 = 2;
+        this.list1.push('bbb');
         console.log('created1');
     },
     methods: {

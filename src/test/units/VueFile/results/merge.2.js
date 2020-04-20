@@ -26,6 +26,7 @@ const source = [
     { text: 'XML', value: 'xml' },
     { text: 'YAML', value: 'yaml' },
 ];
+
 const target = [
     { text: 'CSS', value: 'css' },
     { text: 'HTML', value: 'html' },
@@ -40,6 +41,7 @@ export default {
             var1: undefined,
             list: [],
             model: { instance: {} },
+
             source,
             target,
             var2: 123,
@@ -63,7 +65,10 @@ export default {
             return false;
         },
     },
+
     created() {
+        this.var2 = 2;
+        this.list1.push('bbb');
         console.log('created1');
         console.log('created2');
     },
@@ -72,6 +77,9 @@ export default {
             console.info('aaa');
         },
         submit() {
+            if (!this.model1.name) {
+                return false;
+            }
             this.$refs.form
                 .validate()
                 .then(() => this.$toast.show('验证通过，提交成功！'))

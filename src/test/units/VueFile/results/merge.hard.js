@@ -1,5 +1,6 @@
 import OTest from './o-test.vue';
 import { USubscribe } from 'cloud-ui.vusion';
+
 export default {
     name: 'u-test',
     childName: 'u-test-item',
@@ -13,6 +14,7 @@ export default {
             return false;
         },
     },
+
     created() {
         console.log('created1');
         console.log('created1');

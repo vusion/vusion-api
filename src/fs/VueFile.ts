@@ -656,7 +656,7 @@ export default class VueFile extends FSEntry {
      * - merge(that, '/2/1') 指第2个子节点的第1个子节点
      * - merge(that, '/2/') 指第2个子节点的最后
      */
-    merge(that: VueFile, route: string = '') {
+    merge(that: VueFile, route: string | number | { line: number, character: number } = '') {
         const scriptResult = this.scriptHandler.merge(that.scriptHandler);
         const styleResult = this.styleHandler.merge(that.styleHandler);
         this.templateHandler.merge(that.templateHandler, route, {

@@ -1,6 +1,9 @@
 <template>
 <u-transfer :class="$style.root" :source="source" :target="target">
-    <div v-for="item in list" :key="item.id" :title="var1">{{ var1 }}</div>
+    <div v-for="(item, index) in list" :key="item.id" :title="var1">{{ var1 }}</div>
+    <tr v-for="(item, index) in list" :key="index">
+        <u-input size="huge full" placeholder="请输入区域" v-model="item.region"></u-input>
+    </tr>
 </u-transfer>
 </template>
 <script>
@@ -47,6 +50,8 @@ export default {
         };
     },
     created() {
+        this.var1 = 2;
+        this.list.push('bbb');
         console.log('created1');
     },
 };

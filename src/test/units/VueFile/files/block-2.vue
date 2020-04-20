@@ -60,6 +60,9 @@ export default {
     },
     methods: {
         submit() {
+            if (!this.model.name) {
+                return false;
+            }
             this.$refs.form.validate()
                 .then(() => this.$toast.show('验证通过，提交成功！'))
                 .catch(() => this.$toast.show('验证失败！'));

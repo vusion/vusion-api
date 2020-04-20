@@ -63,7 +63,9 @@ describe('merge', () => {
         yield vueFile2.open();
         const $js2 = vueFile2.parseScript();
         const result = $js.merge($js1);
-        chai_1.expect($js.generate()).to.equal(yield fs.readFile(path.resolve(BASE_PATH, '../results/merge.js'), 'utf8'));
+        const resultContent = $js.generate();
+        yield fs.writeFile(path.resolve(BASE_PATH, '../results/merge-result.js'), resultContent, 'utf8');
+        chai_1.expect(resultContent).to.equal(yield fs.readFile(path.resolve(BASE_PATH, '../results/merge.js'), 'utf8'));
         chai_1.expect(Object.keys(result.data).length).to.equal(2);
         chai_1.expect(result.data['var1']).to.equal('var2');
         chai_1.expect(result.data['list']).to.equal('list1');

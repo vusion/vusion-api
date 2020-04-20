@@ -1,4 +1,1 @@
-export default {
-    components: {},
-    name: 'u-test',
-};
+export default { components: {}, name: 'u-test' };
