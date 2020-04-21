@@ -11,11 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
 const path = require("path");
-const fs_1 = require("../../../fs");
+const VueFile_1 = require("../../../fs/VueFile");
 const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/VueFile/files');
 describe('ExamplesHandler', () => {
     it('should', () => __awaiter(void 0, void 0, void 0, function* () {
-        const vueFile = new fs_1.VueFile(path.resolve(BASE_PATH, 'u-button.vue'));
+        const vueFile = new VueFile_1.default(path.resolve(BASE_PATH, 'u-button.vue'));
         yield vueFile.open();
         vueFile.parseExamples();
         const json = vueFile.examplesHandler.toJSON();

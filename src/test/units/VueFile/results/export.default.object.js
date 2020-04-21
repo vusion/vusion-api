@@ -1,4 +1,4 @@
 export default {
     name: 'u-test',
-    components: { UButton },
+    components: { UButton: UButton },
 };

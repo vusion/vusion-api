@@ -29,7 +29,7 @@ describe('saveAs', () => {
         const oldPath = path.resolve(TEMPLATES_PATH, 'u-multi-file-package.vue');
         const vueFile = new VueFile(oldPath);
         await vueFile.open();
-        const newPath = path.resolve(TMP_PATH, 'temp.vue');
+        const newPath = path.resolve(TMP_PATH, 'temp-2.vue');
         await fs.remove(newPath);
         await vueFile.saveAs(newPath);
 

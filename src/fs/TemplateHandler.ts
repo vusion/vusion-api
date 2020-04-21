@@ -88,13 +88,11 @@ class TemplateHandler {
         const attrs = Object.keys(el.attrsMap).map((key) => {
             const value = el.attrsMap[key];
             if (value === '') {
-                const attr = el.attrs.find((attr) => attr.name === '');
-                if (attr && attr.value !== '')
-                    return `${key}="${value}"`;
-                else
+                const attr = (el as any).rawAttrsMap[key];
+                if (attr && attr.end - attr.start === key.length)
                     return key;
-            } else
-                return `${key}="${value}"`;
+            }
+            return `${key}="${value}"`;
         });
 
         let attrsLength = 0;

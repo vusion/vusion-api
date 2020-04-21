@@ -34,7 +34,7 @@ describe('saveAs', () => {
         const oldPath = path.resolve(TEMPLATES_PATH, 'u-multi-file-package.vue');
         const vueFile = new VueFile_1.default(oldPath);
         yield vueFile.open();
-        const newPath = path.resolve(TMP_PATH, 'temp.vue');
+        const newPath = path.resolve(TMP_PATH, 'temp-2.vue');
         yield fs.remove(newPath);
         yield vueFile.saveAs(newPath);
         chai_1.expect(yield utils_1.isFilesSame(newPath, oldPath, 'index.html')).to.be.true;
