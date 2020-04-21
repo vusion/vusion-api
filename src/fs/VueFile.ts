@@ -657,12 +657,12 @@ export default class VueFile extends FSEntry {
      * - merge(that, '/2/') 指第2个子节点的最后
      */
     merge(that: VueFile, route: string | number | { line: number, character: number } = '') {
-        const scriptResult = this.scriptHandler.merge(that.scriptHandler);
-        const styleResult = this.styleHandler.merge(that.styleHandler);
-        this.templateHandler.merge(that.templateHandler, route, {
-            ...scriptResult,
-            ...styleResult,
-        });
+        const scriptReplacements = this.scriptHandler.merge(that.scriptHandler);
+        const styleReplacements = this.styleHandler.merge(that.styleHandler);
+        const replacements = { ...scriptReplacements, ...styleReplacements };
+
+        this.templateHandler.merge(that.templateHandler, route, replacements);
+        return replacements;
     }
 
     extend(mode: VueFileExtendMode, fullPath: string, fromPath: string) {

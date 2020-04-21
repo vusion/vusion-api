@@ -1,5 +1,5 @@
 import * as MarkdownIt from 'markdown-it';
-import { Token } from 'markdown-it';
+import * as Token from 'markdown-it/lib/token';
 
 export default class ExamplesHandler {
     markdown: MarkdownIt;

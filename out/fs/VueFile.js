@@ -584,9 +584,11 @@ class VueFile extends FSEntry_1.default {
      * - merge(that, '/2/') 指第2个子节点的最后
      */
     merge(that, route = '') {
-        const scriptResult = this.scriptHandler.merge(that.scriptHandler);
-        const styleResult = this.styleHandler.merge(that.styleHandler);
-        this.templateHandler.merge(that.templateHandler, route, Object.assign(Object.assign({}, scriptResult), styleResult));
+        const scriptReplacements = this.scriptHandler.merge(that.scriptHandler);
+        const styleReplacements = this.styleHandler.merge(that.styleHandler);
+        const replacements = Object.assign(Object.assign({}, scriptReplacements), styleReplacements);
+        this.templateHandler.merge(that.templateHandler, route, replacements);
+        return replacements;
     }
     extend(mode, fullPath, fromPath) {
         const vueFile = new VueFile(fullPath);
