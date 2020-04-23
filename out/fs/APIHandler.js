@@ -293,26 +293,26 @@ class APIHandler {
             let parentLink;
             if (showTitle === APIShowTitle.simplified) {
                 const title = api.length > 1 ? `${utils.kebab2Camel(name)} API` : 'API';
-                parentLink = { title, to: { hash: '#' + uslugify(title) }, children: [] };
+                parentLink = { title, to: { path: 'api', hash: '#' + uslugify(title) }, children: [] };
                 tocLinks.push(parentLink);
             }
             else if (showTitle === APIShowTitle.always) {
                 const title = `## ${utils.kebab2Camel(name)} API`;
-                parentLink = { title, to: { hash: '#' + uslugify(title) }, children: [] };
+                parentLink = { title, to: { path: 'api', hash: '#' + uslugify(title) }, children: [] };
                 tocLinks.push(parentLink);
             }
-            options && parentLink.children.push({ title: "Options" /* options */, to: { hash: '#' + "Options" /* options */ } });
-            attrs && parentLink.children.push({ title: "Props/Attrs" /* attrs */, to: { hash: '#' + "Props/Attrs" /* attrs */ } });
-            data && parentLink.children.push({ title: "Data" /* data */, to: { hash: '#' + "Data" /* data */ } });
-            computed && parentLink.children.push({ title: "Computed" /* computed */, to: { hash: '#' + "Computed" /* computed */ } });
-            slots && parentLink.children.push({ title: "Slots" /* slots */, to: { hash: '#' + "Slots" /* slots */ } });
-            events && parentLink.children.push({ title: "Events" /* events */, to: { hash: '#' + "Events" /* events */ } });
-            methods && parentLink.children.push({ title: "Methods" /* methods */, to: { hash: '#' + "Methods" /* methods */ } });
-            aria && parentLink.children.push({ title: "ARIA and Keyboard" /* aria */, to: { hash: '#' + "ARIA and Keyboard" /* aria */ } });
+            options && parentLink.children.push({ title: "Options" /* options */, to: { path: 'api', hash: '#' + uslugify("Options" /* options */) } });
+            attrs && parentLink.children.push({ title: "Props/Attrs" /* attrs */, to: { path: 'api', hash: '#' + uslugify("Props/Attrs" /* attrs */) } });
+            data && parentLink.children.push({ title: "Data" /* data */, to: { path: 'api', hash: '#' + uslugify("Data" /* data */) } });
+            computed && parentLink.children.push({ title: "Computed" /* computed */, to: { path: 'api', hash: '#' + uslugify("Computed" /* computed */) } });
+            slots && parentLink.children.push({ title: "Slots" /* slots */, to: { path: 'api', hash: '#' + uslugify("Slots" /* slots */) } });
+            events && parentLink.children.push({ title: "Events" /* events */, to: { path: 'api', hash: '#' + uslugify("Events" /* events */) } });
+            methods && parentLink.children.push({ title: "Methods" /* methods */, to: { path: 'api', hash: '#' + uslugify("Methods" /* methods */) } });
+            aria && parentLink.children.push({ title: "ARIA and Keyboard" /* aria */, to: { path: 'api', hash: '#' + uslugify("ARIA and Keyboard" /* aria */) } });
         });
         return tocLinks;
     }
-    getTOCFromContent(content, options = { maxLevel: 3, minLevel: 4 }) {
+    getTOCFromContent(content, to, options = { maxLevel: 3, minLevel: 4 }) {
         const tocLinks = [];
         const tokens = this.markdownIt.parse(content, {});
         tokens.forEach((token, index) => {
@@ -325,7 +325,7 @@ class APIHandler {
             if (level < options.maxLevel || level > options.minLevel)
                 return;
             const title = inline.content.trim();
-            const link = { title, to: { hash: '#' + uslugify(title) } };
+            const link = { title, to: { path: to, hash: '#' + uslugify(title) } };
             let parentLink = { title: '', children: tocLinks };
             while (parentLink && level > options.maxLevel) {
                 parentLink = parentLink.children[parentLink.children.length - 1];
@@ -336,22 +336,35 @@ class APIHandler {
         });
         return tocLinks;
     }
-    getTOCFromFile(fullPath) {
+    getTOCFromFile(fullPath, to) {
         return __awaiter(this, void 0, void 0, function* () {
             const content = yield fs.readFile(fullPath, 'utf8');
-            return this.getTOCFromContent(content);
+            return this.getTOCFromContent(content, to);
         });
     }
-    markdownTOC(tocLinks) {
+    markdownTOC(tocLinks, vue = false, level = 0) {
+        const indent = (l) => ' '.repeat(l * 4);
         const outputs = [];
-        outputs.push(`<s-toc>`);
-        tocLinks.forEach((link) => {
-            outputs.push(`<s-toc-item>
-                <u-link to="${link.to}">{{ ${link.title} }}</u-link>
-                ${link.children ? this.markdownTOC(link.children) : ''}
-            </s-toc-item>`);
-        });
-        outputs.push(`</s-toc>`);
+        if (vue) {
+            outputs.push(indent(level) + `<s-toc${level > 0 ? ' slot="sub"' : ''}>`);
+            tocLinks.forEach((link) => {
+                outputs.push(indent(level + 1) + '<s-toc-item>');
+                outputs.push(indent(level + 2) + `<u-link ${typeof link.to === 'object' ? ':to=\'' + JSON.stringify(link.to) + '\'' : 'to="' + link.to + '"'}>${link.title}</u-link>`);
+                link.children && outputs.push(this.markdownTOC(link.children, vue, level + 2));
+                outputs.push(indent(level + 1) + '</s-toc-item>');
+            });
+            outputs.push(indent(level) + '</s-toc>');
+        }
+        else {
+            outputs.push(indent(level) + `<ul>`);
+            tocLinks.forEach((link) => {
+                outputs.push(indent(level + 1) + '<li>');
+                outputs.push(indent(level + 2) + `<a href="${typeof link.to === 'object' ? link.to.hash : link.to}">${link.title}</a>`);
+                link.children && outputs.push(this.markdownTOC(link.children, vue, level + 2));
+                outputs.push(indent(level + 1) + '</li>');
+            });
+            outputs.push(indent(level) + '</ul>');
+        }
         return outputs.join('\n');
     }
     /**
@@ -374,14 +387,12 @@ class APIHandler {
              * 从二级标题开始
              */
             const tocRoot = [];
-            function addSubdoc(fileName, title, to, development = false) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const tocLinks = yield this.getTOCFromFile(path.resolve(docsDir, fileName));
-                    const link = { title, to, children: tocLinks };
-                    tocRoot.push(link);
-                    outputs.push(`<u-h2-tab ${link.development ? 'v-if="NODE_ENV === \'development\'"' : ''}title="${link.title}" to="${link.to}"></u-h2-tab>`);
-                });
-            }
+            const addSubdoc = (fileName, title, to, development = false) => __awaiter(this, void 0, void 0, function* () {
+                const tocLinks = yield this.getTOCFromFile(path.resolve(docsDir, fileName), to);
+                const link = { title, to, children: tocLinks };
+                tocRoot.push(link);
+                outputs.push(`    <u-h2-tab${development ? ' v-if="NODE_ENV === \'development\'"' : ''} title="${title}" to="${to}"></u-h2-tab>`);
+            });
             /**
              * API 中的主组件
              */
@@ -412,8 +423,8 @@ class APIHandler {
             if (docs.includes('setup.md'))
                 yield addSubdoc('setup.md', '安装配置', 'setup');
             if (mainComponent.docs) {
-                const docsKeys = Object.keys(mainComponent.docs);
-                for (let i = 0; i < docsKeys.length; i++) {
+                const names = Object.keys(mainComponent.docs);
+                for (const name of names) {
                     if (docs.includes(name + '.md'))
                         yield addSubdoc(name + '.md', mainComponent.docs[name], name);
                 }
@@ -425,9 +436,9 @@ class APIHandler {
             if (docs.includes('faq.md'))
                 yield addSubdoc('faq.md', '常见问题', 'faq');
             {
-                const link = { title: 'API', to: 'api', children: this.getTOCFromAPI() };
-                tocRoot.push(link);
-                outputs.push(`<u-h2-tab ${link.development ? 'v-if="NODE_ENV === \'development\'"' : ''}title="${link.title}" to="${link.to}"></u-h2-tab>`);
+                const link = { title: 'API', to: 'api' };
+                tocRoot.push(...this.getTOCFromAPI());
+                outputs.push(`    <u-h2-tab title="${link.title}" to="${link.to}"></u-h2-tab>`);
             }
             const changelogPath = path.resolve(this.fullPath, '../CHANGELOG.md');
             if (fs.existsSync(changelogPath))
@@ -435,7 +446,7 @@ class APIHandler {
             outputs.push(`</u-h2-tabs>`);
             outputs.push('<router-view></router-view>');
             // 插入目录
-            outputs.splice(4, 0, '', this.markdownTOC(tocRoot), '');
+            outputs.splice(4, 0, this.markdownTOC(tocRoot, true), '');
             return outputs.join('\n');
         });
     }
@@ -447,7 +458,27 @@ class APIHandler {
             if (fs.existsSync(docsDir))
                 docs = yield fs.readdir(docsDir);
             const api = this.json;
+            /**
+             * 最终 Markdown 输出
+             */
             const outputs = [];
+            /**
+             * 生成文档目录
+             * 从二级标题开始
+             */
+            const tocRoot = [];
+            const addSubdoc = (fileName, title) => __awaiter(this, void 0, void 0, function* () {
+                const filePath = path.resolve(docsDir, fileName);
+                const content = yield fs.readFile(filePath, 'utf8');
+                outputs.push('## ' + title);
+                outputs.push(content);
+                const tocLinks = this.getTOCFromContent(content);
+                const link = { title, to: uslugify(title), children: tocLinks };
+                tocRoot.push(link);
+            });
+            /**
+             * API 中的主组件
+             */
             const mainComponent = api[0];
             // Title
             outputs.push(`<!-- 该 README.md 根据 api.yaml 和 docs/*.md 自动生成，为了方便在 GitHub 和 NPM 上查阅。如需修改，请查看源文件 -->`);
@@ -463,30 +494,29 @@ class APIHandler {
                 outputs.push('');
             }
             if (docs.includes('index.md')) {
-                outputs.push(yield fs.readFile(path.join(docsDir, 'index.md'), 'utf8'));
+                const indexPath = path.join(docsDir, 'index.md');
+                const indexContent = yield fs.readFile(indexPath, 'utf8');
+                outputs.push(indexContent);
+                const tocLinks = yield this.getTOCFromContent(indexContent);
+                tocLinks.length && tocRoot.push({ title: '概述', children: tocLinks });
             }
-            if (docs.includes('setup.md')) {
-                outputs.push('## 安装配置');
-                outputs.push(yield fs.readFile(path.join(docsDir, 'setup.md'), 'utf8'));
-            }
-            if (docs.includes('examples.md')) {
-                outputs.push(!mainComponent.docs ? `## 示例` : `## 基础示例`);
-                outputs.push(yield fs.readFile(path.join(docsDir, 'examples.md'), 'utf8'));
-            }
+            if (docs.includes('setup.md'))
+                yield addSubdoc('setup.md', '安装配置');
+            if (docs.includes('examples.md'))
+                yield addSubdoc('examples.md', !mainComponent.docs ? '## 示例' : '## 基础示例');
             if (mainComponent.docs) {
                 const names = Object.keys(mainComponent.docs);
                 for (const name of names) {
-                    if (docs.includes(name + '.md')) {
-                        outputs.push('## ' + mainComponent.docs[name]);
-                        outputs.push(yield fs.readFile(path.join(docsDir, name + '.md'), 'utf8'));
-                    }
+                    if (docs.includes(name + '.md'))
+                        yield addSubdoc(name + '.md', mainComponent.docs[name]);
                 }
             }
-            if (docs.includes('faq.md')) {
-                outputs.push(`## 常见问题`);
-                outputs.push(yield fs.readFile(path.join(docsDir, 'faq.md'), 'utf8'));
-            }
+            if (docs.includes('faq.md'))
+                yield addSubdoc('faq.md', '常见问题');
             outputs.push(this.markdownAPI(APIShowTitle.simplified));
+            tocRoot.push(...this.getTOCFromAPI());
+            // 插入目录
+            outputs.splice(4, 0, this.markdownTOC(tocRoot), '');
             return outputs.join('\n');
         });
     }

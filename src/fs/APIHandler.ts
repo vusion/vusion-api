@@ -113,8 +113,8 @@ export const enum ComponentAPISubtitle {
 
 export interface TOCLink {
     title: string;
-    to?: string | { hash: string };
     href?: string;
+    to?: string | { path?: string, hash?: string };
     development?: boolean;
     children?: Array<TOCLink>;
 }
@@ -443,29 +443,29 @@ export default class APIHandler {
             let parentLink: TOCLink;
             if (showTitle === APIShowTitle.simplified) {
                 const title = api.length > 1 ? `${utils.kebab2Camel(name)} API` : 'API';
-                parentLink = { title, to: { hash: '#' + uslugify(title) }, children: [] };
+                parentLink = { title, to: { path: 'api', hash: '#' + uslugify(title) }, children: [] };
                 tocLinks.push(parentLink);
             }
             else if (showTitle === APIShowTitle.always) {
                 const title = `## ${utils.kebab2Camel(name)} API`;
-                parentLink = { title, to: { hash: '#' + uslugify(title) }, children: [] };
+                parentLink = { title, to: { path: 'api', hash: '#' + uslugify(title) }, children: [] };
                 tocLinks.push(parentLink);
             }
 
-            options && parentLink.children.push({ title: ComponentAPISubtitle.options, to: { hash: '#' + ComponentAPISubtitle.options } });
-            attrs && parentLink.children.push({ title: ComponentAPISubtitle.attrs, to: { hash: '#' + ComponentAPISubtitle.attrs } });
-            data && parentLink.children.push({ title: ComponentAPISubtitle.data, to: { hash: '#' + ComponentAPISubtitle.data } });
-            computed && parentLink.children.push({ title: ComponentAPISubtitle.computed, to: { hash: '#' + ComponentAPISubtitle.computed } });
-            slots && parentLink.children.push({ title: ComponentAPISubtitle.slots, to: { hash: '#' + ComponentAPISubtitle.slots } });
-            events && parentLink.children.push({ title: ComponentAPISubtitle.events, to: { hash: '#' + ComponentAPISubtitle.events } });
-            methods && parentLink.children.push({ title: ComponentAPISubtitle.methods, to: { hash: '#' + ComponentAPISubtitle.methods } });
-            aria && parentLink.children.push({ title: ComponentAPISubtitle.aria, to: { hash: '#' + ComponentAPISubtitle.aria } });
+            options && parentLink.children.push({ title: ComponentAPISubtitle.options, to: { path: 'api', hash: '#' + uslugify(ComponentAPISubtitle.options) } });
+            attrs && parentLink.children.push({ title: ComponentAPISubtitle.attrs, to: { path: 'api', hash: '#' + uslugify(ComponentAPISubtitle.attrs) } });
+            data && parentLink.children.push({ title: ComponentAPISubtitle.data, to: { path: 'api', hash: '#' + uslugify(ComponentAPISubtitle.data) } });
+            computed && parentLink.children.push({ title: ComponentAPISubtitle.computed, to: { path: 'api', hash: '#' + uslugify(ComponentAPISubtitle.computed) } });
+            slots && parentLink.children.push({ title: ComponentAPISubtitle.slots, to: { path: 'api', hash: '#' + uslugify(ComponentAPISubtitle.slots) } });
+            events && parentLink.children.push({ title: ComponentAPISubtitle.events, to: { path: 'api', hash: '#' + uslugify(ComponentAPISubtitle.events) } });
+            methods && parentLink.children.push({ title: ComponentAPISubtitle.methods, to: { path: 'api', hash: '#' + uslugify(ComponentAPISubtitle.methods) } });
+            aria && parentLink.children.push({ title: ComponentAPISubtitle.aria, to: { path: 'api', hash: '#' + uslugify(ComponentAPISubtitle.aria) } });
         });
 
         return tocLinks;
     }
 
-    getTOCFromContent(content: string, options = { maxLevel: 3, minLevel: 4 }) {
+    getTOCFromContent(content: string, to?: string, options = { maxLevel: 3, minLevel: 4 }) {
         const tocLinks: Array<TOCLink> = [];
 
         const tokens = this.markdownIt.parse(content, {});
@@ -480,7 +480,7 @@ export default class APIHandler {
                 return;
 
             const title = inline.content.trim();
-            const link = { title, to: { hash: '#' + uslugify(title) } };
+            const link = { title, to: { path: to, hash: '#' + uslugify(title) } };
 
             let parentLink: TOCLink = { title: '', children: tocLinks };
             while (parentLink && level > options.maxLevel) {
@@ -494,21 +494,34 @@ export default class APIHandler {
         return tocLinks;
     }
 
-    async getTOCFromFile(fullPath: string) {
+    async getTOCFromFile(fullPath: string, to?: string) {
         const content = await fs.readFile(fullPath, 'utf8');
-        return this.getTOCFromContent(content);
+        return this.getTOCFromContent(content, to);
     }
 
-    markdownTOC(tocLinks: Array<TOCLink>) {
+    markdownTOC(tocLinks: Array<TOCLink>, vue: boolean = false, level: number = 0) {
+        const indent = (l: number) => ' '.repeat(l * 4);
         const outputs = [];
-        outputs.push(`<s-toc>`);
-        tocLinks.forEach((link) => {
-            outputs.push(`<s-toc-item>
-                <u-link to="${link.to}">{{ ${link.title} }}</u-link>
-                ${link.children ? this.markdownTOC(link.children) : ''}
-            </s-toc-item>`);
-        });
-        outputs.push(`</s-toc>`);
+
+        if (vue) {
+            outputs.push(indent(level) + `<s-toc${level > 0 ? ' slot="sub"' : ''}>`);
+            tocLinks.forEach((link) => {
+                outputs.push(indent(level + 1) + '<s-toc-item>');
+                outputs.push(indent(level + 2) + `<u-link ${typeof link.to === 'object' ? ':to=\'' + JSON.stringify(link.to) + '\'' : 'to="' + link.to + '"'}>${link.title}</u-link>`);
+                link.children && outputs.push(this.markdownTOC(link.children, vue, level + 2));
+                outputs.push(indent(level + 1) + '</s-toc-item>');
+            });
+            outputs.push(indent(level) + '</s-toc>');
+        } else {
+            outputs.push(indent(level) + `<ul>`);
+            tocLinks.forEach((link) => {
+                outputs.push(indent(level + 1) + '<li>');
+                outputs.push(indent(level + 2) + `<a href="${typeof link.to === 'object' ? link.to.hash : link.to}">${link.title}</a>`);
+                link.children && outputs.push(this.markdownTOC(link.children, vue, level + 2));
+                outputs.push(indent(level + 1) + '</li>');
+            });
+            outputs.push(indent(level) + '</ul>');
+        }
 
         return outputs.join('\n');
     }
@@ -535,11 +548,11 @@ export default class APIHandler {
          * 从二级标题开始
          */
         const tocRoot: Array<TOCLink> = [];
-        async function addSubdoc(fileName: string, title: string, to: string, development = false) {
-            const tocLinks = await this.getTOCFromFile(path.resolve(docsDir, fileName));
+        const addSubdoc = async (fileName: string, title: string, to: string, development = false) => {
+            const tocLinks = await this.getTOCFromFile(path.resolve(docsDir, fileName), to);
             const link: TOCLink = { title, to, children: tocLinks };
             tocRoot.push(link);
-            outputs.push(`<u-h2-tab ${ link.development ? 'v-if="NODE_ENV === \'development\'"' : ''}title="${link.title}" to="${link.to}"></u-h2-tab>`);
+            outputs.push(`    <u-h2-tab${ development ? ' v-if="NODE_ENV === \'development\'"' : ''} title="${title}" to="${to}"></u-h2-tab>`);
         }
         /**
          * API 中的主组件
@@ -578,8 +591,8 @@ export default class APIHandler {
             await addSubdoc('setup.md', '安装配置', 'setup');
 
         if (mainComponent.docs) {
-            const docsKeys = Object.keys(mainComponent.docs);
-            for (let i = 0; i < docsKeys.length; i++) {
+            const names = Object.keys(mainComponent.docs);
+            for (const name of names) {
                 if (docs.includes(name + '.md'))
                     await addSubdoc(name + '.md', mainComponent.docs[name], name);
             }
@@ -595,9 +608,9 @@ export default class APIHandler {
             await addSubdoc('faq.md', '常见问题', 'faq');
 
         {
-            const link: TOCLink = { title: 'API', to: 'api', children: this.getTOCFromAPI() };
-            tocRoot.push(link);
-            outputs.push(`<u-h2-tab ${ link.development ? 'v-if="NODE_ENV === \'development\'"' : ''}title="${link.title}" to="${link.to}"></u-h2-tab>`);
+            const link: TOCLink = { title: 'API', to: 'api' };
+            tocRoot.push(...this.getTOCFromAPI());
+            outputs.push(`    <u-h2-tab title="${link.title}" to="${link.to}"></u-h2-tab>`);
         }
 
         const changelogPath = path.resolve(this.fullPath, '../CHANGELOG.md');
@@ -609,7 +622,7 @@ export default class APIHandler {
         outputs.push('<router-view></router-view>');
 
         // 插入目录
-        outputs.splice(4, 0, '', this.markdownTOC(tocRoot), '');
+        outputs.splice(4, 0, this.markdownTOC(tocRoot, true), '');
 
         return outputs.join('\n');
     };
@@ -622,7 +635,27 @@ export default class APIHandler {
 
         const api = this.json;
 
+        /**
+         * 最终 Markdown 输出
+         */
         const outputs: Array<string> = [];
+        /**
+         * 生成文档目录
+         * 从二级标题开始
+         */
+        const tocRoot: Array<TOCLink> = [];
+        const addSubdoc = async (fileName: string, title: string) => {
+            const filePath = path.resolve(docsDir, fileName);
+            const content = await fs.readFile(filePath, 'utf8');
+            outputs.push('## ' + title);
+            outputs.push(content);
+            const tocLinks = this.getTOCFromContent(content);
+            const link: TOCLink = { title, to: uslugify(title), children: tocLinks };
+            tocRoot.push(link);
+        }
+        /**
+         * API 中的主组件
+         */
         const mainComponent = api[0];
 
         // Title
@@ -642,35 +675,35 @@ export default class APIHandler {
         }
 
         if (docs.includes('index.md')) {
-            outputs.push(await fs.readFile(path.join(docsDir, 'index.md'), 'utf8'));
+            const indexPath = path.join(docsDir, 'index.md');
+            const indexContent = await fs.readFile(indexPath, 'utf8');
+            outputs.push(indexContent);
+            const tocLinks = await this.getTOCFromContent(indexContent);
+            tocLinks.length && tocRoot.push({ title: '概述', children: tocLinks });
         }
 
-        if (docs.includes('setup.md')) {
-            outputs.push('## 安装配置');
-            outputs.push(await fs.readFile(path.join(docsDir, 'setup.md'), 'utf8'));
-        }
+        if (docs.includes('setup.md'))
+            await addSubdoc('setup.md', '安装配置');
 
-        if (docs.includes('examples.md')) {
-            outputs.push(!mainComponent.docs ? `## 示例` : `## 基础示例`);
-            outputs.push(await fs.readFile(path.join(docsDir, 'examples.md'), 'utf8'));
-        }
+        if (docs.includes('examples.md'))
+            await addSubdoc('examples.md', !mainComponent.docs ? '## 示例' : '## 基础示例');
 
         if (mainComponent.docs) {
             const names = Object.keys(mainComponent.docs);
             for (const name of names) {
-                if (docs.includes(name + '.md')) {
-                    outputs.push('## ' + mainComponent.docs[name]);
-                    outputs.push(await fs.readFile(path.join(docsDir, name + '.md'), 'utf8'));
-                }
+                if (docs.includes(name + '.md'))
+                    await addSubdoc(name + '.md', mainComponent.docs[name]);
             }
         }
 
-        if (docs.includes('faq.md')) {
-            outputs.push(`## 常见问题`);
-            outputs.push(await fs.readFile(path.join(docsDir, 'faq.md'), 'utf8'));
-        }
+        if (docs.includes('faq.md'))
+            await addSubdoc('faq.md', '常见问题');
 
         outputs.push(this.markdownAPI(APIShowTitle.simplified));
+        tocRoot.push(...this.getTOCFromAPI());
+
+        // 插入目录
+        outputs.splice(4, 0, this.markdownTOC(tocRoot), '');
 
         return outputs.join('\n');
     };

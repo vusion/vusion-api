@@ -10,14 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
+const fs = require("fs-extra");
 const path = require("path");
+const VueFile_1 = require("../../../fs/VueFile");
 const APIHandler_1 = require("../../../fs/APIHandler");
 const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/VueFile/files');
 describe('APIHandler', () => {
-    it('should', () => __awaiter(void 0, void 0, void 0, function* () {
-        // const vueFile = new VueFile();
-        // await vueFile.open();
-        // vueFile.parseExamples();
+    it('getTOCFromFile', () => __awaiter(void 0, void 0, void 0, function* () {
         const apiHandler = new APIHandler_1.default('', '');
         const toc = yield apiHandler.getTOCFromFile(path.resolve(BASE_PATH, 'u-button.vue/README.md'));
         chai_1.expect(toc.length).to.equal(11);
@@ -27,6 +26,13 @@ describe('APIHandler', () => {
         const events = toc[toc.length - 1];
         chai_1.expect(events.title).to.equal('Events');
         chai_1.expect(events.children).length(3);
+    }));
+    it('markdown()', () => __awaiter(void 0, void 0, void 0, function* () {
+        const vueFile = new VueFile_1.default(path.resolve(BASE_PATH, 'u-button.vue'));
+        yield vueFile.open();
+        vueFile.parseAPI();
+        const result = yield vueFile.apiHandler.markdown();
+        yield fs.writeFile(path.resolve(BASE_PATH, '../results/README.md'), result);
     }));
 });
 //# sourceMappingURL=APIHandler.spec.js.map
