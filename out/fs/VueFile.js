@@ -55,20 +55,28 @@ exports.SUBFILE_LIST = [
     'vetur',
 ];
 /**
- * 单多 Vue 文件处理类
+ * 用于处理单/多 Vue 文件的类
  *
- * 打开一般分为四个阶段
+ * ### 主要功能
+ *
+ * #### 打开：一般分为四个阶段
  * - const vueFile = new VueFile(fullPath); // 根据路径创建对象，可以为虚拟路径。
- * - await vueFile.preOpen(); // 异步方法。获取 isDirectory，获取子组件，获取标题
- * - await vueFile.open(); // 异步方法。获取常用操作的内容块：script, template, style, api, examples, package。
+ * - await vueFile.preOpen(); // 异步方法。获取 isDirectory，获取子组件、标题信息。
+ * - await vueFile.open(); // 异步方法。如果已经打开则不会重新打开，如果没有 preOpen 会先执行 preOpen。获取常用操作的内容块：script, template, style, api, examples, package。
  * - vueFile.parseAll(); // 解析全部内容块
  *
- * 保存。
- * await vueFile.save();
- * - 如果有解析，先根据解析器生成内容，再保存
+ * #### 保存：
+ * - await vueFile.save();
+ * - 如果有解析，先根据解析器 generate() 内容，再保存
  * - 根据 isDirectory 判断是否保存单多文件
+ *
+ * #### 另存为：
+ * - await vueFile.saveAs(fullPath);
  */
 class VueFile extends FSEntry_1.default {
+    /**
+     * @param fullPath 完整路径，必须以`.vue`结尾。也可以是一个相对的虚拟路径
+     */
     constructor(fullPath) {
         if (!fullPath.endsWith('.vue'))
             throw new Error('Not a vue file: ' + fullPath);
@@ -78,8 +86,9 @@ class VueFile extends FSEntry_1.default {
         this.componentName = utils_1.kebab2Camel(this.tagName);
     }
     /**
-     * 提前检测 VueFile 文件类型，以及子组件等
-     * 需要异步，否则可能会比较慢
+     * 提前打开
+     * 检测 VueFile 文件类型，以及子组件等
+     * 一般用于在列表中快速获取信息，相比直接 open 读取文件内容来说，少耗一些性能
      */
     preOpen() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -127,6 +136,9 @@ class VueFile extends FSEntry_1.default {
             });
         });
     }
+    /**
+     * 加载多文件目录
+     */
     loadDirectory() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
@@ -149,6 +161,9 @@ class VueFile extends FSEntry_1.default {
             return this.children = children;
         });
     }
+    /**
+     * 强制重新打开
+     */
     forceOpen() {
         return __awaiter(this, void 0, void 0, function* () {
             this.close();
@@ -157,6 +172,9 @@ class VueFile extends FSEntry_1.default {
             this.isOpen = true;
         });
     }
+    /**
+     * 关闭文件
+     */
     close() {
         this.isDirectory = undefined;
         this.alias = undefined;
@@ -180,6 +198,9 @@ class VueFile extends FSEntry_1.default {
         this.examplesHandler = undefined;
         this.isOpen = false;
     }
+    /**
+     * 加载所有内容
+     */
     load() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.loadScript();
@@ -190,6 +211,10 @@ class VueFile extends FSEntry_1.default {
             yield this.loadExamples();
         });
     }
+    /**
+    * 预加载
+    * 只加载 content
+    */
     preload() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!fs.existsSync(this.fullPath))
@@ -611,6 +636,20 @@ export default ${vueFile.componentName};
         if (mode === VueFileExtendMode.template || mode === VueFileExtendMode.all)
             vueFile.template = this.template;
         return vueFile;
+    }
+    /**
+     * 根据 extends 查找基类组件
+     */
+    findSuper() {
+        const $js = this.parseScript();
+        const exportDefault = $js.export().default();
+        let vueObject = exportDefault;
+        if (exportDefault.is('id'))
+            vueObject = $js.variables().get(exportDefault.node.name);
+        if (!vueObject.is('object'))
+            throw new TypeError('Cannot find Vue object!');
+        const extendsName = vueObject.get('extends').name();
+        // $js.imports()
     }
     static _splitPath(fullPath) {
         const arr = fullPath.split(path.sep);

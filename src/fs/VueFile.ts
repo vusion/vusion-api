@@ -49,32 +49,59 @@ export const SUBFILE_LIST = [
 ];
 
 /**
- * 单多 Vue 文件处理类
+ * 用于处理单/多 Vue 文件的类
  *
- * 打开一般分为四个阶段
+ * ### 主要功能
+ *
+ * #### 打开：一般分为四个阶段
  * - const vueFile = new VueFile(fullPath); // 根据路径创建对象，可以为虚拟路径。
- * - await vueFile.preOpen(); // 异步方法。获取 isDirectory，获取子组件，获取标题
- * - await vueFile.open(); // 异步方法。获取常用操作的内容块：script, template, style, api, examples, package。
+ * - await vueFile.preOpen(); // 异步方法。获取 isDirectory，获取子组件、标题信息。
+ * - await vueFile.open(); // 异步方法。如果已经打开则不会重新打开，如果没有 preOpen 会先执行 preOpen。获取常用操作的内容块：script, template, style, api, examples, package。
  * - vueFile.parseAll(); // 解析全部内容块
  *
- * 保存。
- * await vueFile.save();
- * - 如果有解析，先根据解析器生成内容，再保存
+ * #### 保存：
+ * - await vueFile.save();
+ * - 如果有解析，先根据解析器 generate() 内容，再保存
  * - 根据 isDirectory 判断是否保存单多文件
+ *
+ * #### 另存为：
+ * - await vueFile.saveAs(fullPath);
  */
 export default class VueFile extends FSEntry {
-    tagName: string; // 中划线名称
-    componentName: string; // 驼峰名称
+    /**
+     * 标签名称/中划线名称
+     */
+    tagName: string;
+    /**
+     * import 组件名称/大驼峰名称
+     */
+    componentName: string;
+    /**
+     * 别名，用于信息提示等
+     */
     alias: string;
-    // 子组件
-    // 为`undefined`表示未打开过，为数组表示已经打开。
+    /**
+     * 父 VueFile
+     */
     parent: VueFile;
+    /**
+     * 多文件组件的子文件
+     */
     subfiles: string[];
+    /**
+     * 该组件的子组件
+     * 为`undefined`时表示未 preOpen 过，为数组表示已经打开。
+     */
     children: VueFile[];
+    /**
+     * 是否为子组件
+     */
     isChild: boolean;
 
-    // 单文件内容
-    // 为`undefined`表示未打开过
+    /**
+     * 单文件读取的内容，或者 generate() 后的内容
+     * 为`undefined`表示未打开过
+     */
     content: string;
     template: string;
     script: string;
@@ -83,24 +110,45 @@ export default class VueFile extends FSEntry {
     examples: string;
     package: PackageJSON;
 
-    templateHandler: TemplateHandler; // 为`undefined`表示还未解析
+    /**
+     * 模板处理器
+     * 为`undefined`表示还未解析
+     */
+    templateHandler: TemplateHandler;
     /**
      * Alias of templateHandler
      */
     $html: TemplateHandler;
-    scriptHandler: ScriptHandler; // 为`undefined`表示还未解析
+    /**
+     * 脚本处理器
+     * 为`undefined`表示还未解析
+     */
+    scriptHandler: ScriptHandler;
     /**
      * Alias of scriptHandler
      */
     $js: ScriptHandler;
-    styleHandler: StyleHandler; // 为`undefined`表示还未解析
+    /**
+     * 样式处理器
+     * 为`undefined`表示还未解析
+     */
+    styleHandler: StyleHandler;
     /**
      * Alias of styleHandler
      */
     $css: StyleHandler;
+    /**
+     * API 处理器
+     */
     apiHandler: APIHandler;
+    /**
+     * 文档示例处理器
+     */
     examplesHandler: ExamplesHandler;
 
+    /**
+     * @param fullPath 完整路径，必须以`.vue`结尾。也可以是一个相对的虚拟路径
+     */
     constructor(fullPath: string) {
         if (!fullPath.endsWith('.vue'))
             throw new Error('Not a vue file: ' + fullPath);
@@ -111,8 +159,9 @@ export default class VueFile extends FSEntry {
     }
 
     /**
-     * 提前检测 VueFile 文件类型，以及子组件等
-     * 需要异步，否则可能会比较慢
+     * 提前打开
+     * 检测 VueFile 文件类型，以及子组件等
+     * 一般用于在列表中快速获取信息，相比直接 open 读取文件内容来说，少耗一些性能
      */
     async preOpen(): Promise<void> {
         if (!fs.existsSync(this.fullPath))
@@ -159,6 +208,9 @@ export default class VueFile extends FSEntry {
         });
     }
 
+    /**
+     * 加载多文件目录
+     */
     async loadDirectory() {
         if (!fs.existsSync(this.fullPath))
             throw new Error(`Cannot find: ${this.fullPath}`);
@@ -184,6 +236,9 @@ export default class VueFile extends FSEntry {
         return this.children = children;
     }
 
+    /**
+     * 强制重新打开
+     */
     async forceOpen(): Promise<void> {
         this.close();
         await this.preOpen();
@@ -191,6 +246,9 @@ export default class VueFile extends FSEntry {
         this.isOpen = true;
     }
 
+    /**
+     * 关闭文件
+     */
     close(): void {
         this.isDirectory = undefined;
         this.alias = undefined;
@@ -218,6 +276,9 @@ export default class VueFile extends FSEntry {
         this.isOpen = false;
     }
 
+    /**
+     * 加载所有内容
+     */
     protected async load(): Promise<void> {
         await this.loadScript();
         await this.loadTemplate();
@@ -227,6 +288,10 @@ export default class VueFile extends FSEntry {
         await this.loadExamples();
     }
 
+     /**
+     * 预加载
+     * 只加载 content
+     */
     async preload() {
         if (!fs.existsSync(this.fullPath))
             throw new Error(`Cannot find: ${this.fullPath}!`);
@@ -691,6 +756,23 @@ export default ${vueFile.componentName};
             vueFile.template = this.template;
 
         return vueFile;
+    }
+
+    /**
+     * 根据 extends 查找基类组件
+     */
+    findSuper() {
+        const $js = this.parseScript();
+        const exportDefault = $js.export().default();
+        let vueObject = exportDefault;
+        if (exportDefault.is('id'))
+            vueObject = $js.variables().get((exportDefault.node as babel.types.Identifier).name);
+        if (!vueObject.is('object'))
+            throw new TypeError('Cannot find Vue object!');
+
+        const extendsName = vueObject.get('extends').name();
+
+        // $js.imports()
     }
 
     private static _splitPath(fullPath: string) {

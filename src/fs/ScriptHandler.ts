@@ -20,6 +20,7 @@ export const SIMPLIFIED_NODE_TYPE: { [type: string]: string } = {
     object: 'ObjectExpression',
     number: 'NumericLiteral',
     string: 'StringLiteral',
+    id: 'Identifier',
 }
 
 export const LIFECYCLE_HOOKS = [
@@ -92,6 +93,19 @@ class DeclarationHandler {
         return this.node.type === type;
     }
 
+    id(name: string) {
+        // 先试试硬 assign 有没有问题
+        if (this.node.type !== 'Identifier')
+            Object.assign(this.node, babel.types.identifier(name));
+        return this;
+    }
+
+    name() {
+        if (this.node.type !== 'Identifier')
+            throw new TypeError('This is not an Identifier!');
+        return this.node.name;
+    }
+
     object() {
         // 先试试硬 assign 有没有问题
         if (this.node.type !== 'ObjectExpression')
@@ -141,7 +155,7 @@ class DeclarationHandler {
     }
 
     /**
-     * 给属性赋值
+     * 给对象的属性赋值
      * @param key 键的名称
      * @param value 值的名称
      */
@@ -150,7 +164,7 @@ class DeclarationHandler {
     }
 
     /**
-     * 获取属性
+     * 获取对象的属性值
      * @param key 键的名称
      */
     get(key: string) {
@@ -214,24 +228,24 @@ class ImportsHandler {
         return this.body[this.lastIndex()];
     }
 
-    findIndex(source: string) {
+    findIndexFrom(source: string) {
         return this.body.findIndex((node) => {
             return (node.type === 'ImportDeclaration') && node.source && node.source.value === source;
         });
     }
 
-    find(source: string) {
-        const index = this.findIndex(source);
+    findFrom(source: string) {
+        const index = this.findIndexFrom(source);
         return ~index ? this.body[index] : undefined;
     }
 
-    has(source: string) {
-        const index = this.findIndex(source);
+    hasFrom(source: string) {
+        const index = this.findIndexFrom(source);
         return !!~index;
     }
 
-    delete(source: string) {
-        const index = this.findIndex(source);
+    deleteFrom(source: string) {
+        const index = this.findIndexFrom(source);
         ~index && this.body.splice(index, 1);
     }
 }
@@ -249,7 +263,12 @@ class StatementHandler {
     }
 
     has(identifier: string) {
-        return !!this.declarators.find((declarator) => (declarator.id as babel.types.Identifier).name === identifier);
+        return !!this.get(identifier);
+    }
+
+    get(identifier: string) {
+        const declarator = this.declarators.find((declarator) => (declarator.id as babel.types.Identifier).name === identifier);
+        return declarator && new DeclarationHandler(declarator.init);
     }
 
     return() {
@@ -675,7 +694,7 @@ class ScriptHandler {
         let replacements: { [key: string]: { [old: string]: string } } = { variables: {} };
         thatBody.forEach((node) => {
             if (node.type === 'ImportDeclaration') { // @TODO 暂时不去重 import identifier，block 的这种情况比较少。因为 import 周边文件就变成 external() 了
-                const index = imports.findIndex(node.source.value);
+                const index = imports.findIndexFrom(node.source.value);
                 if (~index && generate(thisBody[index], { minified: true }).code === generate(node, { minified: true }).code)
                     thisBody.splice(index, 1, node);
                 else
