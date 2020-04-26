@@ -312,7 +312,7 @@ class APIHandler {
         });
         return tocLinks;
     }
-    getTOCFromContent(content, to, options = { maxLevel: 3, minLevel: 4 }) {
+    getTOCFromContent(content, to, options = { maxLevel: 3, minLevel: 3 }) {
         const tocLinks = [];
         const tokens = this.markdownIt.parse(content, {});
         tokens.forEach((token, index) => {
@@ -336,34 +336,47 @@ class APIHandler {
         });
         return tocLinks;
     }
-    getTOCFromFile(fullPath, to) {
+    getTOCFromFile(fullPath, to, options = { maxLevel: 3, minLevel: 3 }) {
         return __awaiter(this, void 0, void 0, function* () {
             const content = yield fs.readFile(fullPath, 'utf8');
-            return this.getTOCFromContent(content, to);
+            return this.getTOCFromContent(content, to, options);
         });
     }
-    markdownTOC(tocLinks, vue = false, level = 0) {
+    /**
+     * 由目录链接树转换成 Markdown
+     * 添加 link 时的去重操作不太方便，所以在这里操作
+     */
+    markdownTOC(tocLinks, vue = false, level = 0, toHashMap = new Map()) {
         const indent = (l) => ' '.repeat(l * 4);
         const outputs = [];
         if (vue) {
-            outputs.push(indent(level) + `<s-toc${level > 0 ? ' slot="sub"' : ''}>`);
+            level === 0 && outputs.push(`<u-toc>`);
             tocLinks.forEach((link) => {
-                outputs.push(indent(level + 1) + '<s-toc-item>');
-                outputs.push(indent(level + 2) + `<u-link ${typeof link.to === 'object' ? ':to=\'' + JSON.stringify(link.to) + '\'' : 'to="' + link.to + '"'}>${link.title}</u-link>`);
-                link.children && outputs.push(this.markdownTOC(link.children, vue, level + 2));
-                outputs.push(indent(level + 1) + '</s-toc-item>');
+                if (typeof link.to === 'object') {
+                    link.to.hash = utils.uniqueInMap(link.to.hash, toHashMap);
+                    toHashMap.set(link.to.hash, true);
+                }
+                const start = indent(level + 1) + `<u-toc-item label="${link.title}" ${typeof link.to === 'object' ? ':to=\'' + JSON.stringify(link.to) + '\'' : 'to="' + link.to + '"'}>`;
+                if (link.children && link.children.length) {
+                    outputs.push(start);
+                    outputs.push(this.markdownTOC(link.children, vue, level + 1, toHashMap));
+                    outputs.push(indent(level + 1) + '</u-toc-item>');
+                }
+                else {
+                    outputs.push(start + '</u-toc-item>');
+                }
             });
-            outputs.push(indent(level) + '</s-toc>');
+            level === 0 && outputs.push(indent(level) + '</u-toc>');
         }
         else {
-            outputs.push(indent(level) + `<ul>`);
             tocLinks.forEach((link) => {
-                outputs.push(indent(level + 1) + '<li>');
-                outputs.push(indent(level + 2) + `<a href="${typeof link.to === 'object' ? link.to.hash : link.to}">${link.title}</a>`);
-                link.children && outputs.push(this.markdownTOC(link.children, vue, level + 2));
-                outputs.push(indent(level + 1) + '</li>');
+                if (typeof link.to === 'object') {
+                    link.to.hash = utils.uniqueInMap(link.to.hash, toHashMap);
+                    toHashMap.set(link.to.hash, true);
+                }
+                outputs.push(indent(level) + `- [${link.title}](${typeof link.to === 'object' ? link.to.hash : '#' + link.to})`);
+                link.children && outputs.push(this.markdownTOC(link.children, vue, level + 1, toHashMap));
             });
-            outputs.push(indent(level) + '</ul>');
         }
         return outputs.join('\n');
     }
@@ -447,7 +460,7 @@ class APIHandler {
             outputs.push('<router-view></router-view>');
             // 插入目录
             outputs.splice(4, 0, this.markdownTOC(tocRoot, true), '');
-            return outputs.join('\n');
+            return outputs.join('\n') + '\n';
         });
     }
     ;
@@ -503,7 +516,7 @@ class APIHandler {
             if (docs.includes('setup.md'))
                 yield addSubdoc('setup.md', '安装配置');
             if (docs.includes('examples.md'))
-                yield addSubdoc('examples.md', !mainComponent.docs ? '## 示例' : '## 基础示例');
+                yield addSubdoc('examples.md', !mainComponent.docs ? '示例' : '基础示例');
             if (mainComponent.docs) {
                 const names = Object.keys(mainComponent.docs);
                 for (const name of names) {
@@ -517,7 +530,7 @@ class APIHandler {
             tocRoot.push(...this.getTOCFromAPI());
             // 插入目录
             outputs.splice(4, 0, this.markdownTOC(tocRoot), '');
-            return outputs.join('\n');
+            return outputs.join('\n') + '\n';
         });
     }
     ;

@@ -248,6 +248,10 @@ class ImportsHandler {
         const index = this.findIndexFrom(source);
         ~index && this.body.splice(index, 1);
     }
+
+    get(identifer: string) {
+
+    }
 }
 
 /**
@@ -347,6 +351,9 @@ class ScriptHandler {
         return this;
     }
 
+    /**
+     * 用于在全部的 import 集合中处理查找、删除等操作
+     */
     imports() {
         return new ImportsHandler(this.ast.program.body);
     }
@@ -450,6 +457,9 @@ class ScriptHandler {
     //     this.state.lastIndex = undefined;
     // }
 
+     /**
+     * 用于在当前级别的作用域所有变量集合中处理查找、删除等操作
+     */
     variables() {
         return new StatementHandler(this.ast.program.body);
     }

@@ -9,7 +9,7 @@ const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/VueFil
 describe('APIHandler', () => {
     it('getTOCFromFile', async () => {
         const apiHandler = new APIHandler('', '');
-        const toc = await apiHandler.getTOCFromFile(path.resolve(BASE_PATH, 'u-button.vue/README.md'));
+        const toc = await apiHandler.getTOCFromFile(path.resolve(BASE_PATH, 'u-button.vue/README.md'), undefined, { maxLevel: 3, minLevel: 4 });
 
         expect(toc.length).to.equal(11);
         expect(toc[1].title).to.equal('设置形状');
@@ -21,11 +21,11 @@ describe('APIHandler', () => {
     });
 
     it('markdown()', async () => {
-        const vueFile = new VueFile(path.resolve(BASE_PATH, 'u-button.vue'));
+        const vueFile = new VueFile(path.resolve(BASE_PATH, 'u-sidebar.vue'));
         await vueFile.open();
         vueFile.parseAPI();
 
-        const result = await vueFile.apiHandler.markdown();
-        await fs.writeFile(path.resolve(BASE_PATH, '../results/README.md'), result);
+        expect(await vueFile.apiHandler.markdownIndex()).to.equal(await fs.readFile(path.resolve(BASE_PATH, '../results/README.index.md'), 'utf8'));
+        expect(await vueFile.apiHandler.markdown()).to.equal(await fs.readFile(path.resolve(BASE_PATH, '../results/README.md'), 'utf8'));
     })
 })

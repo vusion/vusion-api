@@ -213,6 +213,8 @@ class ImportsHandler {
         const index = this.findIndexFrom(source);
         ~index && this.body.splice(index, 1);
     }
+    get(identifer) {
+    }
 }
 /**
  * 没有处理析构的情形
@@ -292,6 +294,9 @@ class ScriptHandler {
         this.state.specifier = specifier;
         return this;
     }
+    /**
+     * 用于在全部的 import 集合中处理查找、删除等操作
+     */
     imports() {
         return new ImportsHandler(this.ast.program.body);
     }
@@ -389,6 +394,9 @@ class ScriptHandler {
     //     body.splice(this.state.lastIndex as number, 1);
     //     this.state.lastIndex = undefined;
     // }
+    /**
+    * 用于在当前级别的作用域所有变量集合中处理查找、删除等操作
+    */
     variables() {
         return new StatementHandler(this.ast.program.body);
     }
