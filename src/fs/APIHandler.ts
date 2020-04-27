@@ -443,7 +443,7 @@ export default class APIHandler {
             let parentLink: TOCLink;
             if (showTitle === APIShowTitle.simplified) {
                 const title = api.length > 1 ? `${utils.kebab2Camel(name)} API` : 'API';
-                parentLink = { title, to: { path: 'api', hash: '#' + uslugify(title) }, children: [] };
+                parentLink = { title, to: { path: 'api', hash: api.length > 1 ? '#' + uslugify(title) : '' }, children: [] };
                 tocLinks.push(parentLink);
             }
             else if (showTitle === APIShowTitle.always) {
@@ -505,15 +505,21 @@ export default class APIHandler {
      */
     markdownTOC(tocLinks: Array<TOCLink>, vue: boolean = false, level: number = 0, toHashMap: Map<string, true> = new Map()) {
         const indent = (l: number) => ' '.repeat(l * 4);
+        const unique = ({ path, hash }: { path?: string, hash?: string }) => {
+            let uniq = `${path}${hash}`;
+            let i = 2;
+            while (toHashMap.has(uniq))
+                uniq = `${path}${hash}-${i++}`;
+            toHashMap.set(uniq, true);
+            return uniq.slice((path || '').length);
+        }
         const outputs = [];
 
         if (vue) {
             level === 0 && outputs.push(`<u-toc>`);
             tocLinks.forEach((link) => {
-                if (typeof link.to === 'object') {
-                    link.to.hash = utils.uniqueInMap(link.to.hash, toHashMap);
-                    toHashMap.set(link.to.hash, true);
-                }
+                if (typeof link.to === 'object')
+                    link.to.hash = unique(link.to);
                 const start = indent(level + 1) + `<u-toc-item label="${link.title}" ${typeof link.to === 'object' ? ':to=\'' + JSON.stringify(link.to) + '\'' : 'to="' + link.to + '"'}>`;
                 if (link.children && link.children.length) {
                     outputs.push(start);
@@ -526,10 +532,8 @@ export default class APIHandler {
             level === 0 && outputs.push(indent(level) + '</u-toc>');
         } else {
             tocLinks.forEach((link) => {
-                if (typeof link.to === 'object') {
-                    link.to.hash = utils.uniqueInMap(link.to.hash, toHashMap);
-                    toHashMap.set(link.to.hash, true);
-                }
+                if (typeof link.to === 'object')
+                    link.to.hash = unique(link.to);
                 outputs.push(indent(level) + `- [${link.title}](${typeof link.to === 'object' ? link.to.hash : '#' + link.to})`);
                 link.children && outputs.push(this.markdownTOC(link.children, vue, level + 1, toHashMap));
             });
