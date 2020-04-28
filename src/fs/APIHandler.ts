@@ -511,7 +511,7 @@ export default class APIHandler {
             while (toHashMap.has(uniq))
                 uniq = `${path}${hash}-${i++}`;
             toHashMap.set(uniq, true);
-            return uniq.slice((path || '').length);
+            return uniq.slice(String(path).length);
         }
         const outputs = [];
 
@@ -520,7 +520,7 @@ export default class APIHandler {
             tocLinks.forEach((link) => {
                 if (typeof link.to === 'object')
                     link.to.hash = unique(link.to);
-                const start = indent(level + 1) + `<u-toc-item label="${link.title}" ${typeof link.to === 'object' ? ':to=\'' + JSON.stringify(link.to) + '\'' : 'to="' + link.to + '"'}>`;
+                const start = indent(level + 1) + `<u-toc-item${ link.development ? ' v-if="NODE_ENV === \'development\'"' : ''} label="${link.title}" ${typeof link.to === 'object' ? ':to=\'' + JSON.stringify(link.to) + '\'' : 'to="' + link.to + '"'}>`;
                 if (link.children && link.children.length) {
                     outputs.push(start);
                     outputs.push(this.markdownTOC(link.children, vue, level + 1, toHashMap));
@@ -565,7 +565,7 @@ export default class APIHandler {
         const tocRoot: Array<TOCLink> = [];
         const addSubdoc = async (fileName: string, title: string, to: string, development = false) => {
             const tocLinks = await this.getTOCFromFile(path.resolve(docsDir, fileName), to);
-            const link: TOCLink = { title, to, children: tocLinks };
+            const link: TOCLink = { title, to, development, children: tocLinks };
             tocRoot.push(link);
             outputs.push(`    <u-h2-tab${ development ? ' v-if="NODE_ENV === \'development\'"' : ''} title="${title}" to="${to}"></u-h2-tab>`);
         }
@@ -629,8 +629,11 @@ export default class APIHandler {
         }
 
         const changelogPath = path.resolve(this.fullPath, '../CHANGELOG.md');
-        if (fs.existsSync(changelogPath))
-            await addSubdoc(changelogPath, '更新日志', 'changelog');
+        if (fs.existsSync(changelogPath)) {
+            const link: TOCLink = { title: '更新日志', to: 'changelog' };
+            tocRoot.push(link);
+            outputs.push(`    <u-h2-tab title="${link.title}" to="${link.to}"></u-h2-tab>`);
+        }
 
         outputs.push(`</u-h2-tabs>`);
 
