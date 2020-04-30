@@ -157,5 +157,13 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
     if (!fs.existsSync(config.baseCSSPath) && throwErrors)
         throw new Error(`Cannot find baseCSSPath: ${baseCSSPath}`);
 
+    if (config.designer) {
+        config.designer = Object.assign({
+            protocol: 'http',
+            host: 'localhost',
+            port: 12800,
+        }, config.designer);
+    }
+
     return config;
 };

@@ -131,6 +131,13 @@ function resolve(cwd, configPath = 'vusion.config.js', args, throwErrors) {
         config.baseCSSPath = baseCSSPath = path.resolve(cwd, config.baseCSSPath);
     if (!fs.existsSync(config.baseCSSPath) && throwErrors)
         throw new Error(`Cannot find baseCSSPath: ${baseCSSPath}`);
+    if (config.designer) {
+        config.designer = Object.assign({
+            protocol: 'http',
+            host: 'localhost',
+            port: 12800,
+        }, config.designer);
+    }
     return config;
 }
 exports.default = resolve;

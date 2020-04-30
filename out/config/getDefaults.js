@@ -15,6 +15,7 @@ function getDefaults() {
         theme: undefined,
         applyTheme: false,
         docs: false,
+        designer: false,
         forceShaking: false,
         experimental: false,
     };

@@ -39,6 +39,12 @@ export interface VusionConfig {
         utils?: Array<MaterialInfo>,
     },
 
+    designer: boolean | {
+        protocol?: string,
+        host?: string,
+        port?: number,
+    }
+
     forceShaking: boolean;
     experimental: boolean;
 }
@@ -61,6 +67,7 @@ export default function getDefaults() {
         applyTheme: false,
 
         docs: false,                           // Generate docs of common components in library. Always be true if project type is `library`
+        designer: false,
 
         forceShaking: false,                   // Force to enable tree shaking under this path without care of side effects. It's different from default tree shaking of webpack.
         experimental: false,                   // Enable some experimental loaders or plugins, like ModuleConcatenationPlugin
