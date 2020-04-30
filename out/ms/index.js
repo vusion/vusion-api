@@ -524,6 +524,7 @@ function createMultiFileWithSubdocs(dir, componentName) {
 }
 exports.createMultiFileWithSubdocs = createMultiFileWithSubdocs;
 /**
+ * @deprecated
  * 从业务模板中添加模块
  */
 function addModule(options) {
@@ -566,6 +567,10 @@ function addModule(options) {
     });
 }
 exports.addModule = addModule;
+/**
+ * @deprecated
+ * @param options
+ */
 function removeModule(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const dest = path.resolve(options.target, options.name);

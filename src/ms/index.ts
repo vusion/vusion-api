@@ -573,6 +573,7 @@ export async function createMultiFileWithSubdocs(dir: string, componentName?: st
 }
 
 /**
+ * @deprecated
  * 从业务模板中添加模块
  */
 export async function addModule(options: MaterialOptions) {
@@ -621,6 +622,10 @@ export async function addModule(options: MaterialOptions) {
     }
 }
 
+/**
+ * @deprecated
+ * @param options
+ */
 export async function removeModule(options: MaterialOptions) {
     const dest = path.resolve(options.target, options.name);
     await fs.remove(dest);

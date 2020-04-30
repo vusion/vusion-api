@@ -13,6 +13,18 @@ export enum ViewType {
     md = 'md', // leaf
 }
 
+export const RESERVED_DIRS = [
+    'layout',
+    'components',
+    'directives',
+    'filters',
+    'mixins',
+    'utils',
+    'styles',
+    'service',
+    'module',
+];
+
 export default class View extends FSEntry {
     viewType: ViewType;
     viewsPath: string;
@@ -41,7 +53,7 @@ export default class View extends FSEntry {
         if (this.viewType === ViewType.root) {
             this.routePath = '/';
         } else if (this.viewType === ViewType.entry) {
-            this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
+            this.vueFilePath = path.join(this.fullPath, 'layout/views', 'index.vue');
             this.routePath = this.parent.routePath + this.baseName + '#/';
         } else if (this.viewType === ViewType.module) {
             this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
@@ -88,6 +100,8 @@ export default class View extends FSEntry {
             if (!(isDirectory || name.endsWith('.vue') || name.endsWith('.md')))
                 return;
             if (name === '.DS_Store' || name === '.git')
+                return;
+            if (RESERVED_DIRS.includes(name))
                 return;
             if (isDirectory && name.endsWith('.blocks'))
                 return;

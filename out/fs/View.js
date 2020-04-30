@@ -21,6 +21,17 @@ var ViewType;
     ViewType["vue"] = "vue";
     ViewType["md"] = "md";
 })(ViewType = exports.ViewType || (exports.ViewType = {}));
+exports.RESERVED_DIRS = [
+    'layout',
+    'components',
+    'directives',
+    'filters',
+    'mixins',
+    'utils',
+    'styles',
+    'service',
+    'module',
+];
 class View extends FSEntry_1.default {
     constructor(fullPath, viewType = ViewType.branch, isDirectory = true) {
         super(fullPath, isDirectory);
@@ -40,7 +51,7 @@ class View extends FSEntry_1.default {
                 this.routePath = '/';
             }
             else if (this.viewType === ViewType.entry) {
-                this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
+                this.vueFilePath = path.join(this.fullPath, 'layout/views', 'index.vue');
                 this.routePath = this.parent.routePath + this.baseName + '#/';
             }
             else if (this.viewType === ViewType.module) {
@@ -85,6 +96,8 @@ class View extends FSEntry_1.default {
                 if (!(isDirectory || name.endsWith('.vue') || name.endsWith('.md')))
                     return;
                 if (name === '.DS_Store' || name === '.git')
+                    return;
+                if (exports.RESERVED_DIRS.includes(name))
                     return;
                 if (isDirectory && name.endsWith('.blocks'))
                     return;
