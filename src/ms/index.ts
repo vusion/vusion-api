@@ -2,14 +2,12 @@ import * as path from 'path';
 import * as babel from '@babel/core';
 import * as compiler from 'vue-template-compiler';
 import * as fs from 'fs-extra';
-import * as shell from 'shelljs';
 import * as os from 'os';
 import * as vfs from '../fs';
 import * as utils from '../utils';
 import * as rc from '../rc';
 import * as download from './download';
 import * as _ from 'lodash';
-import * as compressing from 'compressing';
 import * as FormData from 'form-data';
 
 import Block from './Block';
@@ -75,8 +73,11 @@ export const upload = {
     async nos(files: string | FormFile | Array<string | FormFile>) {
         const formData = upload.getFormData(files);
         const pfAxios = await getPlatformAxios();
+        const headers = formData.getHeaders();
+        console.log(formData);
+        console.log(headers);
         return pfAxios.post('nos/upload', formData, {
-            headers: formData.getHeaders(),
+            headers,
         }).then((res) => res.data);
     },
     async framework(files: string | FormFile | Array<string | FormFile>, framework: string) {
