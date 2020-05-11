@@ -73,11 +73,8 @@ export const upload = {
     async nos(files: string | FormFile | Array<string | FormFile>) {
         const formData = upload.getFormData(files);
         const pfAxios = await getPlatformAxios();
-        const headers = formData.getHeaders();
-        console.log(formData);
-        console.log(headers);
         return pfAxios.post('nos/upload', formData, {
-            headers,
+            headers: formData.getHeaders(),
         }).then((res) => res.data);
     },
     async framework(files: string | FormFile | Array<string | FormFile>, framework: string) {

@@ -72,11 +72,8 @@ exports.upload = {
         return __awaiter(this, void 0, void 0, function* () {
             const formData = exports.upload.getFormData(files);
             const pfAxios = yield getPlatformAxios();
-            const headers = formData.getHeaders();
-            console.log(formData);
-            console.log(headers);
             return pfAxios.post('nos/upload', formData, {
-                headers,
+                headers: formData.getHeaders(),
             }).then((res) => res.data);
         });
     },
