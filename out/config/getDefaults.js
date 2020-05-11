@@ -12,6 +12,7 @@ function getDefaults() {
         srcPath: './src',
         libraryPath: '',
         baseCSSPath: '',
+        rootViewType: 'root',
         theme: undefined,
         applyTheme: false,
         docs: false,

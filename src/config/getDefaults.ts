@@ -22,6 +22,7 @@ export interface VusionConfig {
     srcPath: string;
     libraryPath: string;
     baseCSSPath: string;
+    rootViewType: 'root' | 'entry' | 'module' | 'branch';
     theme: string | Array<string> | Theme;
     applyTheme: boolean;
 
@@ -63,6 +64,7 @@ export default function getDefaults() {
         srcPath: './src',                      // To be `./src` by default
         libraryPath: '',                       // [Required] Library directory path. To be srcPath by default
         baseCSSPath: '',                       // Path of base CSS. If not set, it will be `library/base/base.css`
+        rootViewType: 'root',
         theme: undefined,                      // Project theme
         applyTheme: false,
 

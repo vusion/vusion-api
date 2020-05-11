@@ -15,6 +15,7 @@ export enum ViewType {
 
 export const RESERVED_DIRS = [
     'layout',
+    'assets',
     'components',
     'directives',
     'filters',
@@ -39,7 +40,7 @@ export default class View extends FSEntry {
 
         this.viewType = viewType;
         this.viewsPath = '';
-        this.routePath = '';
+        this.routePath = '/';
     }
 
     /**
@@ -50,20 +51,21 @@ export default class View extends FSEntry {
         if (fs.existsSync(path.join(this.fullPath, 'views')))
             this.viewsPath = 'views';
 
+        const parentRoutePath = this.parent ? this.parent.routePath : '/';
         if (this.viewType === ViewType.root) {
             this.routePath = '/';
         } else if (this.viewType === ViewType.entry) {
             this.vueFilePath = path.join(this.fullPath, 'layout/views', 'index.vue');
-            this.routePath = this.parent.routePath + this.baseName + '#/';
+            this.routePath = parentRoutePath + this.baseName + '#/';
         } else if (this.viewType === ViewType.module) {
             this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
-            this.routePath = this.parent.routePath + this.baseName + '/';
+            this.routePath = parentRoutePath + this.baseName + '/';
         } else if (this.viewType === ViewType.branch) {
             this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
-            this.routePath = this.parent.routePath + this.baseName + '/';
+            this.routePath = parentRoutePath + this.baseName + '/';
         } else {
             this.vueFilePath = this.fullPath;
-            this.routePath = this.parent.routePath + this.baseName;
+            this.routePath = parentRoutePath + this.baseName;
         }
 
         // this.alias = await this.readTitleInReadme();
