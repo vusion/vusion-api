@@ -359,20 +359,29 @@ export default class VueFile extends FSEntry {
 
     // @TODO
     // loadDocs()
-    async loadExamples() {
+    async loadExamples(from?: string) {
         await this.preload();
 
         if (this.isDirectory) {
-            if (fs.existsSync(path.join(this.fullPath, 'docs/blocks.md')))
-                return this.examples = await fs.readFile(path.join(this.fullPath, 'docs/blocks.md'), 'utf8');
-            else if (fs.existsSync(path.join(this.fullPath, 'docs/examples.md')))
-                return this.examples = await fs.readFile(path.join(this.fullPath, 'docs/examples.md'), 'utf8');
+            if (!from) {
+                if (fs.existsSync(path.join(this.fullPath, 'docs/blocks.md')))
+                    from = 'blocks.md';
+                else if (fs.existsSync(path.join(this.fullPath, 'docs/examples.md')))
+                    from = 'examples.md';
+                else
+                    return;
+            }
+            return this.examples = await fs.readFile(path.join(this.fullPath, 'docs/' + from), 'utf8');
         } else {
-            this.examples = fetchPartialContent(this.content, 'doc', 'name="blocks"');
-            if (!this.examples)
-                this.examples = fetchPartialContent(this.content, 'doc', 'name="examples"');
-            else
-                return this.examples;
+            if (!from) {
+                if (fetchPartialContent(this.content, 'doc', `name="blocks.md"`))
+                    from = 'blocks.md';
+                else if (fetchPartialContent(this.content, 'doc', `name="examples.md"`))
+                    from = 'examples.md';
+                else
+                    return;
+            }
+            this.examples = fetchPartialContent(this.content, 'doc', `name="${from}"`);
         }
     }
 
