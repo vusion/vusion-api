@@ -714,7 +714,7 @@ export async function addLeafViewRoute(parent: vfs.View, name: string, title: st
     await jsFile.open();
     jsFile.parse();
 
-    const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name + ext));
+    const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name + ext)).replace(/\\/g, '/');
     let changed = false;
     babel.traverse(jsFile.handler.ast, {
         ExportDefaultDeclaration(nodePath) {
@@ -806,7 +806,7 @@ export async function addBranchViewRoute(parent: vfs.View, name: string, title: 
     jsFile.parse();
 
     // 纯目录，不带 /index.vue 的
-    const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name));
+    const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name)).replace(/\\/g, '/');
     let changed = false;
     babel.traverse(jsFile.handler.ast, {
         ExportDefaultDeclaration(nodePath) {
@@ -936,7 +936,7 @@ export async function addBranchWrapper(parent: vfs.View, name: string, title: st
     }
 
     // 纯目录，不带 /index.vue 的
-    const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name));
+    const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name)).replace(/\\/g, '/');
     let changed = false;
     babel.traverse(jsFile.handler.ast, {
         ExportDefaultDeclaration(nodePath) {
@@ -985,7 +985,7 @@ export async function removeLeafView(view: vfs.View) {
         await jsFile.open();
         jsFile.parse();
 
-        const relativePath = path.relative(module.fullPath, view.fullPath);
+        const relativePath = path.relative(module.fullPath, view.fullPath).replace(/\\/g, '/');
         let changed = false;
         babel.traverse(jsFile.handler.ast, {
             ExportDefaultDeclaration(nodePath) {
