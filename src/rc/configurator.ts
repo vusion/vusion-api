@@ -37,7 +37,7 @@ export default {
             fs.writeFileSync(rcPath, `platform: https://vusion.netease.com
 registries:
   npm: https://registry.npmjs.org
-download_manager: cnpm
+download_manager: npm
 publish_manager: npm
 `);
         }

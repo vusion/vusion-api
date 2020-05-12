@@ -648,7 +648,7 @@ function addLeafViewRoute(parent, name, title, ext = '.vue') {
         const jsFile = new vfs.JSFile(routesPath);
         yield jsFile.open();
         jsFile.parse();
-        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name + ext));
+        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name + ext)).replace(/\\/g, '/');
         let changed = false;
         babel.traverse(jsFile.handler.ast, {
             ExportDefaultDeclaration(nodePath) {
@@ -733,7 +733,7 @@ function addBranchViewRoute(parent, name, title, ext = '.vue') {
         yield jsFile.open();
         jsFile.parse();
         // 纯目录，不带 /index.vue 的
-        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name));
+        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name)).replace(/\\/g, '/');
         let changed = false;
         babel.traverse(jsFile.handler.ast, {
             ExportDefaultDeclaration(nodePath) {
@@ -850,7 +850,7 @@ function addBranchWrapper(parent, name, title) {
             jsFile.handler.ast.program.body.unshift(importDeclaration);
         }
         // 纯目录，不带 /index.vue 的
-        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name));
+        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name)).replace(/\\/g, '/');
         let changed = false;
         babel.traverse(jsFile.handler.ast, {
             ExportDefaultDeclaration(nodePath) {
@@ -894,7 +894,7 @@ function removeLeafView(view) {
             const jsFile = new vfs.JSFile(routesPath);
             yield jsFile.open();
             jsFile.parse();
-            const relativePath = path.relative(module.fullPath, view.fullPath);
+            const relativePath = path.relative(module.fullPath, view.fullPath).replace(/\\/g, '/');
             let changed = false;
             babel.traverse(jsFile.handler.ast, {
                 ExportDefaultDeclaration(nodePath) {
