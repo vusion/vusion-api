@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const MarkdownIt = require("markdown-it");
 class ExamplesHandler {
-    constructor(content) {
+    constructor(content = '') {
         this.content = content;
         this.markdown = new MarkdownIt({
             html: true,

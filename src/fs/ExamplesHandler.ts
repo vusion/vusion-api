@@ -6,7 +6,7 @@ export default class ExamplesHandler {
     tokens: Array<Token>;
 
     constructor(
-        public content: string,
+        public content: string = '',
     ) {
         this.markdown = new MarkdownIt({
             html: true,
