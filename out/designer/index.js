@@ -41,6 +41,26 @@ function addCode(fullPath, route, tpl) {
     });
 }
 exports.addCode = addCode;
+function saveFile(fullPath, content) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return fs.writeFile(fullPath, content);
+    });
+}
+exports.saveFile = saveFile;
+function saveCode(fullPath, type, content) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const vueFile = new vfs.VueFile(fullPath);
+        yield vueFile.open();
+        if (type === 'template')
+            vueFile.template = content;
+        else if (type === 'script')
+            vueFile.script = content;
+        else if (type === 'style')
+            vueFile.style = content;
+        yield vueFile.save();
+    });
+}
+exports.saveCode = saveCode;
 // export async function mergeBlock(fullPath: string, type: string) {
 //     const vueFile = new vfs.VueFile(fullPath);
 //     await vueFile.open();
@@ -52,4 +72,12 @@ exports.addCode = addCode;
 //     rootEl.children.push(compiler.compile(tpl).ast);
 //     await vueFile.save();
 // }
+function loadViews(fullPath, viewType) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const view = new vfs.View(fullPath, viewType);
+        yield view.open();
+        return view.children;
+    });
+}
+exports.loadViews = loadViews;
 //# sourceMappingURL=index.js.map

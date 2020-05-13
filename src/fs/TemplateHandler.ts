@@ -29,6 +29,11 @@ export interface TemplateOptions {
     tabLength?: number,
     startLevel?: number,
 };
+
+/**
+ * 模板 AST 处理器
+ * 该 class 可以在两端(node, browser)运行
+ */
 class TemplateHandler {
     code: string;
     ast: ASTElement;

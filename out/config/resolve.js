@@ -49,15 +49,15 @@ function resolve(cwd, configPath = 'vusion.config.js', args, throwErrors) {
         if (args['apply-theme'] !== undefined)
             config.applyTheme = !!args['apply-theme'];
         if (args['base-css'])
-            config.baseCSSPath = path.resolve(process.cwd(), args['base-css']);
+            config.baseCSSPath = path.resolve(cwd, args['base-css']);
         if (args['output-path'])
-            config.outputPath = path.resolve(process.cwd(), args['output-path']);
+            config.outputPath = path.resolve(cwd, args['output-path']);
         if (args['public-path'])
-            config.publicPath = path.resolve(process.cwd(), args['public-path']);
+            config.publicPath = path.resolve(cwd, args['public-path']);
         if (args['src-path'])
-            config.srcPath = path.resolve(process.cwd(), args['src-path']);
+            config.srcPath = path.resolve(cwd, args['src-path']);
         if (args['library-path'])
-            config.libraryPath = path.resolve(process.cwd(), args['library-path']);
+            config.libraryPath = path.resolve(cwd, args['library-path']);
     }
     config.srcPath = path.resolve(cwd, config.srcPath || './src');
     config.libraryPath = path.resolve(cwd, config.libraryPath || config.srcPath);

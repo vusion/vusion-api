@@ -33,6 +33,24 @@ export async function addCode(fullPath: string, route: string, tpl: string) {
     await vueFile.save();
 }
 
+export async function saveFile(fullPath: string, content: string) {
+    return fs.writeFile(fullPath, content);
+}
+
+export async function saveCode(fullPath: string, type: string, content: string) {
+    const vueFile = new vfs.VueFile(fullPath);
+    await vueFile.open();
+
+    if (type === 'template')
+        vueFile.template = content;
+    else if (type === 'script')
+        vueFile.script = content;
+    else if (type === 'style')
+        vueFile.style = content;
+
+    await vueFile.save();
+}
+
 // export async function mergeBlock(fullPath: string, type: string) {
 //     const vueFile = new vfs.VueFile(fullPath);
 //     await vueFile.open();
@@ -47,3 +65,9 @@ export async function addCode(fullPath: string, route: string, tpl: string) {
 
 //     await vueFile.save();
 // }
+
+export async function loadViews(fullPath: string, viewType: vfs.ViewType) {
+    const view = new vfs.View(fullPath, viewType);
+    await view.open();
+    return view.children;
+}

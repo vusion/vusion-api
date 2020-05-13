@@ -16,6 +16,10 @@ class ASTNodePath {
 }
 exports.ASTNodePath = ASTNodePath;
 ;
+/**
+ * 模板 AST 处理器
+ * 该 class 可以在两端(node, browser)运行
+ */
 class TemplateHandler {
     constructor(code = '', options) {
         this.code = code;
