@@ -12,8 +12,9 @@ import * as FormData from 'form-data';
 
 import Block from './Block';
 import Component from './Component';
+import Template from './Template';
 
-export { download, Block, Component };
+export { download, Block, Component, Template };
 
 import axios, { AxiosInstance } from 'axios';
 let platformAxios: AxiosInstance;
@@ -259,6 +260,18 @@ export function processOptions(options: MaterialOptions): ProcessedMaterialOptio
     }
 
     return result;
+}
+
+export async function getTemplate(packageName: string): Promise<Template> {
+    const pfAxios = await getPlatformAxios();
+    return pfAxios.get('template/info', {
+        params: {
+            name: packageName,
+        },
+    }).then((res) => {
+        const template = res.data.result;
+        return template;
+    });
 }
 
 export async function getBlock(packageName: string): Promise<Block> {

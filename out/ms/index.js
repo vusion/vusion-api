@@ -218,6 +218,20 @@ function processOptions(options) {
     return result;
 }
 exports.processOptions = processOptions;
+function getTemplate(packageName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pfAxios = yield getPlatformAxios();
+        return pfAxios.get('template/info', {
+            params: {
+                name: packageName,
+            },
+        }).then((res) => {
+            const template = res.data.result;
+            return template;
+        });
+    });
+}
+exports.getTemplate = getTemplate;
 function getBlock(packageName) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
