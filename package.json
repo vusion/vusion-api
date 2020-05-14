@@ -11,7 +11,7 @@
     "test:one": "mocha",
     "lint": "eslint ./src --fix",
     "prepublishOnly": "npm run compile && git add .",
-    "ghpages": "typedoc --out docs src && vusion ghpages docs"
+    "ghpages": "typedoc --out docs --exclude 'src/test/**' src && touch ./docs/.nojekyll && vusion ghpages -d docs"
   },
   "main": "./out/index.js",
   "repository": "vusion/vusion-api",

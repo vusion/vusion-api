@@ -58,6 +58,11 @@ exports.saveFile = saveFile;
 //     rootEl.children.push(compiler.compile(tpl).ast);
 //     await vueFile.save();
 // }
+/**
+ * 获取页面列表
+ * @param fullPath 父页面全路径
+ * @param viewType 父页面类型
+ */
 function loadViews(fullPath, viewType) {
     return __awaiter(this, void 0, void 0, function* () {
         const view = new vfs.View(fullPath, viewType);
@@ -66,6 +71,11 @@ function loadViews(fullPath, viewType) {
     });
 }
 exports.loadViews = loadViews;
+/**
+ * 获取页面内容
+ * @param fullPath 页面全路径
+ * @param viewType 页面类型
+ */
 function getViewContent(fullPath, viewType) {
     return __awaiter(this, void 0, void 0, function* () {
         const view = new vfs.View(fullPath, viewType);
@@ -76,6 +86,12 @@ function getViewContent(fullPath, viewType) {
     });
 }
 exports.getViewContent = getViewContent;
+/**
+ * 保存页面内容
+ * @param fullPath 页面全路径
+ * @param viewType 页面类型
+ * @param content 页面代码内容
+ */
 function saveViewContent(fullPath, viewType, content) {
     return __awaiter(this, void 0, void 0, function* () {
         const view = new vfs.View(fullPath, viewType);
@@ -84,6 +100,12 @@ function saveViewContent(fullPath, viewType, content) {
     });
 }
 exports.saveViewContent = saveViewContent;
+/**
+ * 保存 Vue 局部代码
+ * @param fullPath Vue 文件全路径
+ * @param type 内容类型
+ * @param content 代码内容
+ */
 function saveCode(fullPath, type, content) {
     return __awaiter(this, void 0, void 0, function* () {
         const vueFile = new vfs.VueFile(fullPath);

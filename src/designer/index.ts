@@ -52,12 +52,22 @@ export async function saveFile(fullPath: string, content: string) {
 //     await vueFile.save();
 // }
 
+/**
+ * 获取页面列表
+ * @param fullPath 父页面全路径
+ * @param viewType 父页面类型
+ */
 export async function loadViews(fullPath: string, viewType: vfs.ViewType) {
     const view = new vfs.View(fullPath, viewType);
     await view.open();
     return view.children;
 }
 
+/**
+ * 获取页面内容
+ * @param fullPath 页面全路径
+ * @param viewType 页面类型
+ */
 export async function getViewContent(fullPath: string, viewType: vfs.ViewType) {
     const view = new vfs.View(fullPath, viewType);
     await view.open();
@@ -66,13 +76,25 @@ export async function getViewContent(fullPath: string, viewType: vfs.ViewType) {
     return vueFile;
 }
 
+/**
+ * 保存页面内容
+ * @param fullPath 页面全路径
+ * @param viewType 页面类型
+ * @param content 页面代码内容
+ */
 export async function saveViewContent(fullPath: string, viewType: vfs.ViewType, content: string) {
     const view = new vfs.View(fullPath, viewType);
     await view.open();
     return fs.writeFile(view.vueFilePath, content);
 }
 
-export async function saveCode(fullPath: string, type: string, content: string) {
+/**
+ * 保存 Vue 局部代码
+ * @param fullPath Vue 文件全路径
+ * @param type 内容类型
+ * @param content 代码内容
+ */
+export async function saveCode(fullPath: string, type: 'template' | 'script' | 'style', content: string) {
     const vueFile = new vfs.VueFile(fullPath);
     await vueFile.open();
 

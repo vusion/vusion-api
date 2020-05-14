@@ -1,0 +1,2127 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>VueFile | vusion-api</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">vusion-api</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/_fs_vuefile_.html">&quot;fs/VueFile&quot;</a>
+				</li>
+				<li>
+					<a href="_fs_vuefile_.vuefile.html">VueFile</a>
+				</li>
+			</ul>
+			<h1>Class VueFile</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>用于处理单/多 Vue 文件的类</p>
+					</div>
+					<a href="#主要功能" id="主要功能" style="color: inherit; text-decoration: none;">
+						<h3>主要功能</h3>
+					</a>
+					<a href="#打开：一般分为四个阶段" id="打开：一般分为四个阶段" style="color: inherit; text-decoration: none;">
+						<h4>打开：一般分为四个阶段</h4>
+					</a>
+					<ul>
+						<li>const vueFile = new VueFile(fullPath); // 根据路径创建对象，可以为虚拟路径。</li>
+						<li>await vueFile.preOpen(); // 异步方法。获取 isDirectory，获取子组件、标题信息。</li>
+						<li>await vueFile.open(); // 异步方法。如果已经打开则不会重新打开，如果没有 preOpen 会先执行 preOpen。获取常用操作的内容块：script, template, style, api, examples, package。</li>
+						<li>vueFile.parseAll(); // 解析全部内容块</li>
+					</ul>
+					<a href="#保存：" id="保存：" style="color: inherit; text-decoration: none;">
+						<h4>保存：</h4>
+					</a>
+					<ul>
+						<li>await vueFile.save();</li>
+						<li>如果有解析，先根据解析器 generate() 内容，再保存</li>
+						<li>根据 isDirectory 判断是否保存单多文件</li>
+					</ul>
+					<a href="#另存为：" id="另存为：" style="color: inherit; text-decoration: none;">
+						<h4>另存为：</h4>
+					</a>
+					<ul>
+						<li>await vueFile.saveAs(fullPath);</li>
+					</ul>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<a href="_fs_fsentry_.fsentry.html" class="tsd-signature-type">FSEntry</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">VueFile</span>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="_fs_vuefile_.vuefile.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#_css" class="tsd-kind-icon">$css</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#_html" class="tsd-kind-icon">$html</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#_js" class="tsd-kind-icon">$js</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#_changelisteners" class="tsd-kind-icon">_change<wbr>Listeners</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#_minichangelisteners" class="tsd-kind-icon">_mini<wbr>Change<wbr>Listeners</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#alias" class="tsd-kind-icon">alias</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#api" class="tsd-kind-icon">api</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#apihandler" class="tsd-kind-icon">api<wbr>Handler</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#basename" class="tsd-kind-icon">base<wbr>Name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#children" class="tsd-kind-icon">children</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#componentname" class="tsd-kind-icon">component<wbr>Name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#content" class="tsd-kind-icon">content</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#examples" class="tsd-kind-icon">examples</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#exampleshandler" class="tsd-kind-icon">examples<wbr>Handler</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#extname" class="tsd-kind-icon">ext<wbr>Name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#filename" class="tsd-kind-icon">file<wbr>Name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#fullpath" class="tsd-kind-icon">full<wbr>Path</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#ischild" class="tsd-kind-icon">is<wbr>Child</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#isdirectory" class="tsd-kind-icon">is<wbr>Directory</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#isopen" class="tsd-kind-icon">is<wbr>Open</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#issaving" class="tsd-kind-icon">is<wbr>Saving</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#isvue" class="tsd-kind-icon">is<wbr>Vue</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#iswatched" class="tsd-kind-icon">is<wbr>Watched</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#package" class="tsd-kind-icon">package</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#parent" class="tsd-kind-icon">parent</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#script" class="tsd-kind-icon">script</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#scripthandler" class="tsd-kind-icon">script<wbr>Handler</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#style" class="tsd-kind-icon">style</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#stylehandler" class="tsd-kind-icon">style<wbr>Handler</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#subfiles" class="tsd-kind-icon">subfiles</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#tagname" class="tsd-kind-icon">tag<wbr>Name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#template" class="tsd-kind-icon">template</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#templatehandler" class="tsd-kind-icon">template<wbr>Handler</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#title" class="tsd-kind-icon">title</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#addeventlistener" class="tsd-kind-icon">add<wbr>Event<wbr>Listener</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#checktransform" class="tsd-kind-icon">check<wbr>Transform</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#clone" class="tsd-kind-icon">clone</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_fs_vuefile_.vuefile.html#close" class="tsd-kind-icon">close</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#extend" class="tsd-kind-icon">extend</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#findsuper" class="tsd-kind-icon">find<wbr>Super</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_fs_vuefile_.vuefile.html#forceopen" class="tsd-kind-icon">force<wbr>Open</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#generate" class="tsd-kind-icon">generate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#hasassets" class="tsd-kind-icon">has<wbr>Assets</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#hasextra" class="tsd-kind-icon">has<wbr>Extra</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#hasscript" class="tsd-kind-icon">has<wbr>Script</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#hasstyle" class="tsd-kind-icon">has<wbr>Style</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#hastemplate" class="tsd-kind-icon">has<wbr>Template</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><a href="_fs_vuefile_.vuefile.html#load" class="tsd-kind-icon">load</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#loadapi" class="tsd-kind-icon">loadAPI</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#loaddirectory" class="tsd-kind-icon">load<wbr>Directory</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#loadexamples" class="tsd-kind-icon">load<wbr>Examples</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#loadpackage" class="tsd-kind-icon">load<wbr>Package</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#loadscript" class="tsd-kind-icon">load<wbr>Script</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#loadstyle" class="tsd-kind-icon">load<wbr>Style</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#loadtemplate" class="tsd-kind-icon">load<wbr>Template</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#merge" class="tsd-kind-icon">merge</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#onchange" class="tsd-kind-icon">on<wbr>Change</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#onminichange" class="tsd-kind-icon">on<wbr>Mini<wbr>Change</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#open" class="tsd-kind-icon">open</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#parseapi" class="tsd-kind-icon">parseAPI</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#parseall" class="tsd-kind-icon">parse<wbr>All</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#parseexamples" class="tsd-kind-icon">parse<wbr>Examples</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#parsescript" class="tsd-kind-icon">parse<wbr>Script</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#parsestyle" class="tsd-kind-icon">parse<wbr>Style</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#parsetemplate" class="tsd-kind-icon">parse<wbr>Template</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#preopen" class="tsd-kind-icon">pre<wbr>Open</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#preload" class="tsd-kind-icon">preload</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#readtitleinreadme" class="tsd-kind-icon">read<wbr>Title<wbr>InReadme</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#removeeventlistener" class="tsd-kind-icon">remove<wbr>Event<wbr>Listener</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_fs_vuefile_.vuefile.html#save" class="tsd-kind-icon">save</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#saveas" class="tsd-kind-icon">save<wbr>As</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#transform" class="tsd-kind-icon">transform</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_vuefile_.vuefile.html#warnifnotopen" class="tsd-kind-icon">warn<wbr>IfNot<wbr>Open</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_fs_vuefile_.vuefile.html#watch" class="tsd-kind-icon">watch</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-static"><a href="_fs_vuefile_.vuefile.html#_splitpath" class="tsd-kind-icon">_split<wbr>Path</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-static"><a href="_fs_vuefile_.vuefile.html#fetch" class="tsd-kind-icon">fetch</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_fs_vuefile_.vuefile.html#from" class="tsd-kind-icon">from</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_fs_vuefile_.vuefile.html#resolverootvuedir" class="tsd-kind-icon">resolve<wbr>Root<wbr>Vue<wbr>Dir</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_fs_vuefile_.vuefile.html#resolvetagname" class="tsd-kind-icon">resolve<wbr>Tag<wbr>Name</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Vue<wbr>File<span class="tsd-signature-symbol">(</span>fullPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#constructor">constructor</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L147">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:147</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fullPath: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>完整路径，必须以<code>.vue</code>结尾。也可以是一个相对的虚拟路径</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="_css" class="tsd-anchor"></a>
+					<h3>$css</h3>
+					<div class="tsd-signature tsd-kind-icon">$css<span class="tsd-signature-symbol">:</span> <a href="_fs_stylehandler_.stylehandler.html" class="tsd-signature-type">StyleHandler</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L139">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:139</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Alias of styleHandler</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="_html" class="tsd-anchor"></a>
+					<h3>$html</h3>
+					<div class="tsd-signature tsd-kind-icon">$html<span class="tsd-signature-symbol">:</span> <a href="_fs_templatehandler_.templatehandler.html" class="tsd-signature-type">TemplateHandler</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L121">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:121</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Alias of templateHandler</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="_js" class="tsd-anchor"></a>
+					<h3>$js</h3>
+					<div class="tsd-signature tsd-kind-icon">$js<span class="tsd-signature-symbol">:</span> <a href="_fs_scripthandler_.scripthandler.html" class="tsd-signature-type">ScriptHandler</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L130">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:130</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Alias of scriptHandler</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="_changelisteners" class="tsd-anchor"></a>
+					<h3>_change<wbr>Listeners</h3>
+					<div class="tsd-signature tsd-kind-icon">_change<wbr>Listeners<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#_changelisteners">_changeListeners</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L20">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:20</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="_minichangelisteners" class="tsd-anchor"></a>
+					<h3>_mini<wbr>Change<wbr>Listeners</h3>
+					<div class="tsd-signature tsd-kind-icon">_mini<wbr>Change<wbr>Listeners<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#_minichangelisteners">_miniChangeListeners</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L21">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:21</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="alias" class="tsd-anchor"></a>
+					<h3>alias</h3>
+					<div class="tsd-signature tsd-kind-icon">alias<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L82">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:82</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>别名，用于信息提示等</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="api" class="tsd-anchor"></a>
+					<h3>api</h3>
+					<div class="tsd-signature tsd-kind-icon">api<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L109">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:109</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="apihandler" class="tsd-anchor"></a>
+					<h3>api<wbr>Handler</h3>
+					<div class="tsd-signature tsd-kind-icon">api<wbr>Handler<span class="tsd-signature-symbol">:</span> <a href="_fs_apihandler_.apihandler.html" class="tsd-signature-type">APIHandler</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L143">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:143</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>API 处理器</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="basename" class="tsd-anchor"></a>
+					<h3>base<wbr>Name</h3>
+					<div class="tsd-signature tsd-kind-icon">base<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#basename">baseName</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L11">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:11</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="children" class="tsd-anchor"></a>
+					<h3>children</h3>
+					<div class="tsd-signature tsd-kind-icon">children<span class="tsd-signature-symbol">:</span> <a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L95">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:95</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>该组件的子组件
+							为<code>undefined</code>时表示未 preOpen 过，为数组表示已经打开。</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="componentname" class="tsd-anchor"></a>
+					<h3>component<wbr>Name</h3>
+					<div class="tsd-signature tsd-kind-icon">component<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L78">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:78</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>import 组件名称/大驼峰名称</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="content" class="tsd-anchor"></a>
+					<h3>content</h3>
+					<div class="tsd-signature tsd-kind-icon">content<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L105">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:105</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>单文件读取的内容，或者 generate() 后的内容
+							为<code>undefined</code>表示未打开过</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="examples" class="tsd-anchor"></a>
+					<h3>examples</h3>
+					<div class="tsd-signature tsd-kind-icon">examples<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L110">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:110</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="exampleshandler" class="tsd-anchor"></a>
+					<h3>examples<wbr>Handler</h3>
+					<div class="tsd-signature tsd-kind-icon">examples<wbr>Handler<span class="tsd-signature-symbol">:</span> <a href="_fs_exampleshandler_.exampleshandler.html" class="tsd-signature-type">ExamplesHandler</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L147">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:147</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>文档示例处理器</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="extname" class="tsd-anchor"></a>
+					<h3>ext<wbr>Name</h3>
+					<div class="tsd-signature tsd-kind-icon">ext<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#extname">extName</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L12">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:12</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="filename" class="tsd-anchor"></a>
+					<h3>file<wbr>Name</h3>
+					<div class="tsd-signature tsd-kind-icon">file<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#filename">fileName</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L9">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:9</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="fullpath" class="tsd-anchor"></a>
+					<h3>full<wbr>Path</h3>
+					<div class="tsd-signature tsd-kind-icon">full<wbr>Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#fullpath">fullPath</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L8">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:8</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="ischild" class="tsd-anchor"></a>
+					<h3>is<wbr>Child</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Child<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L99">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:99</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>是否为子组件</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="isdirectory" class="tsd-anchor"></a>
+					<h3>is<wbr>Directory</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Directory<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#isdirectory">isDirectory</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L14">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:14</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="isopen" class="tsd-anchor"></a>
+					<h3>is<wbr>Open</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Open<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#isopen">isOpen</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L16">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:16</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="issaving" class="tsd-anchor"></a>
+					<h3>is<wbr>Saving</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Saving<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#issaving">isSaving</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L18">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:18</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="isvue" class="tsd-anchor"></a>
+					<h3>is<wbr>Vue</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Vue<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#isvue">isVue</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L15">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:15</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="iswatched" class="tsd-anchor"></a>
+					<h3>is<wbr>Watched</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Watched<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#iswatched">isWatched</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L19">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:19</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="package" class="tsd-anchor"></a>
+					<h3>package</h3>
+					<div class="tsd-signature tsd-kind-icon">package<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_types_packagejson_.packagejson.html" class="tsd-signature-type">PackageJSON</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L111">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:111</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="parent" class="tsd-anchor"></a>
+					<h3>parent</h3>
+					<div class="tsd-signature tsd-kind-icon">parent<span class="tsd-signature-symbol">:</span> <a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L86">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:86</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>父 VueFile</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="script" class="tsd-anchor"></a>
+					<h3>script</h3>
+					<div class="tsd-signature tsd-kind-icon">script<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L107">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:107</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="scripthandler" class="tsd-anchor"></a>
+					<h3>script<wbr>Handler</h3>
+					<div class="tsd-signature tsd-kind-icon">script<wbr>Handler<span class="tsd-signature-symbol">:</span> <a href="_fs_scripthandler_.scripthandler.html" class="tsd-signature-type">ScriptHandler</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L126">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:126</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>脚本处理器
+							为<code>undefined</code>表示还未解析</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="style" class="tsd-anchor"></a>
+					<h3>style</h3>
+					<div class="tsd-signature tsd-kind-icon">style<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L108">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:108</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="stylehandler" class="tsd-anchor"></a>
+					<h3>style<wbr>Handler</h3>
+					<div class="tsd-signature tsd-kind-icon">style<wbr>Handler<span class="tsd-signature-symbol">:</span> <a href="_fs_stylehandler_.stylehandler.html" class="tsd-signature-type">StyleHandler</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L135">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:135</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>样式处理器
+							为<code>undefined</code>表示还未解析</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="subfiles" class="tsd-anchor"></a>
+					<h3>subfiles</h3>
+					<div class="tsd-signature tsd-kind-icon">subfiles<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L90">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:90</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>多文件组件的子文件</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="tagname" class="tsd-anchor"></a>
+					<h3>tag<wbr>Name</h3>
+					<div class="tsd-signature tsd-kind-icon">tag<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L74">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:74</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>标签名称/中划线名称</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="template" class="tsd-anchor"></a>
+					<h3>template</h3>
+					<div class="tsd-signature tsd-kind-icon">template<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L106">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:106</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="templatehandler" class="tsd-anchor"></a>
+					<h3>template<wbr>Handler</h3>
+					<div class="tsd-signature tsd-kind-icon">template<wbr>Handler<span class="tsd-signature-symbol">:</span> <a href="_fs_templatehandler_.templatehandler.html" class="tsd-signature-type">TemplateHandler</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L117">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:117</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>模板处理器
+							为<code>undefined</code>表示还未解析</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="title" class="tsd-anchor"></a>
+					<h3>title</h3>
+					<div class="tsd-signature tsd-kind-icon">title<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#title">title</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L13">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:13</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="addeventlistener" class="tsd-anchor"></a>
+					<h3>add<wbr>Event<wbr>Listener</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Event<wbr>Listener<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#addeventlistener">addEventListener</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L70">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:70</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>listener: <span class="tsd-signature-type">Function</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="checktransform" class="tsd-anchor"></a>
+					<h3>check<wbr>Transform</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">check<wbr>Transform<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L633">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:633</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="clone" class="tsd-anchor"></a>
+					<h3>clone</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">clone<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L514">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:514</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>克隆 VueFile 对象
+									克隆所有参数，但 handler 引用会被排除</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="close" class="tsd-anchor"></a>
+					<h3>close</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">close<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#close">close</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L252">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:252</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>关闭文件</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="extend" class="tsd-anchor"></a>
+					<h3>extend</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">extend<span class="tsd-signature-symbol">(</span>mode<span class="tsd-signature-symbol">: </span><a href="../enums/_fs_vuefile_.vuefileextendmode.html" class="tsd-signature-type">VueFileExtendMode</a>, fullPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, fromPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L742">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:742</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>mode: <a href="../enums/_fs_vuefile_.vuefileextendmode.html" class="tsd-signature-type">VueFileExtendMode</a></h5>
+								</li>
+								<li>
+									<h5>fullPath: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>fromPath: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="findsuper" class="tsd-anchor"></a>
+					<h3>find<wbr>Super</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">find<wbr>Super<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L773">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:773</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>根据 extends 查找基类组件</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="forceopen" class="tsd-anchor"></a>
+					<h3>force<wbr>Open</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">force<wbr>Open<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#forceopen">forceOpen</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L242">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:242</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>强制重新打开</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="generate" class="tsd-anchor"></a>
+					<h3>generate</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">generate<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-signature-type">TemplateOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L487">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:487</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-signature-type">TemplateOptions</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="hasassets" class="tsd-anchor"></a>
+					<h3>has<wbr>Assets</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Assets<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L388">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:388</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="hasextra" class="tsd-anchor"></a>
+					<h3>has<wbr>Extra</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Extra<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L395">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:395</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>是否有额外的</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="hasscript" class="tsd-anchor"></a>
+					<h3>has<wbr>Script</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Script<span class="tsd-signature-symbol">(</span>simplify<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L415">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:415</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>是否有 JS 脚本</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>simplify: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>简化模式。在此模式下，<code>export default {};</code>视为没有 JS 脚本</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="hasstyle" class="tsd-anchor"></a>
+					<h3>has<wbr>Style</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Style<span class="tsd-signature-symbol">(</span>simplify<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L427">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:427</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>是否有 CSS 样式</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>simplify: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>简化模式。在此模式下，<code>.root {}</code>视为没有 CSS 样式</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="hastemplate" class="tsd-anchor"></a>
+					<h3>has<wbr>Template</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Template<span class="tsd-signature-symbol">(</span>simplify<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L403">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:403</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>是否有模板</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>simplify: <span class="tsd-signature-type">boolean</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>简化模式。在此模式下，<code>&lt;div&gt;&lt;/div&gt;</code>视为没有模板</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+					<a name="load" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> load</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+						<li class="tsd-signature tsd-kind-icon">load<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L282">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:282</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>加载所有内容</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="loadapi" class="tsd-anchor"></a>
+					<h3>loadAPI</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">loadAPI<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L349">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:349</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="loaddirectory" class="tsd-anchor"></a>
+					<h3>load<wbr>Directory</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">load<wbr>Directory<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L214">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:214</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>加载多文件目录</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="loadexamples" class="tsd-anchor"></a>
+					<h3>load<wbr>Examples</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">load<wbr>Examples<span class="tsd-signature-symbol">(</span>from<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L362">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:362</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> from: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="loadpackage" class="tsd-anchor"></a>
+					<h3>load<wbr>Package</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">load<wbr>Package<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L338">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:338</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="loadscript" class="tsd-anchor"></a>
+					<h3>load<wbr>Script</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">load<wbr>Script<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L303">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:303</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="loadstyle" class="tsd-anchor"></a>
+					<h3>load<wbr>Style</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">load<wbr>Style<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L327">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:327</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="loadtemplate" class="tsd-anchor"></a>
+					<h3>load<wbr>Template</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">load<wbr>Template<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L316">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:316</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="merge" class="tsd-anchor"></a>
+					<h3>merge</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">merge<span class="tsd-signature-symbol">(</span>that<span class="tsd-signature-symbol">: </span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a>, route<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>character<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>line<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L733">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:733</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>与另一个 Vue 文件合并模板、逻辑和样式
+									两个 VueFile 必须先 parseAll()</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>that: <a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>另一个 VueFile</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> route: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>character<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>line<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>插入的节点路径，最后一位表示节点位置，为空表示最后，比如 /1/2/1 表示插入到根节点的第1个子节点的第2个子节点的第1个位置</p>
+										<ul>
+											<li>merge(that, &#39;&#39;) 指根节点本身</li>
+											<li>merge(that, &#39;/&#39;) 指根节点本身</li>
+											<li>merge(that, &#39;/0&#39;) 指第0个子节点</li>
+											<li>merge(that, &#39;/2/1&#39;) 指第2个子节点的第1个子节点</li>
+											<li>merge(that, &#39;/2/&#39;) 指第2个子节点的最后</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{}</span></h4>
+							<ul class="tsd-parameters">
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="onchange" class="tsd-anchor"></a>
+					<h3>on<wbr>Change</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Change<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, filePath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, key<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, hash<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#onchange">onChange</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L66">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:66</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>filePath: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> key: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> hash: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="onminichange" class="tsd-anchor"></a>
+					<h3>on<wbr>Mini<wbr>Change</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Mini<wbr>Change<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, filePath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, key<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, hash<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#onminichange">onMiniChange</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L58">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:58</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>filePath: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> key: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> hash: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="open" class="tsd-anchor"></a>
+					<h3>open</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">open<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#open">open</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L38">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:38</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="parseapi" class="tsd-anchor"></a>
+					<h3>parseAPI</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">parseAPI<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_apihandler_.apihandler.html" class="tsd-signature-type">APIHandler</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L473">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:473</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_apihandler_.apihandler.html" class="tsd-signature-type">APIHandler</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="parseall" class="tsd-anchor"></a>
+					<h3>parse<wbr>All</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>All<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L442">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:442</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="parseexamples" class="tsd-anchor"></a>
+					<h3>parse<wbr>Examples</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Examples<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_exampleshandler_.exampleshandler.html" class="tsd-signature-type">ExamplesHandler</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L480">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:480</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_exampleshandler_.exampleshandler.html" class="tsd-signature-type">ExamplesHandler</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="parsescript" class="tsd-anchor"></a>
+					<h3>parse<wbr>Script</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Script<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_scripthandler_.scripthandler.html" class="tsd-signature-type">ScriptHandler</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L459">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:459</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_scripthandler_.scripthandler.html" class="tsd-signature-type">ScriptHandler</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="parsestyle" class="tsd-anchor"></a>
+					<h3>parse<wbr>Style</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Style<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_stylehandler_.stylehandler.html" class="tsd-signature-type">StyleHandler</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L466">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:466</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_stylehandler_.stylehandler.html" class="tsd-signature-type">StyleHandler</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="parsetemplate" class="tsd-anchor"></a>
+					<h3>parse<wbr>Template</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Template<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_templatehandler_.templatehandler.html" class="tsd-signature-type">TemplateHandler</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L452">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:452</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_templatehandler_.templatehandler.html" class="tsd-signature-type">TemplateHandler</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="preopen" class="tsd-anchor"></a>
+					<h3>pre<wbr>Open</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">pre<wbr>Open<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L166">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:166</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>提前打开
+										检测 VueFile 文件类型，以及子组件等
+									一般用于在列表中快速获取信息，相比直接 open 读取文件内容来说，少耗一些性能</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="preload" class="tsd-anchor"></a>
+					<h3>preload</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">preload<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L295">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:295</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>预加载
+									只加载 content</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="readtitleinreadme" class="tsd-anchor"></a>
+					<h3>read<wbr>Title<wbr>InReadme</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">read<wbr>Title<wbr>InReadme<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L185">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:185</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>尝试读取 README.md 的标题行
+									在前 10 行中查找</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="removeeventlistener" class="tsd-anchor"></a>
+					<h3>remove<wbr>Event<wbr>Listener</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">remove<wbr>Event<wbr>Listener<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#removeeventlistener">removeEventListener</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L82">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:82</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>eventName: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>listener: <span class="tsd-signature-type">Function</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="save" class="tsd-anchor"></a>
+					<h3>save</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">save<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#save">save</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L549">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:549</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>await vueFile.save();
+									仅依赖 this.fullPath 和 this.isDirectory 两个变量</p>
+									<ul>
+										<li>如果有解析，先根据解析器生成内容，再保存</li>
+										<li>根据 isDirectory 判断是否保存单多文件</li>
+									</ul>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="saveas" class="tsd-anchor"></a>
+					<h3>save<wbr>As</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">save<wbr>As<span class="tsd-signature-symbol">(</span>fullPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, isDirectory<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L582">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:582</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>另存为，保存到另一个路径
+									会克隆所有内容参数，但 handler 引用会被排除</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fullPath: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> isDirectory: <span class="tsd-signature-type">boolean</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="transform" class="tsd-anchor"></a>
+					<h3>transform</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">transform<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L649">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:649</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="warnifnotopen" class="tsd-anchor"></a>
+					<h3>warn<wbr>IfNot<wbr>Open</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">warn<wbr>IfNot<wbr>Open<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L437">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:437</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="watch" class="tsd-anchor"></a>
+					<h3>watch</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">watch<span class="tsd-signature-symbol">(</span>listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, filePath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">FSWatcher</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#watch">watch</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/FSEntry.ts#L95">Projects/GitHub/VusionIDE/vusion-api/src/fs/FSEntry.ts:95</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>listener: <span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, filePath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, filePath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>eventName: <span class="tsd-signature-type">string</span></h5>
+														</li>
+														<li>
+															<h5>filePath: <span class="tsd-signature-type">string</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">FSWatcher</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-static">
+					<a name="_splitpath" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagPrivate">Private</span> _split<wbr>Path</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">_split<wbr>Path<span class="tsd-signature-symbol">(</span>fullPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>arr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L787">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:787</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fullPath: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>arr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>arr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-static">
+					<a name="fetch" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> fetch</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">fetch<span class="tsd-signature-symbol">(</span>fullPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="_fs_fsentry_.fsentry.html">FSEntry</a>.<a href="_fs_fsentry_.fsentry.html#fetch">fetch</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L824">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:824</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fullPath: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="from" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> from</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">from<span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, fileName<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L833">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:833</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>从代码创建临时的 VueFile 文件
+									相关于跳过 preOpen 和 open 阶段，但路径是虚拟的</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>code: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>代码</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> fileName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;temp.vue&quot;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="resolverootvuedir" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> resolve<wbr>Root<wbr>Vue<wbr>Dir</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">resolve<wbr>Root<wbr>Vue<wbr>Dir<span class="tsd-signature-symbol">(</span>fullPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L801">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:801</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>计算根组件所在的目录</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fullPath: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>完整路径</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="resolvetagname" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> resolve<wbr>Tag<wbr>Name</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">resolve<wbr>Tag<wbr>Name<span class="tsd-signature-symbol">(</span>fullPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/VueFile.ts#L806">Projects/GitHub/VusionIDE/vusion-api/src/fs/VueFile.ts:806</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fullPath: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-external-module">
+						<a href="../modules/_fs_vuefile_.html">&quot;fs/<wbr>Vue<wbr>File&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_fs_vuefile_.vuefileextendmode.html" class="tsd-kind-icon">Vue<wbr>File<wbr>Extend<wbr>Mode</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-external-module">
+						<a href="_fs_vuefile_.vuefile.html" class="tsd-kind-icon">Vue<wbr>File</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_fs_vuefile_.vuefile.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#_css" class="tsd-kind-icon">$css</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#_html" class="tsd-kind-icon">$html</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#_js" class="tsd-kind-icon">$js</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#_changelisteners" class="tsd-kind-icon">_change<wbr>Listeners</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#_minichangelisteners" class="tsd-kind-icon">_mini<wbr>Change<wbr>Listeners</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#alias" class="tsd-kind-icon">alias</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#api" class="tsd-kind-icon">api</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#apihandler" class="tsd-kind-icon">api<wbr>Handler</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#basename" class="tsd-kind-icon">base<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#children" class="tsd-kind-icon">children</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#componentname" class="tsd-kind-icon">component<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#content" class="tsd-kind-icon">content</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#examples" class="tsd-kind-icon">examples</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#exampleshandler" class="tsd-kind-icon">examples<wbr>Handler</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#extname" class="tsd-kind-icon">ext<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#filename" class="tsd-kind-icon">file<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#fullpath" class="tsd-kind-icon">full<wbr>Path</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#ischild" class="tsd-kind-icon">is<wbr>Child</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#isdirectory" class="tsd-kind-icon">is<wbr>Directory</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#isopen" class="tsd-kind-icon">is<wbr>Open</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#issaving" class="tsd-kind-icon">is<wbr>Saving</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#isvue" class="tsd-kind-icon">is<wbr>Vue</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#iswatched" class="tsd-kind-icon">is<wbr>Watched</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#package" class="tsd-kind-icon">package</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#parent" class="tsd-kind-icon">parent</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#script" class="tsd-kind-icon">script</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#scripthandler" class="tsd-kind-icon">script<wbr>Handler</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#style" class="tsd-kind-icon">style</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#stylehandler" class="tsd-kind-icon">style<wbr>Handler</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#subfiles" class="tsd-kind-icon">subfiles</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#tagname" class="tsd-kind-icon">tag<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#template" class="tsd-kind-icon">template</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#templatehandler" class="tsd-kind-icon">template<wbr>Handler</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#title" class="tsd-kind-icon">title</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#addeventlistener" class="tsd-kind-icon">add<wbr>Event<wbr>Listener</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#checktransform" class="tsd-kind-icon">check<wbr>Transform</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#clone" class="tsd-kind-icon">clone</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_fs_vuefile_.vuefile.html#close" class="tsd-kind-icon">close</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#extend" class="tsd-kind-icon">extend</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#findsuper" class="tsd-kind-icon">find<wbr>Super</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_fs_vuefile_.vuefile.html#forceopen" class="tsd-kind-icon">force<wbr>Open</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#generate" class="tsd-kind-icon">generate</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#hasassets" class="tsd-kind-icon">has<wbr>Assets</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#hasextra" class="tsd-kind-icon">has<wbr>Extra</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#hasscript" class="tsd-kind-icon">has<wbr>Script</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#hasstyle" class="tsd-kind-icon">has<wbr>Style</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#hastemplate" class="tsd-kind-icon">has<wbr>Template</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-protected">
+								<a href="_fs_vuefile_.vuefile.html#load" class="tsd-kind-icon">load</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#loadapi" class="tsd-kind-icon">loadAPI</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#loaddirectory" class="tsd-kind-icon">load<wbr>Directory</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#loadexamples" class="tsd-kind-icon">load<wbr>Examples</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#loadpackage" class="tsd-kind-icon">load<wbr>Package</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#loadscript" class="tsd-kind-icon">load<wbr>Script</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#loadstyle" class="tsd-kind-icon">load<wbr>Style</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#loadtemplate" class="tsd-kind-icon">load<wbr>Template</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#merge" class="tsd-kind-icon">merge</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#onchange" class="tsd-kind-icon">on<wbr>Change</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#onminichange" class="tsd-kind-icon">on<wbr>Mini<wbr>Change</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#open" class="tsd-kind-icon">open</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#parseapi" class="tsd-kind-icon">parseAPI</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#parseall" class="tsd-kind-icon">parse<wbr>All</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#parseexamples" class="tsd-kind-icon">parse<wbr>Examples</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#parsescript" class="tsd-kind-icon">parse<wbr>Script</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#parsestyle" class="tsd-kind-icon">parse<wbr>Style</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#parsetemplate" class="tsd-kind-icon">parse<wbr>Template</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#preopen" class="tsd-kind-icon">pre<wbr>Open</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#preload" class="tsd-kind-icon">preload</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#readtitleinreadme" class="tsd-kind-icon">read<wbr>Title<wbr>InReadme</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#removeeventlistener" class="tsd-kind-icon">remove<wbr>Event<wbr>Listener</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_fs_vuefile_.vuefile.html#save" class="tsd-kind-icon">save</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#saveas" class="tsd-kind-icon">save<wbr>As</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#transform" class="tsd-kind-icon">transform</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_vuefile_.vuefile.html#warnifnotopen" class="tsd-kind-icon">warn<wbr>IfNot<wbr>Open</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_fs_vuefile_.vuefile.html#watch" class="tsd-kind-icon">watch</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private tsd-is-static">
+								<a href="_fs_vuefile_.vuefile.html#_splitpath" class="tsd-kind-icon">_split<wbr>Path</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-static">
+								<a href="_fs_vuefile_.vuefile.html#fetch" class="tsd-kind-icon">fetch</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_fs_vuefile_.vuefile.html#from" class="tsd-kind-icon">from</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_fs_vuefile_.vuefile.html#resolverootvuedir" class="tsd-kind-icon">resolve<wbr>Root<wbr>Vue<wbr>Dir</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_fs_vuefile_.vuefile.html#resolvetagname" class="tsd-kind-icon">resolve<wbr>Tag<wbr>Name</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_fs_vuefile_.html#subfile_list" class="tsd-kind-icon">SUBFILE_<wbr>LIST</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_fs_vuefile_.html#fetchpartialcontent" class="tsd-kind-icon">fetch<wbr>Partial<wbr>Content</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
