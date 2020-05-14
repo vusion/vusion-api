@@ -69,6 +69,14 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>模板 AST 处理器
+						该 class 可以在两端(node, browser)运行</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -98,8 +106,11 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_templatehandler_.templatehandler.html#findbyposition" class="tsd-kind-icon">find<wbr>ByPosition</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_templatehandler_.templatehandler.html#findbyroute" class="tsd-kind-icon">find<wbr>ByRoute</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_templatehandler_.templatehandler.html#generate" class="tsd-kind-icon">generate</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_templatehandler_.templatehandler.html#generateelement" class="tsd-kind-icon">generate<wbr>Element</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_templatehandler_.templatehandler.html#merge" class="tsd-kind-icon">merge</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_templatehandler_.templatehandler.html#parse" class="tsd-kind-icon">parse</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_templatehandler_.templatehandler.html#traverse" class="tsd-kind-icon">traverse</a></li>
 							</ul>
@@ -113,13 +124,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Template<wbr>Handler<span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_templatehandler_.templatehandler.html" class="tsd-signature-type">TemplateHandler</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Template<wbr>Handler<span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-signature-type">TemplateOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_templatehandler_.templatehandler.html" class="tsd-signature-type">TemplateHandler</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/TemplateHandler.ts#L21">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L40">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:40</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -128,7 +139,7 @@
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> code: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <span class="tsd-signature-type">Object</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-signature-type">TemplateOptions</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_fs_templatehandler_.templatehandler.html" class="tsd-signature-type">TemplateHandler</a></h4>
@@ -144,7 +155,7 @@
 					<div class="tsd-signature tsd-kind-icon">ast<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ASTElement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/TemplateHandler.ts#L17">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L39">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:39</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -154,47 +165,119 @@
 					<div class="tsd-signature tsd-kind-icon">code<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/TemplateHandler.ts#L16">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L38">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:38</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="options" class="tsd-anchor"></a>
 					<h3>options</h3>
-					<div class="tsd-signature tsd-kind-icon">options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>startLevel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>tabLength<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">options<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-signature-type">TemplateOptions</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/TemplateHandler.ts#L18">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L40">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:40</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5>start<wbr>Level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5>tab<wbr>Length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
-							</li>
-						</ul>
-					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="generate" class="tsd-anchor"></a>
-					<h3>generate</h3>
+					<a name="findbyposition" class="tsd-anchor"></a>
+					<h3>find<wbr>ByPosition</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">generate<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">find<wbr>ByPosition<span class="tsd-signature-symbol">(</span>position<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>character<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>line<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">compiler.ASTNode</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/TemplateHandler.ts#L41">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L157">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:157</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>该函数处理一个试用阶段</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>position: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>character<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>line<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">compiler.ASTNode</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="findbyroute" class="tsd-anchor"></a>
+					<h3>find<wbr>ByRoute</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">find<wbr>ByRoute<span class="tsd-signature-symbol">(</span>route<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, node<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">compiler.ASTNode</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">compiler.ASTNode</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L143">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:143</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>根据路径查找子节点</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>examples</dt>
+									<dd><ul>
+											<li>findByRoute(&#39;&#39;, root) 指根节点本身</li>
+											<li>findByRoute(&#39;/&#39;, root) 指根节点本身</li>
+											<li>findByRoute(&#39;/0&#39;, root) 指第0个子节点</li>
+											<li>findByRoute(&#39;/2/1&#39;, root) 指第2个子节点的第1个子节点</li>
+										</ul>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>route: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>节点路径，/1/2 表示根节点的第1个子节点的第2个子节点</p>
+									</div>
+								</li>
+								<li>
+									<h5>node: <span class="tsd-signature-type">compiler.ASTNode</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>查找的起始节点</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">compiler.ASTNode</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="generate" class="tsd-anchor"></a>
+					<h3>generate</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">generate<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-signature-type">TemplateOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L60">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:60</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-signature-type">TemplateOptions</a></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 						</li>
 					</ul>
@@ -203,13 +286,13 @@
 					<a name="generateelement" class="tsd-anchor"></a>
 					<h3>generate<wbr>Element</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">generate<wbr>Element<span class="tsd-signature-symbol">(</span>el<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ASTElement</span>, level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">generate<wbr>Element<span class="tsd-signature-symbol">(</span>el<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ASTElement</span>, level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, options<span class="tsd-signature-symbol">: </span><a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-signature-type">TemplateOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/TemplateHandler.ts#L48">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:48</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L69">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:69</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -220,8 +303,71 @@
 								<li>
 									<h5>level: <span class="tsd-signature-type">number</span></h5>
 								</li>
+								<li>
+									<h5>options: <a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-signature-type">TemplateOptions</a></h5>
+								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="merge" class="tsd-anchor"></a>
+					<h3>merge</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">merge<span class="tsd-signature-symbol">(</span>that<span class="tsd-signature-symbol">: </span><a href="_fs_templatehandler_.templatehandler.html" class="tsd-signature-type">TemplateHandler</a>, route<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>character<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>line<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span>, replacements<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L190">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:190</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将另一个 that 的模板合并到当前模板中</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>that: <a href="_fs_templatehandler_.templatehandler.html" class="tsd-signature-type">TemplateHandler</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>另一个 TemplateHandler</p>
+									</div>
+								</li>
+								<li>
+									<h5>route: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>character<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>line<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>插入的节点路径，最后一位表示节点位置，为空表示最后，比如 /1/2/1 表示插入到根节点的第1个子节点的第2个子节点的第1个位置</p>
+										<ul>
+											<li>merge(that, &#39;&#39;) 指根节点本身</li>
+											<li>merge(that, &#39;/&#39;) 指根节点本身</li>
+											<li>merge(that, &#39;/0&#39;) 指第0个子节点</li>
+											<li>merge(that, &#39;/2/1&#39;) 指第2个子节点的第1个子节点</li>
+											<li>merge(that, &#39;/2/&#39;) 指第2个子节点的最后</li>
+										</ul>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> replacements: <span class="tsd-signature-symbol">{}</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>需要跟着替换的样式和变量</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-index-signature">
+											<h5><span class="tsd-signature-symbol">[</span>key: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-symbol">{}</span></h5>
+											<ul class="tsd-parameters">
+												<li class="tsd-parameter-index-signature">
+													<h5><span class="tsd-signature-symbol">[</span>old: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span></h5>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -235,7 +381,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/TemplateHandler.ts#L32">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L51">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:51</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -258,7 +404,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/TemplateHandler.ts#L91">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:91</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/TemplateHandler.ts#L118">Projects/GitHub/VusionIDE/vusion-api/src/fs/TemplateHandler.ts:118</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -325,10 +471,19 @@
 								<a href="_fs_templatehandler_.templatehandler.html#options" class="tsd-kind-icon">options</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_templatehandler_.templatehandler.html#findbyposition" class="tsd-kind-icon">find<wbr>ByPosition</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_templatehandler_.templatehandler.html#findbyroute" class="tsd-kind-icon">find<wbr>ByRoute</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_fs_templatehandler_.templatehandler.html#generate" class="tsd-kind-icon">generate</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_fs_templatehandler_.templatehandler.html#generateelement" class="tsd-kind-icon">generate<wbr>Element</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_templatehandler_.templatehandler.html#merge" class="tsd-kind-icon">merge</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_fs_templatehandler_.templatehandler.html#parse" class="tsd-kind-icon">parse</a>
@@ -340,6 +495,15 @@
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_fs_templatehandler_.templateoptions.html" class="tsd-kind-icon">Template<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_fs_templatehandler_.html#astelement" class="tsd-kind-icon">ASTElement</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_fs_templatehandler_.html#attr" class="tsd-kind-icon">Attr</a>
+					</li>
 				</ul>
 			</nav>
 		</div>

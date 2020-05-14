@@ -93,13 +93,27 @@
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#ast" class="tsd-kind-icon">ast</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#code" class="tsd-kind-icon">code</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#dirty" class="tsd-kind-icon">dirty</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#state" class="tsd-kind-icon">state</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#default" class="tsd-kind-icon">default</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#export" class="tsd-kind-icon">export</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#from" class="tsd-kind-icon">from</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#froms" class="tsd-kind-icon">froms</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#generate" class="tsd-kind-icon">generate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#import" class="tsd-kind-icon">import</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#imports" class="tsd-kind-icon">imports</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#merge" class="tsd-kind-icon">merge</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#mergearray" class="tsd-kind-icon">merge<wbr>Array</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#mergefunction" class="tsd-kind-icon">merge<wbr>Function</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#mergeobject" class="tsd-kind-icon">merge<wbr>Object</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#mergevueobject" class="tsd-kind-icon">merge<wbr>Vue<wbr>Object</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#parse" class="tsd-kind-icon">parse</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#resetstate" class="tsd-kind-icon">reset<wbr>State</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_scripthandler_.scripthandler.html#variables" class="tsd-kind-icon">variables</a></li>
 							</ul>
 						</section>
 					</div>
@@ -117,7 +131,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/ScriptHandler.ts#L21">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L291">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:291</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -142,7 +156,7 @@
 					<div class="tsd-signature tsd-kind-icon">ast<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">File</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/ScriptHandler.ts#L20">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L289">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:289</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -152,7 +166,7 @@
 					<div class="tsd-signature tsd-kind-icon">code<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/ScriptHandler.ts#L19">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L288">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:288</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -162,13 +176,127 @@
 					<div class="tsd-signature tsd-kind-icon">dirty<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/ScriptHandler.ts#L21">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L290">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:290</a></li>
 						</ul>
 					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="state" class="tsd-anchor"></a>
+					<h3>state</h3>
+					<div class="tsd-signature tsd-kind-icon">state<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L291">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:291</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>name: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h5>
+							</li>
+						</ul>
+					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="default" class="tsd-anchor"></a>
+					<h3>default</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">default<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_scripthandler_.declarationhandler.html" class="tsd-signature-type">DeclarationHandler</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L440">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:440</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_scripthandler_.declarationhandler.html" class="tsd-signature-type">DeclarationHandler</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="export" class="tsd-anchor"></a>
+					<h3>export</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">export<span class="tsd-signature-symbol">(</span>specifier<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L361">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:361</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> specifier: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="from" class="tsd-anchor"></a>
+					<h3>from</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">from<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L379">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:379</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>从哪里引入
+									如果遇到相同路径，以前的会被替换；如果不存在相同路径，则添加到最后一个 ImportDeclaration 之后</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>source: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>文件路径</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="froms" class="tsd-anchor"></a>
+					<h3>froms</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">froms<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_scripthandler_.fromshandler.html" class="tsd-signature-type">FromsHandler</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L436">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:436</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>获取所有包含 from 的 import 和 export 声明
+										import xxx from &#39;source&#39;/export xxx from &#39;source&#39;
+									一般用于判断存在或删除</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_scripthandler_.fromshandler.html" class="tsd-signature-type">FromsHandler</a></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="generate" class="tsd-anchor"></a>
 					<h3>generate</h3>
@@ -179,10 +307,263 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/ScriptHandler.ts#L35">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L306">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:306</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="import" class="tsd-anchor"></a>
+					<h3>import</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">import<span class="tsd-signature-symbol">(</span>specifier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">this</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L341">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:341</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>引入</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><p>$js.import(&#39;*&#39;).from(&#39;./u-button.vue&#39;);
+											$js.import(&#39;UButton&#39;).from(&#39;./u-button.vue&#39;);
+										$js.import({ default: &#39;UButton&#39;, UButton2: &#39;&#39;, UButton3: &#39;UButton3&#39; }).from(&#39;./u-button.vue&#39;);</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>specifier: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{}</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>指示符</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="imports" class="tsd-anchor"></a>
+					<h3>imports</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">imports<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_scripthandler_.importshandler.html" class="tsd-signature-type">ImportsHandler</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L357">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:357</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>用于在全部的 import 集合中处理查找、删除等操作</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_scripthandler_.importshandler.html" class="tsd-signature-type">ImportsHandler</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="merge" class="tsd-anchor"></a>
+					<h3>merge</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">merge<span class="tsd-signature-symbol">(</span>that<span class="tsd-signature-symbol">: </span><a href="_fs_scripthandler_.scripthandler.html" class="tsd-signature-type">ScriptHandler</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L686">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:686</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将另一个 that 的脚本合并到当前样式中
+									原则是处理能够名单里的代码，其它的自然合并（因此可能会有问题）</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>todo</dt>
+									<dd><p>目前对另一个 that 的样式 ast 有修改</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>that: <a href="_fs_scripthandler_.scripthandler.html" class="tsd-signature-type">ScriptHandler</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>另一个 ScriptHandler</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{}</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter-index-signature">
+									<h5><span class="tsd-signature-symbol">[</span>key: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-symbol">{}</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-index-signature">
+											<h5><span class="tsd-signature-symbol">[</span>old: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="mergearray" class="tsd-anchor"></a>
+					<h3>merge<wbr>Array</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">merge<wbr>Array<span class="tsd-signature-symbol">(</span>thisArray<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayExpression</span>, thatArray<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayExpression</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L470">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:470</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>处理 mixins 不去重了，直接复用</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>thisArray: <span class="tsd-signature-type">ArrayExpression</span></h5>
+								</li>
+								<li>
+									<h5>thatArray: <span class="tsd-signature-type">ArrayExpression</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{}</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter-index-signature">
+									<h5><span class="tsd-signature-symbol">[</span>old: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="mergefunction" class="tsd-anchor"></a>
+					<h3>merge<wbr>Function</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">merge<wbr>Function<span class="tsd-signature-symbol">(</span>thisFunction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ObjectMethod</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">FunctionExpression</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrowFunctionExpression</span>, thatFunction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ObjectMethod</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">FunctionExpression</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrowFunctionExpression</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L517">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:517</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>没有管 params 不相同的情况</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>thisFunction: <span class="tsd-signature-type">ObjectMethod</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">FunctionExpression</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrowFunctionExpression</span></h5>
+								</li>
+								<li>
+									<h5>thatFunction: <span class="tsd-signature-type">ObjectMethod</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">FunctionExpression</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrowFunctionExpression</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{}</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter-index-signature">
+									<h5><span class="tsd-signature-symbol">[</span>key: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-symbol">{}</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-index-signature">
+											<h5><span class="tsd-signature-symbol">[</span>old: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="mergeobject" class="tsd-anchor"></a>
+					<h3>merge<wbr>Object</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">merge<wbr>Object<span class="tsd-signature-symbol">(</span>thisObject<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ObjectExpression</span>, thatObject<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ObjectExpression</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L492">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:492</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>thisObject: <span class="tsd-signature-type">ObjectExpression</span></h5>
+								</li>
+								<li>
+									<h5>thatObject: <span class="tsd-signature-type">ObjectExpression</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{}</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter-index-signature">
+									<h5><span class="tsd-signature-symbol">[</span>old: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="mergevueobject" class="tsd-anchor"></a>
+					<h3>merge<wbr>Vue<wbr>Object</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">merge<wbr>Vue<wbr>Object<span class="tsd-signature-symbol">(</span>thisObject<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ObjectExpression</span>, thatObject<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ObjectExpression</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L558">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:558</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>thisObject: <span class="tsd-signature-type">ObjectExpression</span></h5>
+								</li>
+								<li>
+									<h5>thatObject: <span class="tsd-signature-type">ObjectExpression</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{}</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter-index-signature">
+									<h5><span class="tsd-signature-symbol">[</span>key: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-symbol">{}</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-index-signature">
+											<h5><span class="tsd-signature-symbol">[</span>old: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
 						</li>
 					</ul>
 				</section>
@@ -196,7 +577,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/ScriptHandler.ts#L28">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L299">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:299</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -206,6 +587,45 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">File</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="resetstate" class="tsd-anchor"></a>
+					<h3>reset<wbr>State</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">reset<wbr>State<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L329">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:329</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="variables" class="tsd-anchor"></a>
+					<h3>variables</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">variables<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_fs_scripthandler_.statementhandler.html" class="tsd-signature-type">StatementHandler</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/ScriptHandler.ts#L463">Projects/GitHub/VusionIDE/vusion-api/src/fs/ScriptHandler.ts:463</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>用于在当前级别的作用域所有变量集合中处理查找、删除等操作</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="_fs_scripthandler_.statementhandler.html" class="tsd-signature-type">StatementHandler</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -224,6 +644,15 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_fs_scripthandler_.declarationhandler.html" class="tsd-kind-icon">Declaration<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_fs_scripthandler_.fromshandler.html" class="tsd-kind-icon">Froms<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_fs_scripthandler_.importshandler.html" class="tsd-kind-icon">Imports<wbr>Handler</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-external-module">
@@ -241,16 +670,73 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_fs_scripthandler_.scripthandler.html#dirty" class="tsd-kind-icon">dirty</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#state" class="tsd-kind-icon">state</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#default" class="tsd-kind-icon">default</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#export" class="tsd-kind-icon">export</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#from" class="tsd-kind-icon">from</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#froms" class="tsd-kind-icon">froms</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_fs_scripthandler_.scripthandler.html#generate" class="tsd-kind-icon">generate</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#import" class="tsd-kind-icon">import</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#imports" class="tsd-kind-icon">imports</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#merge" class="tsd-kind-icon">merge</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#mergearray" class="tsd-kind-icon">merge<wbr>Array</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#mergefunction" class="tsd-kind-icon">merge<wbr>Function</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#mergeobject" class="tsd-kind-icon">merge<wbr>Object</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#mergevueobject" class="tsd-kind-icon">merge<wbr>Vue<wbr>Object</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_fs_scripthandler_.scripthandler.html#parse" class="tsd-kind-icon">parse</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#resetstate" class="tsd-kind-icon">reset<wbr>State</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_scripthandler_.scripthandler.html#variables" class="tsd-kind-icon">variables</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_fs_scripthandler_.statementhandler.html" class="tsd-kind-icon">Statement<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_fs_scripthandler_.html#lifecycle_hooks" class="tsd-kind-icon">LIFECYCLE_<wbr>HOOKS</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_fs_scripthandler_.html#order_in_components" class="tsd-kind-icon">ORDER_<wbr>IN_<wbr>COMPONENTS</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module">
+						<a href="../modules/_fs_scripthandler_.html#order_in_components_map" class="tsd-kind-icon">ORDER_<wbr>IN_<wbr>COMPONENTS_<wbr>MAP</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-external-module">
+						<a href="../modules/_fs_scripthandler_.html#simplified_node_type" class="tsd-kind-icon">SIMPLIFIED_<wbr>NODE_<wbr>TYPE</a>
+					</li>
 					<li class=" tsd-kind-object-literal tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="../modules/_fs_scripthandler_.html#prettierconfig" class="tsd-kind-icon">prettier<wbr>Config</a>
 					</li>

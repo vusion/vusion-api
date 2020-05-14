@@ -69,6 +69,14 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>处理组件 API 的类
+						用于修改、保存，以及生成 Markdown 文档等功能</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -93,12 +101,16 @@
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#content" class="tsd-kind-icon">content</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#fullpath" class="tsd-kind-icon">full<wbr>Path</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#json" class="tsd-kind-icon">json</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#markdownit" class="tsd-kind-icon">markdown<wbr>It</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#generate" class="tsd-kind-icon">generate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#gettocfromapi" class="tsd-kind-icon">getTOCFromAPI</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#gettocfromcontent" class="tsd-kind-icon">getTOCFrom<wbr>Content</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#gettocfromfile" class="tsd-kind-icon">getTOCFrom<wbr>File</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#markdown" class="tsd-kind-icon">markdown</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#markdownapi" class="tsd-kind-icon">markdownAPI</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#markdownaria" class="tsd-kind-icon">markdownARIA</a></li>
@@ -110,6 +122,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#markdownmethods" class="tsd-kind-icon">markdown<wbr>Methods</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#markdownoptions" class="tsd-kind-icon">markdown<wbr>Options</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#markdownslots" class="tsd-kind-icon">markdown<wbr>Slots</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#markdowntoc" class="tsd-kind-icon">markdownTOC</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#parse" class="tsd-kind-icon">parse</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_fs_apihandler_.apihandler.html#tovetur" class="tsd-kind-icon">to<wbr>Vetur</a></li>
 							</ul>
@@ -129,7 +142,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L123">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:123</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L165">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:165</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -154,7 +167,7 @@
 					<div class="tsd-signature tsd-kind-icon">content<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L120">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:120</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L161">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:161</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -164,7 +177,7 @@
 					<div class="tsd-signature tsd-kind-icon">full<wbr>Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L123">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:123</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L164">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:164</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -174,7 +187,17 @@
 					<div class="tsd-signature tsd-kind-icon">json<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.componentapi.html" class="tsd-signature-type">ComponentAPI</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L121">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:121</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L162">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:162</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="markdownit" class="tsd-anchor"></a>
+					<h3>markdown<wbr>It</h3>
+					<div class="tsd-signature tsd-kind-icon">markdown<wbr>It<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">MarkdownIt</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L165">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:165</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -191,10 +214,112 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L140">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:140</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L193">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:193</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将处理类中的 json 对象重新转回 YAML 文件</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="gettocfromapi" class="tsd-anchor"></a>
+					<h3>getTOCFromAPI</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">getTOCFromAPI<span class="tsd-signature-symbol">(</span>showTitle<span class="tsd-signature-symbol">?: </span><a href="../enums/_fs_apihandler_.apishowtitle.html" class="tsd-signature-type">APIShowTitle</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_fs_apihandler_.toclink.html" class="tsd-signature-type">TOCLink</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L433">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:433</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> showTitle: <a href="../enums/_fs_apihandler_.apishowtitle.html" class="tsd-signature-type">APIShowTitle</a><span class="tsd-signature-symbol"> = APIShowTitle[&#x27;simplified&#x27;]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_fs_apihandler_.toclink.html" class="tsd-signature-type">TOCLink</a><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="gettocfromcontent" class="tsd-anchor"></a>
+					<h3>getTOCFrom<wbr>Content</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">getTOCFrom<wbr>Content<span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, to<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{ </span>maxLevel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>minLevel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_fs_apihandler_.toclink.html" class="tsd-signature-type">TOCLink</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L468">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:468</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>content: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> to: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> options: <span class="tsd-signature-symbol">{ </span>maxLevel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>minLevel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = { maxLevel: 3, minLevel: 3 }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>max<wbr>Level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>min<wbr>Level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_fs_apihandler_.toclink.html" class="tsd-signature-type">TOCLink</a><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="gettocfromfile" class="tsd-anchor"></a>
+					<h3>getTOCFrom<wbr>File</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">getTOCFrom<wbr>File<span class="tsd-signature-symbol">(</span>fullPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, to<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{ </span>maxLevel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>minLevel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.toclink.html" class="tsd-signature-type">TOCLink</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L497">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:497</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fullPath: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> to: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> options: <span class="tsd-signature-symbol">{ </span>maxLevel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>minLevel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = { maxLevel: 3, minLevel: 3 }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>max<wbr>Level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>min<wbr>Level<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.toclink.html" class="tsd-signature-type">TOCLink</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -208,7 +333,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L407">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:407</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L648">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:648</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -219,19 +344,27 @@
 					<a name="markdownapi" class="tsd-anchor"></a>
 					<h3>markdownAPI</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">markdownAPI<span class="tsd-signature-symbol">(</span>showTitle<span class="tsd-signature-symbol">?: </span><a href="../enums/_fs_apihandler_.markdownapishowtitle.html" class="tsd-signature-type">MarkdownAPIShowTitle</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">markdownAPI<span class="tsd-signature-symbol">(</span>showTitle<span class="tsd-signature-symbol">?: </span><a href="../enums/_fs_apihandler_.apishowtitle.html" class="tsd-signature-type">APIShowTitle</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L312">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:312</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L401">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:401</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将组件 API 转换成 Markdown</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> showTitle: <a href="../enums/_fs_apihandler_.markdownapishowtitle.html" class="tsd-signature-type">MarkdownAPIShowTitle</a><span class="tsd-signature-symbol"> = MarkdownAPIShowTitle[&#x27;as-needed&#x27;]</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> showTitle: <a href="../enums/_fs_apihandler_.apishowtitle.html" class="tsd-signature-type">APIShowTitle</a><span class="tsd-signature-symbol"> = APIShowTitle[&#x27;as-needed&#x27;]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>如何显示组件二级标题</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -248,13 +381,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L296">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:296</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L381">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:381</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将 API 中的 aria 列表转换成 Markdown</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>aria: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.ariaapi.html" class="tsd-signature-type">AriaAPI</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -271,13 +411,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L160">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:160</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L221">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:221</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将 API 中的 attrs 列表转换成 Markdown</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>attrs: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.attrapi.html" class="tsd-signature-type">AttrAPI</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -294,13 +441,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L197">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:197</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L266">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:266</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将 API 中的 computed 列表转换成 Markdown</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>computed: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.computedapi.html" class="tsd-signature-type">ComputedAPI</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -317,13 +471,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L181">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:181</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L246">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:246</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将 API 中的 data 列表转换成 Markdown</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>data: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.dataapi.html" class="tsd-signature-type">DataAPI</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -340,13 +501,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L239">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:239</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L316">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:316</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将 API 中的 events 列表转换成 Markdown</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>events: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.eventapi.html" class="tsd-signature-type">EventAPI</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -363,9 +531,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L345">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:345</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L549">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:549</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>生成多页面组件的顶级页面
+									会读取组件目录下的 docs 子文档</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
@@ -380,13 +554,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L265">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:265</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L346">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:346</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将 API 中的 methods 列表转换成 Markdown</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>methods: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.methodapi.html" class="tsd-signature-type">MethodAPI</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> type: <span class="tsd-signature-type">string</span></h5>
@@ -406,13 +587,20 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L144">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:144</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L201">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:201</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将 API 中的 options 列表转换成 Markdown</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>options: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.optionapi.html" class="tsd-signature-type">OptionAPI</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -429,13 +617,58 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L213">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:213</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L286">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:286</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>将 API 中的 slots 列表转换成 Markdown</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>slots: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.slotapi.html" class="tsd-signature-type">SlotAPI</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="markdowntoc" class="tsd-anchor"></a>
+					<h3>markdownTOC</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">markdownTOC<span class="tsd-signature-symbol">(</span>tocLinks<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.toclink.html" class="tsd-signature-type">TOCLink</a><span class="tsd-signature-symbol">&gt;</span>, vue<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, level<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, toHashMap<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L506">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:506</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>由目录链接树转换成 Markdown
+									添加 link 时的去重操作不太方便，所以在这里操作</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tocLinks: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_fs_apihandler_.toclink.html" class="tsd-signature-type">TOCLink</a><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> vue: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> level: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> toHashMap: <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = new Map()</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -452,13 +685,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L131">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:131</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L181">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:181</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>解析 api.yaml 的内容</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>content: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>api.yaml 的文件内容</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
@@ -475,7 +716,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/fs/APIHandler.ts#L468">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:468</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/fs/APIHandler.ts#L729">Projects/GitHub/VusionIDE/vusion-api/src/fs/APIHandler.ts:729</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>attributes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>tags<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> }</span></h4>
@@ -516,7 +757,10 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
-						<a href="../enums/_fs_apihandler_.markdownapishowtitle.html" class="tsd-kind-icon">MarkdownAPIShow<wbr>Title</a>
+						<a href="../enums/_fs_apihandler_.apishowtitle.html" class="tsd-kind-icon">APIShow<wbr>Title</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module">
+						<a href="../enums/_fs_apihandler_.componentapisubtitle.html" class="tsd-kind-icon">ComponentAPISubtitle</a>
 					</li>
 				</ul>
 				<ul class="current">
@@ -535,8 +779,20 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_fs_apihandler_.apihandler.html#json" class="tsd-kind-icon">json</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_fs_apihandler_.apihandler.html#markdownit" class="tsd-kind-icon">markdown<wbr>It</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_fs_apihandler_.apihandler.html#generate" class="tsd-kind-icon">generate</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_apihandler_.apihandler.html#gettocfromapi" class="tsd-kind-icon">getTOCFromAPI</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_apihandler_.apihandler.html#gettocfromcontent" class="tsd-kind-icon">getTOCFrom<wbr>Content</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_apihandler_.apihandler.html#gettocfromfile" class="tsd-kind-icon">getTOCFrom<wbr>File</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_fs_apihandler_.apihandler.html#markdown" class="tsd-kind-icon">markdown</a>
@@ -570,6 +826,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_fs_apihandler_.apihandler.html#markdownslots" class="tsd-kind-icon">markdown<wbr>Slots</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_fs_apihandler_.apihandler.html#markdowntoc" class="tsd-kind-icon">markdownTOC</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_fs_apihandler_.apihandler.html#parse" class="tsd-kind-icon">parse</a>
@@ -609,6 +868,9 @@
 						<a href="../interfaces/_fs_apihandler_.slotapi.html" class="tsd-kind-icon">SlotAPI</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="../interfaces/_fs_apihandler_.toclink.html" class="tsd-kind-icon">TOCLink</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="../interfaces/_fs_apihandler_.veturattribute.html" class="tsd-kind-icon">Vetur<wbr>Attribute</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
@@ -619,6 +881,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="../modules/_fs_apihandler_.html#formatvalue" class="tsd-kind-icon">format<wbr>Value</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_fs_apihandler_.html#uslugify" class="tsd-kind-icon">uslugify</a>
 					</li>
 				</ul>
 			</nav>

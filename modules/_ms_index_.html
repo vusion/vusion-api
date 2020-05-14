@@ -82,6 +82,7 @@
 						<section class="tsd-index-section tsd-is-not-exported">
 							<h3>Variables</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_ms_index_.html#block_removing_list" class="tsd-kind-icon">BLOCK_<wbr>REMOVING_<wbr>LIST</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_ms_index_.html#platformaxios" class="tsd-kind-icon">platform<wbr>Axios</a></li>
 							</ul>
 						</section>
@@ -89,7 +90,7 @@
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#addblock" class="tsd-kind-icon">add<wbr>Block</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#addblockonlyscripts" class="tsd-kind-icon">add<wbr>Block<wbr>Only<wbr>Scripts</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#addblockexternally" class="tsd-kind-icon">add<wbr>Block<wbr>Externally</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#addbranchview" class="tsd-kind-icon">add<wbr>Branch<wbr>View</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#addbranchviewfromblock" class="tsd-kind-icon">add<wbr>Branch<wbr>View<wbr>From<wbr>Block</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#addbranchviewroute" class="tsd-kind-icon">add<wbr>Branch<wbr>View<wbr>Route</a></li>
@@ -98,7 +99,6 @@
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#addleafviewfromblock" class="tsd-kind-icon">add<wbr>Leaf<wbr>View<wbr>From<wbr>Block</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#addleafviewroute" class="tsd-kind-icon">add<wbr>Leaf<wbr>View<wbr>Route</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#addmodule" class="tsd-kind-icon">add<wbr>Module</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#checkblockonlyhastemplate" class="tsd-kind-icon">check<wbr>Block<wbr>Only<wbr>Has<wbr>Template</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#createblockpackage" class="tsd-kind-icon">create<wbr>Block<wbr>Package</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#createcomponentpackage" class="tsd-kind-icon">create<wbr>Component<wbr>Package</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#createmultifile" class="tsd-kind-icon">create<wbr>Multi<wbr>File</a></li>
@@ -113,6 +113,7 @@
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#getblock" class="tsd-kind-icon">get<wbr>Block</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#getblocks" class="tsd-kind-icon">get<wbr>Blocks</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#getcachedir" class="tsd-kind-icon">get<wbr>Cache<wbr>Dir</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#getcomponent" class="tsd-kind-icon">get<wbr>Component</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#getcomponents" class="tsd-kind-icon">get<wbr>Components</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_ms_index_.html#getplatformaxios" class="tsd-kind-icon">get<wbr>Platform<wbr>Axios</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_ms_index_.html#getruncontrol" class="tsd-kind-icon">get<wbr>Run<wbr>Control</a></li>
@@ -140,12 +141,22 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
 				<h2>Variables</h2>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="block_removing_list" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> BLOCK_<wbr>REMOVING_<wbr>LIST</h3>
+					<div class="tsd-signature tsd-kind-icon">BLOCK_<wbr>REMOVING_<wbr>LIST<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = [&#x27;package.json&#x27;,&#x27;node_modules&#x27;,&#x27;assets&#x27;,&#x27;docs&#x27;,&#x27;public&#x27;,&#x27;screenshots&#x27;,&#x27;vetur&#x27;,]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L405">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:405</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
 					<a name="platformaxios" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagLet">Let</span> platform<wbr>Axios</h3>
 					<div class="tsd-signature tsd-kind-icon">platform<wbr>Axios<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">AxiosInstance</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L21">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L19">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -162,9 +173,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L401">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:401</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L460">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:460</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>For vusion cli</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -176,28 +192,45 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
-					<a name="addblockonlyscripts" class="tsd-anchor"></a>
-					<h3>add<wbr>Block<wbr>Only<wbr>Scripts</h3>
+					<a name="addblockexternally" class="tsd-anchor"></a>
+					<h3>add<wbr>Block<wbr>Externally</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-						<li class="tsd-signature tsd-kind-icon">add<wbr>Block<wbr>Only<wbr>Scripts<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><a href="../interfaces/_ms_index_.materialoptions.html" class="tsd-signature-type">MaterialOptions</a>, tempPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Block<wbr>Externally<span class="tsd-signature-symbol">(</span>blockVue<span class="tsd-signature-symbol">: </span><a href="../classes/_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a>, target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L479">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:479</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L421">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:421</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>添加代码为外部区块</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>options: <a href="../interfaces/_ms_index_.materialoptions.html" class="tsd-signature-type">MaterialOptions</a></h5>
+									<h5>blockVue: <a href="../classes/_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>刚下载后的 Block Vue 文件</p>
+									</div>
 								</li>
 								<li>
-									<h5>tempPath: <span class="tsd-signature-type">string</span></h5>
+									<h5>target: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>目标路径</p>
+									</div>
+								</li>
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>区块名称</p>
+									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/_fs_vuefile_.vuefile.html" class="tsd-signature-type">VueFile</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -211,7 +244,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L957">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:957</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L840">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:840</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -243,7 +276,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L974">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:974</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L857">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:857</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -275,7 +308,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L908">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:908</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L791">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:791</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -307,7 +340,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L1008">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:1008</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L891">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:891</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -336,7 +369,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L864">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:864</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L747">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:747</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -368,7 +401,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L879">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:879</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L762">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:762</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -400,7 +433,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L817">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:817</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L700">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:700</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -432,13 +465,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L697">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:697</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L576">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:576</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>从业务模板中添加模块</p>
-								</div>
+								<dl class="tsd-comment-tags">
+									<dt>deprecated</dt>
+									<dd><p>从业务模板中添加模块</p>
+									</dd>
+								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -447,29 +482,6 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
-					<a name="checkblockonlyhastemplate" class="tsd-anchor"></a>
-					<h3>check<wbr>Block<wbr>Only<wbr>Has<wbr>Template</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-						<li class="tsd-signature tsd-kind-icon">check<wbr>Block<wbr>Only<wbr>Has<wbr>Template<span class="tsd-signature-symbol">(</span>blockPath<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L381">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:381</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>blockPath: <span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -483,7 +495,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L334">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:334</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L358">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:358</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -532,7 +544,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L620">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:620</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L498">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:498</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -581,7 +593,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L657">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:657</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L535">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:535</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -607,7 +619,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L675">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:675</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L553">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:553</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -633,7 +645,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L103">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:103</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L112">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:112</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -659,7 +671,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L371">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:371</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L395">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:395</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -682,7 +694,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L84">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:84</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L93">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:93</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -704,7 +716,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L95">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:95</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L104">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:104</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -726,7 +738,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L775">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:775</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L658">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:658</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -766,7 +778,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L107">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:107</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L116">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:116</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -816,7 +828,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L124">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:124</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L133">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:133</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -869,7 +881,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L255">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:255</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L264">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:264</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -892,7 +904,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L270">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:270</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L279">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:279</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_ms_block_.block.html" class="tsd-signature-type">Block</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -909,7 +921,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L38">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:38</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L37">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:37</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -923,6 +935,29 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
+					<a name="getcomponent" class="tsd-anchor"></a>
+					<h3>get<wbr>Component</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Component<span class="tsd-signature-symbol">(</span>packageName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Component</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L293">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:293</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>packageName: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Component</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
 					<a name="getcomponents" class="tsd-anchor"></a>
 					<h3>get<wbr>Components</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
@@ -932,7 +967,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L284">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:284</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L308">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:308</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Component</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -949,7 +984,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L22">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L20">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:20</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">AxiosInstance</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -966,7 +1001,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L45">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L44">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:44</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -983,7 +1018,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L194">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:194</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L203">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:203</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1006,7 +1041,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L304">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:304</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L328">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:328</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1029,7 +1064,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L310">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:310</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L334">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:334</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1052,7 +1087,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L316">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:316</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L340">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:340</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1075,7 +1110,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L322">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:322</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L346">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:346</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1098,7 +1133,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L328">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:328</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L352">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:352</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1121,7 +1156,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L557">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:557</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L471">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:471</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1147,7 +1182,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L1087">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:1087</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L970">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:970</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1170,13 +1205,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L743">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:743</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L626">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:626</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>deprecated</dt>
+									<dd></dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>options: <a href="../interfaces/_ms_index_.materialoptions.html" class="tsd-signature-type">MaterialOptions</a></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1193,7 +1236,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L298">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:298</a></li>
+									<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L322">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:322</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1215,9 +1258,58 @@
 					<div class="tsd-signature tsd-kind-icon">upload<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L56">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:56</a></li>
+							<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L55">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:55</a></li>
 						</ul>
 					</aside>
+					<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
+						<a name="upload.framework" class="tsd-anchor"></a>
+						<h3>framework</h3>
+						<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-object-literal">
+							<li class="tsd-signature tsd-kind-icon">framework<span class="tsd-signature-symbol">(</span>files<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_ms_index_.formfile.html" class="tsd-signature-type">FormFile</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_ms_index_.formfile.html" class="tsd-signature-type">FormFile</a><span class="tsd-signature-symbol">&gt;</span>, framework<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+						</ul>
+						<ul class="tsd-descriptions">
+							<li class="tsd-description">
+								<aside class="tsd-sources">
+									<ul>
+										<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L80">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:80</a></li>
+									</ul>
+								</aside>
+								<h4 class="tsd-parameters-title">Parameters</h4>
+								<ul class="tsd-parameters">
+									<li>
+										<h5>files: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_ms_index_.formfile.html" class="tsd-signature-type">FormFile</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_ms_index_.formfile.html" class="tsd-signature-type">FormFile</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									</li>
+									<li>
+										<h5>framework: <span class="tsd-signature-type">string</span></h5>
+									</li>
+								</ul>
+								<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							</li>
+						</ul>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
+						<a name="upload.getformdata" class="tsd-anchor"></a>
+						<h3>get<wbr>Form<wbr>Data</h3>
+						<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-object-literal">
+							<li class="tsd-signature tsd-kind-icon">get<wbr>Form<wbr>Data<span class="tsd-signature-symbol">(</span>files<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_ms_index_.formfile.html" class="tsd-signature-type">FormFile</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_ms_index_.formfile.html" class="tsd-signature-type">FormFile</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">FormData</span></li>
+						</ul>
+						<ul class="tsd-descriptions">
+							<li class="tsd-description">
+								<aside class="tsd-sources">
+									<ul>
+										<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L56">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:56</a></li>
+									</ul>
+								</aside>
+								<h4 class="tsd-parameters-title">Parameters</h4>
+								<ul class="tsd-parameters">
+									<li>
+										<h5>files: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_ms_index_.formfile.html" class="tsd-signature-type">FormFile</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_ms_index_.formfile.html" class="tsd-signature-type">FormFile</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									</li>
+								</ul>
+								<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">FormData</span></h4>
+							</li>
+						</ul>
+					</section>
 					<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-object-literal">
 						<a name="upload.nos" class="tsd-anchor"></a>
 						<h3>nos</h3>
@@ -1228,7 +1320,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/16f72f4/src/ms/index.ts#L57">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:57</a></li>
+										<li>Defined in <a href="https://github.com/vusion/vusion-api/blob/786d246/src/ms/index.ts#L73">Projects/GitHub/VusionIDE/vusion-api/src/ms/index.ts:73</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1270,13 +1362,16 @@
 						<a href="../interfaces/_ms_index_.processedmaterialoptions.html" class="tsd-kind-icon">Processed<wbr>Material<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_ms_index_.html#block_removing_list" class="tsd-kind-icon">BLOCK_<wbr>REMOVING_<wbr>LIST</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="_ms_index_.html#platformaxios" class="tsd-kind-icon">platform<wbr>Axios</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">
 						<a href="_ms_index_.html#addblock" class="tsd-kind-icon">add<wbr>Block</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="_ms_index_.html#addblockonlyscripts" class="tsd-kind-icon">add<wbr>Block<wbr>Only<wbr>Scripts</a>
+						<a href="_ms_index_.html#addblockexternally" class="tsd-kind-icon">add<wbr>Block<wbr>Externally</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">
 						<a href="_ms_index_.html#addbranchview" class="tsd-kind-icon">add<wbr>Branch<wbr>View</a>
@@ -1301,9 +1396,6 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">
 						<a href="_ms_index_.html#addmodule" class="tsd-kind-icon">add<wbr>Module</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="_ms_index_.html#checkblockonlyhastemplate" class="tsd-kind-icon">check<wbr>Block<wbr>Only<wbr>Has<wbr>Template</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">
 						<a href="_ms_index_.html#createblockpackage" class="tsd-kind-icon">create<wbr>Block<wbr>Package</a>
@@ -1346,6 +1438,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">
 						<a href="_ms_index_.html#getcachedir" class="tsd-kind-icon">get<wbr>Cache<wbr>Dir</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module">
+						<a href="_ms_index_.html#getcomponent" class="tsd-kind-icon">get<wbr>Component</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">
 						<a href="_ms_index_.html#getcomponents" class="tsd-kind-icon">get<wbr>Components</a>
