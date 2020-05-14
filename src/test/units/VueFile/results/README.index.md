@@ -17,14 +17,14 @@
         <u-toc-item label="Methods" :to='{"path":"api","hash":"#methods"}'></u-toc-item>
     </u-toc-item>
     <u-toc-item label="USidebarItem API" :to='{"path":"api","hash":"#usidebaritem-api"}'>
-        <u-toc-item label="Props/Attrs" :to='{"path":"api","hash":"#propsattrs1"}'></u-toc-item>
-        <u-toc-item label="Slots" :to='{"path":"api","hash":"#slots1"}'></u-toc-item>
-        <u-toc-item label="Events" :to='{"path":"api","hash":"#events1"}'></u-toc-item>
+        <u-toc-item label="Props/Attrs" :to='{"path":"api","hash":"#propsattrs-2"}'></u-toc-item>
+        <u-toc-item label="Slots" :to='{"path":"api","hash":"#slots-2"}'></u-toc-item>
+        <u-toc-item label="Events" :to='{"path":"api","hash":"#events-2"}'></u-toc-item>
     </u-toc-item>
     <u-toc-item label="USidebarGroup API" :to='{"path":"api","hash":"#usidebargroup-api"}'>
-        <u-toc-item label="Props/Attrs" :to='{"path":"api","hash":"#propsattrs2"}'></u-toc-item>
-        <u-toc-item label="Slots" :to='{"path":"api","hash":"#slots2"}'></u-toc-item>
-        <u-toc-item label="Events" :to='{"path":"api","hash":"#events2"}'></u-toc-item>
+        <u-toc-item label="Props/Attrs" :to='{"path":"api","hash":"#propsattrs-3"}'></u-toc-item>
+        <u-toc-item label="Slots" :to='{"path":"api","hash":"#slots-3"}'></u-toc-item>
+        <u-toc-item label="Events" :to='{"path":"api","hash":"#events-3"}'></u-toc-item>
     </u-toc-item>
     <u-toc-item label="USidebarDivider API" :to='{"path":"api","hash":"#usidebardivider-api"}'></u-toc-item>
 </u-toc>

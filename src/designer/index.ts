@@ -37,20 +37,6 @@ export async function saveFile(fullPath: string, content: string) {
     return fs.writeFile(fullPath, content);
 }
 
-export async function saveCode(fullPath: string, type: string, content: string) {
-    const vueFile = new vfs.VueFile(fullPath);
-    await vueFile.open();
-
-    if (type === 'template')
-        vueFile.template = content;
-    else if (type === 'script')
-        vueFile.script = content;
-    else if (type === 'style')
-        vueFile.style = content;
-
-    await vueFile.save();
-}
-
 // export async function mergeBlock(fullPath: string, type: string) {
 //     const vueFile = new vfs.VueFile(fullPath);
 //     await vueFile.open();
@@ -70,4 +56,32 @@ export async function loadViews(fullPath: string, viewType: vfs.ViewType) {
     const view = new vfs.View(fullPath, viewType);
     await view.open();
     return view.children;
+}
+
+export async function getViewContent(fullPath: string, viewType: vfs.ViewType) {
+    const view = new vfs.View(fullPath, viewType);
+    await view.open();
+    const vueFile = new vfs.VueFile(view.vueFilePath);
+    await vueFile.open();
+    return vueFile;
+}
+
+export async function saveViewContent(fullPath: string, viewType: vfs.ViewType, content: string) {
+    const view = new vfs.View(fullPath, viewType);
+    await view.open();
+    return fs.writeFile(view.vueFilePath, content);
+}
+
+export async function saveCode(fullPath: string, type: string, content: string) {
+    const vueFile = new vfs.VueFile(fullPath);
+    await vueFile.open();
+
+    if (type === 'template')
+        vueFile.template = content;
+    else if (type === 'script')
+        vueFile.script = content;
+    else if (type === 'style')
+        vueFile.style = content;
+
+    await vueFile.save();
 }

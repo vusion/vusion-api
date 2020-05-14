@@ -47,20 +47,6 @@ function saveFile(fullPath, content) {
     });
 }
 exports.saveFile = saveFile;
-function saveCode(fullPath, type, content) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const vueFile = new vfs.VueFile(fullPath);
-        yield vueFile.open();
-        if (type === 'template')
-            vueFile.template = content;
-        else if (type === 'script')
-            vueFile.script = content;
-        else if (type === 'style')
-            vueFile.style = content;
-        yield vueFile.save();
-    });
-}
-exports.saveCode = saveCode;
 // export async function mergeBlock(fullPath: string, type: string) {
 //     const vueFile = new vfs.VueFile(fullPath);
 //     await vueFile.open();
@@ -80,4 +66,36 @@ function loadViews(fullPath, viewType) {
     });
 }
 exports.loadViews = loadViews;
+function getViewContent(fullPath, viewType) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const view = new vfs.View(fullPath, viewType);
+        yield view.open();
+        const vueFile = new vfs.VueFile(view.vueFilePath);
+        yield vueFile.open();
+        return vueFile;
+    });
+}
+exports.getViewContent = getViewContent;
+function saveViewContent(fullPath, viewType, content) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const view = new vfs.View(fullPath, viewType);
+        yield view.open();
+        return fs.writeFile(view.vueFilePath, content);
+    });
+}
+exports.saveViewContent = saveViewContent;
+function saveCode(fullPath, type, content) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const vueFile = new vfs.VueFile(fullPath);
+        yield vueFile.open();
+        if (type === 'template')
+            vueFile.template = content;
+        else if (type === 'script')
+            vueFile.script = content;
+        else if (type === 'style')
+            vueFile.style = content;
+        yield vueFile.save();
+    });
+}
+exports.saveCode = saveCode;
 //# sourceMappingURL=index.js.map

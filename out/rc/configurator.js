@@ -24,7 +24,7 @@ exports.default = {
         if (this.config)
             return this.config;
         if (!fs.existsSync(rcPath)) {
-            fs.writeFileSync(rcPath, `platform: https://vusion.netease.com
+            fs.writeFileSync(rcPath, `platform: https://vusion.163yun.com
 registries:
   npm: https://registry.npmjs.org
 download_manager: npm
