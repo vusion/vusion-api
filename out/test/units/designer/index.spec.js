@@ -16,22 +16,61 @@ const fs_1 = require("../../../fs");
 const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/designer');
 describe('designer', () => {
     it('loadViews', () => __awaiter(void 0, void 0, void 0, function* () {
-        const views = yield designer.loadViews({
+        const entryViews = yield designer.loadViews({
             fullPath: BASE_PATH,
             viewType: fs_1.ViewType.root,
             routePath: '/',
         });
-        const dashboardView = views[0];
+        const dashboardView = entryViews[0];
         // console.log(dashboardView);
         chai_1.expect(dashboardView.baseName).to.equal('dashboard');
         const moduleViews = yield designer.loadViews({
             fullPath: dashboardView.fullPath,
             viewType: dashboardView.viewType,
+            routePath: dashboardView.routePath,
         });
         // expect(modulesViews[])
         chai_1.expect(moduleViews.length).to.equal(6);
     }));
-    it('markdown()', () => __awaiter(void 0, void 0, void 0, function* () {
+    it('addLeafView', () => __awaiter(void 0, void 0, void 0, function* () {
+        const entryViews = yield designer.loadViews({
+            fullPath: BASE_PATH,
+            viewType: fs_1.ViewType.root,
+            routePath: '/',
+        });
+        const dashboardView = entryViews[0];
+        const moduleViews = yield designer.loadViews({
+            fullPath: dashboardView.fullPath,
+            viewType: dashboardView.viewType,
+            routePath: dashboardView.routePath,
+        });
+        const module0View = moduleViews[0];
+        const views = yield designer.loadViews({
+            fullPath: module0View.fullPath,
+            viewType: module0View.viewType,
+            routePath: module0View.routePath,
+        });
+        // await designer.addLeafView({
+        //     fullPath: views[0].fullPath,
+        //     viewType: views[0].viewType,
+        //     routePath: views[0].routePath,
+        // }, {
+        //     fullPath: module0View.fullPath,
+        //     viewType: module0View.viewType,
+        //     routePath: module0View.routePath,
+        // }, {
+        //     name: 'leaf',
+        //     title: '页面',
+        // })
+        // await designer.removeView({
+        //     fullPath: views[0].fullPath,
+        //     viewType: views[0].viewType,
+        //     routePath: views[0].routePath,
+        // }, {
+        //     fullPath: module0View.fullPath,
+        //     viewType: module0View.viewType,
+        //     routePath: module0View.routePath,
+        // });
     }));
 });
 //# sourceMappingURL=index.spec.js.map

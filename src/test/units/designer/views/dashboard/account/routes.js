@@ -40,5 +40,11 @@ export default {
                 crumb: '安全设置',
             },
         },
+
+        {
+            path: 'leaf',
+            component: () => import(/* webpackChunkName: 'account' */ './views/leaf.vue'),
+            meta: { title: '页面' },
+        },
     ],
 };
