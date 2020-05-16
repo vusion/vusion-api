@@ -34,11 +34,11 @@ exports.RESERVED_DIRS = [
     'module',
 ];
 class View extends FSEntry_1.default {
-    constructor(fullPath, viewType = ViewType.branch, isDirectory = true) {
+    constructor(fullPath, viewType = ViewType.branch, isDirectory = true, routePath) {
         super(fullPath, isDirectory);
         this.viewType = viewType;
         this.viewsPath = '';
-        this.routePath = '/';
+        this.routePath = routePath;
     }
     /**
      * 提前检测 View 文件类型，以及子 View 等
@@ -48,25 +48,37 @@ class View extends FSEntry_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             if (fs.existsSync(path.join(this.fullPath, 'views')))
                 this.viewsPath = 'views';
-            const parentRoutePath = this.parent ? this.parent.routePath : '/';
             if (this.viewType === ViewType.root) {
-                this.routePath = '/';
             }
             else if (this.viewType === ViewType.entry) {
                 this.vueFilePath = path.join(this.fullPath, 'layout/views', 'index.vue');
-                this.routePath = parentRoutePath + this.baseName + '#/';
             }
             else if (this.viewType === ViewType.module) {
                 this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
-                this.routePath = parentRoutePath + this.baseName + '/';
             }
             else if (this.viewType === ViewType.branch) {
                 this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
-                this.routePath = parentRoutePath + this.baseName + '/';
             }
             else {
                 this.vueFilePath = this.fullPath;
-                this.routePath = parentRoutePath + this.baseName;
+            }
+            if (this.routePath === undefined) {
+                const parentRoutePath = this.parent ? this.parent.routePath : '/';
+                if (this.viewType === ViewType.root) {
+                    this.routePath = '/';
+                }
+                else if (this.viewType === ViewType.entry) {
+                    this.routePath = parentRoutePath + this.baseName + '#/';
+                }
+                else if (this.viewType === ViewType.module) {
+                    this.routePath = parentRoutePath + this.baseName + '/';
+                }
+                else if (this.viewType === ViewType.branch) {
+                    this.routePath = parentRoutePath + this.baseName + '/';
+                }
+                else {
+                    this.routePath = parentRoutePath + this.baseName;
+                }
             }
             // this.alias = await this.readTitleInReadme();
         });

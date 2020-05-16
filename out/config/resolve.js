@@ -71,7 +71,7 @@ function resolve(cwd, configPath = 'vusion.config.js', args, throwErrors) {
         if (!libraryName && pkg.peerDependencies)
             libraryName = Object.keys(pkg.peerDependencies).find((key) => key.endsWith('.vusion'));
         if (!libraryName)
-            libraryName = 'proto-ui.vusion';
+            libraryName = 'cloud-ui.vusion';
         config.libraryPath = path.dirname(require.resolve(`${libraryName}/src`));
     }
     let themeAutoDetected = false;

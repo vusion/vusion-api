@@ -91,7 +91,7 @@ export default function resolve(cwd: string, configPath: string = 'vusion.config
         if (!libraryName && pkg.peerDependencies)
             libraryName = Object.keys(pkg.peerDependencies).find((key) => key.endsWith('.vusion'));
         if (!libraryName)
-            libraryName = 'proto-ui.vusion';
+            libraryName = 'cloud-ui.vusion';
         config.libraryPath = path.dirname(require.resolve(`${libraryName}/src`));
     }
 

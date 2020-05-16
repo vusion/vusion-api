@@ -14,6 +14,7 @@ const babel = require("@babel/core");
 const fs = require("fs-extra");
 const os = require("os");
 const vfs = require("../fs");
+const designer = require("../designer");
 const utils = require("../utils");
 const rc = require("../rc");
 const download = require("./download");
@@ -613,98 +614,18 @@ function removeModule(options) {
     });
 }
 exports.removeModule = removeModule;
-function findRouteObjectAndParentArray(objectExpression, relativePath, createChildrenArrayIfNeeded = false, pos = 0) {
-    const arr = Array.isArray(relativePath) ? relativePath : relativePath.split('/');
-    if (arr[pos] === 'views')
-        pos++;
-    if (pos === arr.length)
-        throw new Error('Route path error. Cannot find route: ' + arr.join('/'));
-    const ext = path.extname(arr[arr.length - 1]);
-    const nextName = arr[pos].replace(/\.[^.]*?$/, '');
-    let childrenProperty = objectExpression.properties.find((property) => property.type === 'ObjectProperty' && property.key.name === 'children');
-    if (!childrenProperty) {
-        if (createChildrenArrayIfNeeded) {
-            childrenProperty = babel.types.objectProperty(babel.types.identifier('children'), babel.types.arrayExpression([]));
-            objectExpression.properties.push(childrenProperty);
-        }
-        else
-            return { routeObject: undefined, parentArray: undefined };
-    }
-    const arrayExpression = childrenProperty.value;
-    const routeObject = arrayExpression.elements.find((element) => {
-        return ((element.type === 'ObjectExpression' && element.properties.some((property) => property.type === 'ObjectProperty' && property.key.name === 'path' && property.value.type === 'StringLiteral' && property.value.value === nextName))
-            || (element.type === 'ObjectExpression' && element.properties.some((property) => property.type === 'ObjectProperty' && property.key.name === 'component' && property.value.type === 'ArrowFunctionExpression'
-                && property.value.body.arguments[0].value === './' + arr.slice(0, pos + 1).join('/') + (arr[pos].endsWith(ext) ? '' : '/index' + ext))));
-    });
-    if (pos === arr.length - 1) {
-        return { routeObject, parentArray: arrayExpression };
-    }
-    else {
-        if (!routeObject)
-            return { routeObject: undefined, parentArray: undefined };
-        else
-            return findRouteObjectAndParentArray(routeObject, arr, createChildrenArrayIfNeeded, pos + 1);
-    }
-}
-exports.findRouteObjectAndParentArray = findRouteObjectAndParentArray;
-function addLeafViewRoute(parent, name, title, ext = '.vue') {
-    return __awaiter(this, void 0, void 0, function* () {
-        // 添加路由
-        // 目前只支持在 module 层添加路由
-        let module = parent;
-        while (module && module.viewType !== vfs.ViewType.module)
-            module = module.parent;
-        if (!module)
-            return;
-        const routesPath = path.join(module.fullPath, 'routes.js');
-        if (!fs.existsSync(routesPath))
-            return;
-        const jsFile = new vfs.JSFile(routesPath);
-        yield jsFile.open();
-        jsFile.parse();
-        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name + ext)).replace(/\\/g, '/');
-        let changed = false;
-        babel.traverse(jsFile.handler.ast, {
-            ExportDefaultDeclaration(nodePath) {
-                const declaration = nodePath.node.declaration;
-                if (declaration && declaration.type === 'ObjectExpression') {
-                    const { routeObject, parentArray } = findRouteObjectAndParentArray(declaration, relativePath, true);
-                    if (parentArray && !routeObject) {
-                        const tpl = babel.parse(`[{
-                        path: '${name}',
-                        component: () => import(/* webpackChunkName: '${module.baseName}' */ './${relativePath}'),
-                        ${title ? "meta: { title: '" + title + "' }," : ''}
-                    }]`, {
-                            plugins: [require('@babel/plugin-syntax-dynamic-import')]
-                        });
-                        const element = tpl.program.body[0].expression.elements[0];
-                        parentArray.elements.push(element);
-                        changed = true;
-                    }
-                }
-            }
-        });
-        if (changed)
-            yield jsFile.save();
-        return;
-    });
-}
-exports.addLeafViewRoute = addLeafViewRoute;
+/**
+ * @deprecated
+ */
 function addLeafView(parent, name, title, ext = '.vue') {
     return __awaiter(this, void 0, void 0, function* () {
-        // parent view 必然是个目录
-        const dest = path.join(parent.fullPath, parent.viewsPath, name + ext);
-        let tplPath;
-        if (ext === '.vue')
-            tplPath = path.resolve(__dirname, '../../templates/leaf-view.vue');
-        else if (ext === '.md')
-            tplPath = path.resolve(__dirname, '../../templates/leaf-view.md');
-        yield fs.copy(tplPath, dest);
-        yield addLeafViewRoute(parent, name, title, ext);
-        return dest;
+        return designer.addLeafView(parent, { name, title, ext });
     });
 }
 exports.addLeafView = addLeafView;
+/**
+ * @deprecated
+ */
 function addLeafViewFromBlock(source, parent, name, title) {
     return __awaiter(this, void 0, void 0, function* () {
         // parent view 必然是个目录
@@ -726,72 +647,26 @@ function addLeafViewFromBlock(source, parent, name, title) {
             vueFile.transform();
             yield vueFile.save();
         }
-        yield addLeafViewRoute(parent, name, title);
-        return dest;
-    });
-}
-exports.addLeafViewFromBlock = addLeafViewFromBlock;
-function addBranchViewRoute(parent, name, title, ext = '.vue') {
-    return __awaiter(this, void 0, void 0, function* () {
-        // 添加路由
         // 目前只支持在 module 层添加路由
         let module = parent;
         while (module && module.viewType !== vfs.ViewType.module)
             module = module.parent;
         if (!module)
             return;
-        const routesPath = path.join(module.fullPath, 'routes.js');
-        if (!fs.existsSync(routesPath))
-            return;
-        const jsFile = new vfs.JSFile(routesPath);
-        yield jsFile.open();
-        jsFile.parse();
-        // 纯目录，不带 /index.vue 的
-        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name)).replace(/\\/g, '/');
-        let changed = false;
-        babel.traverse(jsFile.handler.ast, {
-            ExportDefaultDeclaration(nodePath) {
-                const declaration = nodePath.node.declaration;
-                if (declaration && declaration.type === 'ObjectExpression') {
-                    const { routeObject, parentArray } = findRouteObjectAndParentArray(declaration, relativePath, true);
-                    if (parentArray && !routeObject) {
-                        const tpl = babel.parse(`[{
-                        path: '${name}',
-                        component: () => import(/* webpackChunkName: '${module.baseName}' */ './${relativePath + '/index' + ext}'),
-                        ${title ? "meta: { title: '" + title + "' }," : ''}
-                        children: [],
-                    }]`, {
-                            plugins: [require('@babel/plugin-syntax-dynamic-import')]
-                        });
-                        const element = tpl.program.body[0].expression.elements[0];
-                        parentArray.elements.push(element);
-                        changed = true;
-                    }
-                }
-            }
-        });
-        if (changed)
-            yield jsFile.save();
-        return;
-    });
-}
-exports.addBranchViewRoute = addBranchViewRoute;
-function addBranchView(parent, name, title, ext = '.vue') {
-    return __awaiter(this, void 0, void 0, function* () {
-        // parent view 必然是个目录
-        const dir = path.join(parent.fullPath, parent.viewsPath, name);
-        let tplPath;
-        if (ext === '.vue')
-            tplPath = path.resolve(__dirname, '../../templates/branch-view');
-        else if (ext === '.md')
-            tplPath = path.resolve(__dirname, '../../templates/branch-view-md');
-        yield fs.copy(tplPath, dir);
-        const dest = path.join(dir, 'index' + ext);
-        yield addBranchViewRoute(parent, name, title, ext);
+        yield designer.addLeafViewRoute(parent, module, { name, title });
         return dest;
     });
 }
+exports.addLeafViewFromBlock = addLeafViewFromBlock;
+function addBranchView(parent, name, title, ext = '.vue') {
+    return __awaiter(this, void 0, void 0, function* () {
+        return designer.addBranchView(parent, { name, title, ext });
+    });
+}
 exports.addBranchView = addBranchView;
+/**
+ * @deprecated
+ */
 function addBranchViewFromBlock(source, parent, name, title) {
     return __awaiter(this, void 0, void 0, function* () {
         // parent view 必然是个目录
@@ -817,137 +692,38 @@ function addBranchViewFromBlock(source, parent, name, title) {
             vueFile.transform();
             yield vueFile.save();
         }
-        yield addBranchViewRoute(parent, name, title);
-        return dest;
-    });
-}
-exports.addBranchViewFromBlock = addBranchViewFromBlock;
-function addBranchWrapper(parent, name, title) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // parent view 必然是个目录
-        const dir = path.join(parent.fullPath, parent.viewsPath, name);
-        const tplPath = path.resolve(__dirname, '../../templates/branch-view');
-        yield fs.copy(tplPath, dir);
-        let dest = path.join(dir, 'index.vue');
-        yield fs.remove(dest);
-        dest = path.dirname(dest);
-        // 添加路由
         // 目前只支持在 module 层添加路由
         let module = parent;
         while (module && module.viewType !== vfs.ViewType.module)
             module = module.parent;
         if (!module)
-            return dest;
-        const routesPath = path.join(module.fullPath, 'routes.js');
-        if (!fs.existsSync(routesPath))
-            return dest;
-        const jsFile = new vfs.JSFile(routesPath);
-        yield jsFile.open();
-        jsFile.parse();
-        let hasImportedLWrapper = false;
-        babel.traverse(jsFile.handler.ast, {
-            ImportDefaultSpecifier(nodePath) {
-                if (nodePath.node.local.name === 'LWrapper') {
-                    hasImportedLWrapper = true;
-                    nodePath.stop();
-                }
-            },
-            ImportSpecifier(nodePath) {
-                if (nodePath.node.local.name === 'LWrapper') {
-                    hasImportedLWrapper = true;
-                    nodePath.stop();
-                }
-            },
-        });
-        if (!hasImportedLWrapper) {
-            const importDeclaration = babel.template(`import { LWrapper } from 'cloud-ui.vusion'`)();
-            jsFile.handler.ast.program.body.unshift(importDeclaration);
-        }
-        // 纯目录，不带 /index.vue 的
-        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, name)).replace(/\\/g, '/');
-        let changed = false;
-        babel.traverse(jsFile.handler.ast, {
-            ExportDefaultDeclaration(nodePath) {
-                const declaration = nodePath.node.declaration;
-                if (declaration && declaration.type === 'ObjectExpression') {
-                    const { routeObject, parentArray } = findRouteObjectAndParentArray(declaration, relativePath, true);
-                    if (parentArray && !routeObject) {
-                        const tpl = babel.parse(`[{
-                        path: '${name}',
-                        component: LWrapper,
-                        ${title ? "meta: { title: '" + title + "' }," : ''}
-                        children: [],
-                    }]`, {
-                            plugins: [require('@babel/plugin-syntax-dynamic-import')]
-                        });
-                        const element = tpl.program.body[0].expression.elements[0];
-                        parentArray.elements.push(element);
-                        changed = true;
-                    }
-                }
-            }
-        });
-        if (changed)
-            yield jsFile.save();
+            return;
+        yield designer.addBranchViewRoute(parent, module, { name, title });
         return dest;
     });
 }
+exports.addBranchViewFromBlock = addBranchViewFromBlock;
+/**
+ * @deprecated
+ */
+function addBranchWrapper(parent, name, title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // 目前只支持在 module 层添加路由
+        let module = parent;
+        while (module && module.viewType !== vfs.ViewType.module)
+            module = module.parent;
+        if (!module)
+            return;
+        return designer.addBranchWrapper(parent, module, { name, title });
+    });
+}
 exports.addBranchWrapper = addBranchWrapper;
+/**
+ * @deprecated
+ */
 function removeLeafView(view) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield (() => __awaiter(this, void 0, void 0, function* () {
-            // const ext = path.extname(view.fullPath);
-            let module = view.parent;
-            while (module && module.viewType !== vfs.ViewType.module)
-                module = module.parent;
-            if (!module)
-                return;
-            const routesPath = path.join(module.fullPath, 'routes.js');
-            if (!fs.existsSync(routesPath))
-                return;
-            const jsFile = new vfs.JSFile(routesPath);
-            yield jsFile.open();
-            jsFile.parse();
-            const relativePath = path.relative(module.fullPath, view.fullPath).replace(/\\/g, '/');
-            let changed = false;
-            babel.traverse(jsFile.handler.ast, {
-                ExportDefaultDeclaration(nodePath) {
-                    const declaration = nodePath.node.declaration;
-                    if (declaration && declaration.type === 'ObjectExpression') {
-                        const { routeObject, parentArray } = findRouteObjectAndParentArray(declaration, relativePath, true);
-                        if (routeObject) {
-                            parentArray.elements.splice(parentArray.elements.indexOf(routeObject), 1);
-                            // 判断是不是 LWrapper
-                            const LWrapper = routeObject.properties.find((property) => property.type === 'ObjectProperty' && property.key.name === 'component' && property.value.type === 'Identifier' && property.value.name === 'LWrapper');
-                            if (LWrapper) {
-                                let wrapperCount = 0;
-                                String(jsFile.content).replace(/LWrapper/, () => String(wrapperCount++));
-                                if (wrapperCount === 2) {
-                                    babel.traverse(jsFile.handler.ast, {
-                                        ImportDefaultSpecifier(nodePath) {
-                                            if (nodePath.node.local.name === 'LWrapper') {
-                                                nodePath.remove();
-                                                nodePath.stop();
-                                            }
-                                        },
-                                        ImportSpecifier(nodePath) {
-                                            if (nodePath.node.local.name === 'LWrapper') {
-                                                nodePath.remove();
-                                                nodePath.stop();
-                                            }
-                                        },
-                                    });
-                                }
-                            }
-                            changed = true;
-                        }
-                    }
-                },
-            });
-            if (changed)
-                yield jsFile.save();
-        }))();
-        yield fs.remove(view.fullPath);
+        return designer.removeView(view);
     });
 }
 exports.removeLeafView = removeLeafView;

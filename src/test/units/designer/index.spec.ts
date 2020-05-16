@@ -8,10 +8,18 @@ const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/design
 
 describe('designer', () => {
     it('loadViews', async () => {
-        const views = await designer.loadViews(BASE_PATH, ViewType.root);
+        const views = await designer.loadViews({
+            fullPath: BASE_PATH,
+            viewType: ViewType.root,
+            routePath: '/',
+        });
         const dashboardView = views[0];
+        // console.log(dashboardView);
         expect(dashboardView.baseName).to.equal('dashboard');
-        const moduleViews = await designer.loadViews(dashboardView.fullPath, dashboardView.viewType);
+        const moduleViews = await designer.loadViews({
+            fullPath: dashboardView.fullPath,
+            viewType: dashboardView.viewType,
+        });
         // expect(modulesViews[])
         expect(moduleViews.length).to.equal(6);
     });

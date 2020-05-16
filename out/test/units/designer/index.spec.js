@@ -22,7 +22,7 @@ describe('designer', () => {
             routePath: '/',
         });
         const dashboardView = views[0];
-        console.log(dashboardView);
+        // console.log(dashboardView);
         chai_1.expect(dashboardView.baseName).to.equal('dashboard');
         const moduleViews = yield designer.loadViews({
             fullPath: dashboardView.fullPath,
@@ -34,4 +34,4 @@ describe('designer', () => {
     it('markdown()', () => __awaiter(void 0, void 0, void 0, function* () {
     }));
 });
-//# sourceMappingURL=APIHandler.spec.js.map
+//# sourceMappingURL=index.spec.js.map
