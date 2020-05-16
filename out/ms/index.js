@@ -78,6 +78,15 @@ exports.upload = {
             }).then((res) => res.data);
         });
     },
+    micro(files) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const formData = exports.upload.getFormData(files);
+            const pfAxios = yield getPlatformAxios();
+            return pfAxios.post('micro/upload', formData, {
+                headers: formData.getHeaders(),
+            }).then((res) => res.data);
+        });
+    },
     framework(files, framework) {
         return __awaiter(this, void 0, void 0, function* () {
             const formData = exports.upload.getFormData(files);

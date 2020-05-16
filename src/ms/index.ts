@@ -79,6 +79,13 @@ export const upload = {
             headers: formData.getHeaders(),
         }).then((res) => res.data);
     },
+    async micro(files: string | FormFile | Array<string | FormFile>) {
+        const formData = upload.getFormData(files);
+        const pfAxios = await getPlatformAxios();
+        return pfAxios.post('micro/upload', formData, {
+            headers: formData.getHeaders(),
+        }).then((res) => res.data);
+    },
     async framework(files: string | FormFile | Array<string | FormFile>, framework: string) {
         const formData = upload.getFormData(files);
         formData.append('ui', framework);
