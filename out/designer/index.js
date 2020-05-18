@@ -167,6 +167,7 @@ function addLeafViewRoute(parent, module, params) {
                 component: () => import(/* webpackChunkName: '${module.baseName}' */ './${relativePath}'),
                 ${params.title ? "meta: { title: '" + params.title + "' }," : ''}
             }]`, {
+                    filename: 'file.js',
                     plugins: [require('@babel/plugin-syntax-dynamic-import')]
                 });
                 const element = tpl.program.body[0].expression.elements[0];
@@ -235,6 +236,7 @@ function addBranchViewRoute(parent, module, params) {
                 ${params.title ? "meta: { title: '" + params.title + "' }," : ''}
                 children: [],
             }]`, {
+                    filename: 'file.js',
                     plugins: [require('@babel/plugin-syntax-dynamic-import')]
                 });
                 const element = tpl.program.body[0].expression.elements[0];
@@ -347,6 +349,7 @@ function addBranchWrapper(parentInfo, moduleInfo, params) {
                 ${params.title ? "meta: { title: '" + params.title + "' }," : ''}
                 children: [],
             }]`, {
+                    filename: 'file.js',
                     plugins: [require('@babel/plugin-syntax-dynamic-import')]
                 });
                 const element = tpl.program.body[0].expression.elements[0];

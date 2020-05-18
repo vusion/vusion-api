@@ -194,7 +194,9 @@ class TemplateHandler {
             const identifierMap = { ...replacements['props'], ...replacements['data'], ...replacements['computed'], ...replacements['method'] };
             const identifierKeys = Object.keys(identifierMap);
             function fix(expr: string) {
-                const ast = babel.parse('const __RESULT__ = ' + expr);
+                const ast = babel.parse('const __RESULT__ = ' + expr, {
+                    filename: 'file.js',
+                });
                 let changed = false;
                 // 替换是个小概率事件，而且主要是替换 Block，因此不用考虑太多情况
                 babel.traverse(ast, {

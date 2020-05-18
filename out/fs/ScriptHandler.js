@@ -247,7 +247,8 @@ class ScriptHandler {
         this.ast = this.parse(code);
     }
     parse(code) {
-        return babel.parseSync(code, {
+        return babel.parse(code, {
+            filename: 'file.js',
             // Must require manually in VSCode
             plugins: [require('@babel/plugin-syntax-dynamic-import')],
         });

@@ -189,6 +189,7 @@ export async function addLeafViewRoute(parent: vfs.View, module: vfs.View, param
                 component: () => import(/* webpackChunkName: '${module.baseName}' */ './${relativePath}'),
                 ${params.title ? "meta: { title: '" + params.title + "' }," : ''}
             }]`, {
+                filename: 'file.js',
                 plugins: [require('@babel/plugin-syntax-dynamic-import')]
             }) as babel.types.File;
 
@@ -264,6 +265,7 @@ export async function addBranchViewRoute(parent: vfs.View, module: vfs.View, par
                 ${params.title ? "meta: { title: '" + params.title + "' }," : ''}
                 children: [],
             }]`, {
+                filename: 'file.js',
                 plugins: [require('@babel/plugin-syntax-dynamic-import')]
             }) as babel.types.File;
 
@@ -390,6 +392,7 @@ export async function addBranchWrapper(parentInfo: ViewInfo | vfs.View, moduleIn
                 ${params.title ? "meta: { title: '" + params.title + "' }," : ''}
                 children: [],
             }]`, {
+                filename: 'file.js',
                 plugins: [require('@babel/plugin-syntax-dynamic-import')]
             }) as babel.types.File;
 
