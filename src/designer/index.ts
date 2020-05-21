@@ -478,3 +478,30 @@ export async function removeView(viewInfo: ViewInfo | vfs.View, moduleInfo?: Vie
 
     await fs.remove(view.fullPath);
 }
+
+export interface ParseTypes {
+    template?: boolean,
+    script?: boolean,
+    style?: boolean,
+    api?: boolean,
+    examples?: boolean,
+}
+
+export async function loadExternalLibrary(fullPath: string, parseTypes: ParseTypes = {}) {
+    const library = new vfs.Library(fullPath, vfs.LibraryType.external);
+    await library.open();
+    await Promise.all(library.components.map(async (vueFile) => {
+        await vueFile.open();
+        if (parseTypes.template)
+            vueFile.parseTemplate();
+        if (parseTypes.script)
+            vueFile.parseScript();
+        if (parseTypes.style)
+            vueFile.parseStyle();
+        if (parseTypes.api)
+            vueFile.parseAPI();
+        if (parseTypes.examples)
+            vueFile.parseExamples();
+    }));
+    return library;
+}

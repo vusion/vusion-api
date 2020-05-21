@@ -12,6 +12,8 @@ const uslugify = (s: string) => uslug(s);
  */
 
 function escape(name: string = '') {
+    if (typeof name !== 'string')
+        name = String(name);
     return name.replace(/\\?([[\]<>|])/g, '\\$1');
 }
 

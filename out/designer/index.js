@@ -427,4 +427,25 @@ function removeView(viewInfo, moduleInfo) {
     });
 }
 exports.removeView = removeView;
+function loadExternalLibrary(fullPath, parseTypes = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const library = new vfs.Library(fullPath, vfs.LibraryType.external);
+        yield library.open();
+        yield Promise.all(library.components.map((vueFile) => __awaiter(this, void 0, void 0, function* () {
+            yield vueFile.open();
+            if (parseTypes.template)
+                vueFile.parseTemplate();
+            if (parseTypes.script)
+                vueFile.parseScript();
+            if (parseTypes.style)
+                vueFile.parseStyle();
+            if (parseTypes.api)
+                vueFile.parseAPI();
+            if (parseTypes.examples)
+                vueFile.parseExamples();
+        })));
+        return library;
+    });
+}
+exports.loadExternalLibrary = loadExternalLibrary;
 //# sourceMappingURL=index.js.map

@@ -4,6 +4,7 @@ import * as semver from 'semver';
 import VueFile from './VueFile';
 import JSFile from './JSFile';
 import FSEntry from './FSEntry';
+import { listAllFiles } from './';
 import { config, Directory } from '..';
 import { VusionConfig, MaterialInfo } from '../config/getDefaults';
 import PackageJSON from '../types/PackageJSON';
@@ -118,8 +119,8 @@ export default class Library {
             const componentsIndexPath = path.resolve(this.componentsDirectory.fullPath, 'index.js');
             if (fs.existsSync(componentsIndexPath))
                 this.componentsIndexFile = JSFile.fetch(componentsIndexPath);
-        } else {
-            if (this.libraryType === LibraryType.external && semver.lt(this.package.version, '0.4.0-alpha'))
+        } else if (this.libraryType === LibraryType.external) {
+            if (semver.lt(this.package.version, '0.4.0-alpha'))
                 this.componentsDirectory = new Directory(path.resolve(this.libraryPath));
             else
                 this.componentsDirectory = new Directory(path.resolve(this.libraryPath, 'components'));
@@ -127,6 +128,15 @@ export default class Library {
             const componentsIndexPath = path.resolve(this.componentsDirectory.fullPath, 'index.js');
             if (fs.existsSync(componentsIndexPath))
                 this.componentsIndexFile = new JSFile(componentsIndexPath);
+        }
+
+        if (this.componentsDirectory) {
+            this.components = listAllFiles(this.componentsDirectory.fullPath, {
+                dot: false,
+                patterns: ['!**/node_modules', '!**/.git'],
+                includes: /\.vue$/,
+                excludes: /\.vue[\\/]/,
+            }).map((fullPath) => new VueFile(fullPath));
         }
     }
 

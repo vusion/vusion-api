@@ -14,6 +14,7 @@ const path = require("path");
 const semver = require("semver");
 const VueFile_1 = require("./VueFile");
 const JSFile_1 = require("./JSFile");
+const _1 = require("./");
 const __1 = require("..");
 var LibraryType;
 (function (LibraryType) {
@@ -88,14 +89,22 @@ class Library {
                 if (fs.existsSync(componentsIndexPath))
                     this.componentsIndexFile = JSFile_1.default.fetch(componentsIndexPath);
             }
-            else {
-                if (this.libraryType === LibraryType.external && semver.lt(this.package.version, '0.4.0-alpha'))
+            else if (this.libraryType === LibraryType.external) {
+                if (semver.lt(this.package.version, '0.4.0-alpha'))
                     this.componentsDirectory = new __1.Directory(path.resolve(this.libraryPath));
                 else
                     this.componentsDirectory = new __1.Directory(path.resolve(this.libraryPath, 'components'));
                 const componentsIndexPath = path.resolve(this.componentsDirectory.fullPath, 'index.js');
                 if (fs.existsSync(componentsIndexPath))
                     this.componentsIndexFile = new JSFile_1.default(componentsIndexPath);
+            }
+            if (this.componentsDirectory) {
+                this.components = _1.listAllFiles(this.componentsDirectory.fullPath, {
+                    dot: false,
+                    patterns: ['!**/node_modules', '!**/.git'],
+                    includes: /\.vue$/,
+                    excludes: /\.vue[\\/]/,
+                }).map((fullPath) => new VueFile_1.default(fullPath));
             }
         });
     }

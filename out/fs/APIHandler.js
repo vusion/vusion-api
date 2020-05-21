@@ -21,6 +21,8 @@ const uslugify = (s) => uslug(s);
  * 所以需要提取到 vusion-api 中
  */
 function escape(name = '') {
+    if (typeof name !== 'string')
+        name = String(name);
     return name.replace(/\\?([[\]<>|])/g, '\\$1');
 }
 function formatValue(type, value) {
