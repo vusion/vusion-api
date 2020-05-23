@@ -23,13 +23,13 @@ const _ = require("lodash");
 const FormData = require("form-data");
 const axios_1 = require("axios");
 let platformAxios;
-const getPlatformAxios = () => {
+const getPlatformAxios = (prefix = '/internal') => {
     return new Promise((res, rej) => {
         if (platformAxios)
             return res(platformAxios);
         const config = rc.configurator.load();
         platformAxios = axios_1.default.create({
-            baseURL: config.platform + '/internal',
+            baseURL: config.platform + prefix,
             headers: {
                 'access-token': config.access_token,
             },
@@ -63,7 +63,7 @@ exports.upload = {
         });
         const formData = new FormData();
         files.forEach((file, index) => {
-            formData.append('file', fs.createReadStream(file.path), {
+            formData.append('files', fs.createReadStream(file.path), {
                 filepath: file.name,
             });
         });
@@ -78,10 +78,10 @@ exports.upload = {
             }).then((res) => res.data);
         });
     },
-    micro(files) {
+    micro(files, prefix) {
         return __awaiter(this, void 0, void 0, function* () {
             const formData = exports.upload.getFormData(files);
-            const pfAxios = yield getPlatformAxios();
+            const pfAxios = yield getPlatformAxios(prefix);
             return pfAxios.post('micro/upload', formData, {
                 headers: formData.getHeaders(),
             }).then((res) => res.data);
@@ -340,6 +340,14 @@ function publishTemplate(params) {
     });
 }
 exports.publishTemplate = publishTemplate;
+function recordMicroVersionURL(params, prefix) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pfAxios = yield getPlatformAxios(prefix);
+        return pfAxios.post('app/addAppVersion', params)
+            .then((res) => res.data);
+    });
+}
+exports.recordMicroVersionURL = recordMicroVersionURL;
 function recordMicroAppVersion(params) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();

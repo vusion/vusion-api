@@ -19,14 +19,14 @@ export { download, Block, Component, Template };
 
 import axios, { AxiosInstance } from 'axios';
 let platformAxios: AxiosInstance;
-const getPlatformAxios = (): Promise<AxiosInstance> => {
+const getPlatformAxios = (prefix = '/internal'): Promise<AxiosInstance> => {
     return new Promise((res, rej) => {
         if (platformAxios)
             return res(platformAxios);
 
         const config = rc.configurator.load();
         platformAxios = axios.create({
-            baseURL: config.platform + '/internal',
+            baseURL: config.platform + prefix,
             headers: {
                 'access-token': config.access_token,
             },
@@ -66,7 +66,7 @@ export const upload = {
         });
         const formData = new FormData();
         files.forEach((file: FormFile, index: number) => {
-            formData.append('file', fs.createReadStream(file.path), {
+            formData.append('files', fs.createReadStream(file.path), {
                 filepath: file.name, // filepath 在 Form 提交的时候是 name
             });
         });
@@ -79,9 +79,9 @@ export const upload = {
             headers: formData.getHeaders(),
         }).then((res) => res.data);
     },
-    async micro(files: string | FormFile | Array<string | FormFile>) {
+    async micro(files: string | FormFile | Array<string | FormFile>, prefix?: string) {
         const formData = upload.getFormData(files);
-        const pfAxios = await getPlatformAxios();
+        const pfAxios = await getPlatformAxios(prefix);
         return pfAxios.post('micro/upload', formData, {
             headers: formData.getHeaders(),
         }).then((res) => res.data);
@@ -361,6 +361,12 @@ export async function publishComponent(params: object) {
 export async function publishTemplate(params: object) {
     const pfAxios = await getPlatformAxios();
     return pfAxios.post('template/publish', params)
+        .then((res) => res.data);
+}
+
+export async function recordMicroVersionURL(params: object, prefix?: string) {
+    const pfAxios = await getPlatformAxios(prefix);
+    return pfAxios.post('app/addAppVersion', params)
         .then((res) => res.data);
 }
 
