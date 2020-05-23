@@ -505,3 +505,36 @@ export async function loadExternalLibrary(fullPath: string, parseTypes: ParseTyp
     }));
     return library;
 }
+
+/**
+ * 获取接口信息
+ */
+export async function loadServiceApis(fullPath: string) {
+     const servicePath = path.join(fullPath, 'service');
+     const directory = new vfs.Directory(servicePath);
+     await directory.forceOpen();
+     const tasks = directory.children.filter((item)=>{
+         if(item.isDirectory){
+            item.fullPath = path.join(item.fullPath, 'api.json');
+         }
+         return item.fullPath.endsWith('.json');
+     }).map(async (item)=>{
+        const apis = await fs.readFile(item.fullPath, 'utf8');
+        return {
+            filePath: item.fullPath, 
+            serviceName: item.isDirectory? item.baseName : 'default', 
+            apis: JSON.parse(apis),
+        };
+     });
+     return Promise.all(tasks);
+}
+
+export async function saveServiceApis(services: any[]) {
+    const tasks = services.map((item)=>{
+        const file = new vfs.File(item.filePath);
+        file.content = JSON.stringify(item.apis, null, 4);
+        return file.save();
+    });
+    await Promise.all(tasks);
+}
+

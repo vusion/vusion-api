@@ -312,7 +312,7 @@ class ScriptHandler {
         }).code;
         let formatted = prettier.format(code, Object.assign({
             parser: 'babel',
-        } as { [prop: string]: any }, prettierConfig));
+        } as prettier.Options, prettierConfig));
 
         formatted = formatted.replace(/component: \(\) =>\s+import\(([\s\S]+?)\),/g, (m, $1) => {
             return `component: () => import(${$1.replace(/\n\s+/g, ' ').trim()}),`;
