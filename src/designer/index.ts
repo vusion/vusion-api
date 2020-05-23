@@ -538,3 +538,26 @@ export async function saveServiceApis(services: any[]) {
     await Promise.all(tasks);
 }
 
+export async function addServiceApis(fullPath: string, newName: string, name: string) {
+    if(!name){
+        const dir = path.join(fullPath, 'service', newName);
+        let tplPath = path.resolve(__dirname, '../../templates/service');
+        await fs.copy(tplPath, dir);
+        return path.join(dir, 'api.json');
+    }else{
+        const oldPath = path.join(fullPath, 'service', name);
+        const newPath = path.join(fullPath, 'service', newName);
+        await fs.rename(oldPath, newPath);
+        return path.join(newPath, 'api.json');
+    }
+}
+
+export async function removeServiceApis(fullPath: string) {
+    const fileNames = await fs.readdir(fullPath);
+    const tasks = fileNames.map(async (name) =>{
+        return await fs.remove(path.join(fullPath, name));
+    })
+    Promise.all(tasks).then(()=>{
+        fs.rmdirSync(fullPath);
+    });
+}
