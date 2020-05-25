@@ -1,5 +1,5 @@
 import { createService } from '@/global/utils/service';
-import apis from './apis.json';
+import apis from './api';
 
 const service = createService(apis);
 
