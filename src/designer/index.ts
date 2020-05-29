@@ -13,10 +13,25 @@ export async function addLayout(fullPath: string, route: string, type: string) {
 
     let tplPath = path.resolve(__dirname, `../../snippets/${type}.vue`);
     let tpl = await fs.readFile(tplPath, 'utf8');
-    tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '');
+    tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '') + '\n';
     const rootEl = vueFile.templateHandler.ast;
     const selectedEl = vueFile.templateHandler.findByRoute(route, rootEl) as compiler.ASTElement;
     selectedEl.children.push(compiler.compile(tpl).ast);
+
+    await vueFile.save();
+}
+
+export async function initLayout(fullPath: string, type: string) {
+    const vueFile = new vfs.VueFile(fullPath);
+    await vueFile.open();
+
+    let tplPath = path.resolve(__dirname, `../../snippets/${type}.vue`);
+    let tpl = await fs.readFile(tplPath, 'utf8');
+    tpl = tpl.replace(/^<template>\s*/, '').replace(/\s*<\/template>\s*$/, '') + '\n';
+
+    if (type.startsWith('grid-'))
+        tpl = `<u-grid-layout>${tpl}</u-grid-layout>\n`;
+    vueFile.template = tpl;
 
     await vueFile.save();
 }
@@ -66,6 +81,7 @@ export interface AddParams {
     name: string,
     title: string,
     ext?: string,
+    layout?: string,
 }
 
 async function initView(viewInfo: ViewInfo) {
@@ -290,6 +306,17 @@ export async function saveCode(fullPath: string, type: 'template' | 'script' | '
     await vueFile.save();
 }
 
+export async function mergeCode(fullPath: string, content: string, nodePath?: string) {
+    const vueFile = new vfs.VueFile(fullPath);
+    await vueFile.open();
+    vueFile.parseAll();
+
+    const blockVue = vfs.VueFile.from(content);
+    blockVue.parseAll();
+    vueFile.merge(blockVue, nodePath);
+    await vueFile.save();
+}
+
 export function findRouteObjectAndParentArray(objectExpression: babel.types.ObjectExpression, relativePath: string | Array<string>, createChildrenArrayIfNeeded: boolean = false, pos: number = 0): {
     routeObject: babel.types.ObjectExpression,
     parentArray: babel.types.ArrayExpression,
@@ -400,6 +427,9 @@ export async function addLeafView(parentInfo: ViewInfo | vfs.View, moduleInfo: V
         tplPath = path.resolve(__dirname, '../../templates/leaf-view.md');
     await fs.copy(tplPath, dest);
 
+    if (params.layout)
+        await initLayout(dest, params.layout);
+
     if (module)
         await addLeafViewRoute(parent, module, params);
 
@@ -477,6 +507,8 @@ export async function addBranchView(parentInfo: ViewInfo | vfs.View, moduleInfo:
     await fs.copy(tplPath, dir);
 
     const dest = path.join(dir, 'index' + params.ext);
+    if (params.layout)
+        await initLayout(dest, params.layout);
 
     await addBranchViewRoute(parent, module, params);
     return dest;

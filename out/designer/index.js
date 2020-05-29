@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.removeServiceApis = exports.addServiceApis = exports.saveServiceApis = exports.loadServiceApis = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = require("path");
 const fs = require("fs-extra");
 const babel = require("@babel/core");
@@ -21,7 +22,7 @@ function addLayout(fullPath, route, type) {
         vueFile.parseTemplate();
         let tplPath = path.resolve(__dirname, `../../snippets/${type}.vue`);
         let tpl = yield fs.readFile(tplPath, 'utf8');
-        tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '');
+        tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '') + '\n';
         const rootEl = vueFile.templateHandler.ast;
         const selectedEl = vueFile.templateHandler.findByRoute(route, rootEl);
         selectedEl.children.push(compiler.compile(tpl).ast);
@@ -29,6 +30,20 @@ function addLayout(fullPath, route, type) {
     });
 }
 exports.addLayout = addLayout;
+function initLayout(fullPath, type) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const vueFile = new vfs.VueFile(fullPath);
+        yield vueFile.open();
+        let tplPath = path.resolve(__dirname, `../../snippets/${type}.vue`);
+        let tpl = yield fs.readFile(tplPath, 'utf8');
+        tpl = tpl.replace(/^<template>\s*/, '').replace(/\s*<\/template>\s*$/, '') + '\n';
+        if (type.startsWith('grid-'))
+            tpl = `<u-grid-layout>${tpl}</u-grid-layout>\n`;
+        vueFile.template = tpl;
+        yield vueFile.save();
+    });
+}
+exports.initLayout = initLayout;
 function addCode(fullPath, route, tpl) {
     return __awaiter(this, void 0, void 0, function* () {
         const vueFile = new vfs.VueFile(fullPath);
@@ -114,6 +129,18 @@ function saveCode(fullPath, type, content) {
     });
 }
 exports.saveCode = saveCode;
+function mergeCode(fullPath, content, nodePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const vueFile = new vfs.VueFile(fullPath);
+        yield vueFile.open();
+        vueFile.parseAll();
+        const blockVue = vfs.VueFile.from(content);
+        blockVue.parseAll();
+        vueFile.merge(blockVue, nodePath);
+        yield vueFile.save();
+    });
+}
+exports.mergeCode = mergeCode;
 function findRouteObjectAndParentArray(objectExpression, relativePath, createChildrenArrayIfNeeded = false, pos = 0) {
     const arr = Array.isArray(relativePath) ? relativePath : relativePath.split('/');
     if (arr[pos] === 'views')
@@ -209,6 +236,8 @@ function addLeafView(parentInfo, moduleInfo, params) {
         else if (params.ext === '.md')
             tplPath = path.resolve(__dirname, '../../templates/leaf-view.md');
         yield fs.copy(tplPath, dest);
+        if (params.layout)
+            yield initLayout(dest, params.layout);
         if (module)
             yield addLeafViewRoute(parent, module, params);
         return dest;
@@ -279,6 +308,8 @@ function addBranchView(parentInfo, moduleInfo, params) {
             tplPath = path.resolve(__dirname, '../../templates/branch-view-md');
         yield fs.copy(tplPath, dir);
         const dest = path.join(dir, 'index' + params.ext);
+        if (params.layout)
+            yield initLayout(dest, params.layout);
         yield addBranchViewRoute(parent, module, params);
         return dest;
     });
@@ -448,4 +479,69 @@ function loadExternalLibrary(fullPath, parseTypes = {}) {
     });
 }
 exports.loadExternalLibrary = loadExternalLibrary;
+/**
+ * 获取接口信息
+ */
+function loadServiceApis(fullPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const servicePath = path.join(fullPath, 'service');
+        const directory = new vfs.Directory(servicePath);
+        yield directory.forceOpen();
+        const tasks = directory.children.filter((item) => {
+            if (item.isDirectory) {
+                item.fullPath = path.join(item.fullPath, 'api.json');
+            }
+            return item.fullPath.endsWith('.json');
+        }).map((item) => __awaiter(this, void 0, void 0, function* () {
+            const apis = yield fs.readFile(item.fullPath, 'utf8');
+            return {
+                filePath: item.fullPath,
+                serviceName: item.isDirectory ? item.baseName : 'default',
+                apis: JSON.parse(apis),
+            };
+        }));
+        return Promise.all(tasks);
+    });
+}
+exports.loadServiceApis = loadServiceApis;
+function saveServiceApis(services) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const tasks = services.map((item) => {
+            const file = new vfs.File(item.filePath);
+            file.content = JSON.stringify(item.apis, null, 4);
+            return file.save();
+        });
+        yield Promise.all(tasks);
+    });
+}
+exports.saveServiceApis = saveServiceApis;
+function addServiceApis(fullPath, newName, name) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!name) {
+            const dir = path.join(fullPath, 'service', newName);
+            let tplPath = path.resolve(__dirname, '../../templates/service');
+            yield fs.copy(tplPath, dir);
+            return path.join(dir, 'api.json');
+        }
+        else {
+            const oldPath = path.join(fullPath, 'service', name);
+            const newPath = path.join(fullPath, 'service', newName);
+            yield fs.rename(oldPath, newPath);
+            return path.join(newPath, 'api.json');
+        }
+    });
+}
+exports.addServiceApis = addServiceApis;
+function removeServiceApis(fullPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const fileNames = yield fs.readdir(fullPath);
+        const tasks = fileNames.map((name) => __awaiter(this, void 0, void 0, function* () {
+            return yield fs.remove(path.join(fullPath, name));
+        }));
+        Promise.all(tasks).then(() => {
+            fs.rmdirSync(fullPath);
+        });
+    });
+}
+exports.removeServiceApis = removeServiceApis;
 //# sourceMappingURL=index.js.map

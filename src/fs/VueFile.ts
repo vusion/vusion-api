@@ -307,7 +307,7 @@ export default class VueFile extends FSEntry {
             if (fs.existsSync(path.join(this.fullPath, 'index.js')))
                 return this.script = await fs.readFile(path.join(this.fullPath, 'index.js'), 'utf8');
             else
-                throw new Error(`Cannot find 'index.js' in multifile Vue!`);
+                throw new Error(`Cannot find 'index.js' in multifile Vue ${this.fullPath}!`);
         } else {
             return this.script = fetchPartialContent(this.content, 'script');
         }

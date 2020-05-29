@@ -6,7 +6,6 @@ import ScriptHandler from '../../../fs/ScriptHandler';
 const BASE_PATH = path.resolve(__dirname, '../../../../', 'src/test/units/VueFile/files');
 
 describe('ScriptHandler', () => {
-
     it('import(identifer)', async () => {
         const content = fs.readFileSync(path.resolve(BASE_PATH, 'u-button.vue/index.js'), 'utf8');
         const $js = new ScriptHandler(content);

@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SUBFILE_LIST = exports.VueFileExtendMode = void 0;
 /// <reference path="../../types/line-reader.d.ts" />
 const fs = require("fs-extra");
 const path = require("path");
@@ -230,7 +231,7 @@ class VueFile extends FSEntry_1.default {
                 if (fs.existsSync(path.join(this.fullPath, 'index.js')))
                     return this.script = yield fs.readFile(path.join(this.fullPath, 'index.js'), 'utf8');
                 else
-                    throw new Error(`Cannot find 'index.js' in multifile Vue!`);
+                    throw new Error(`Cannot find 'index.js' in multifile Vue ${this.fullPath}!`);
             }
             else {
                 return this.script = fetchPartialContent(this.content, 'script');

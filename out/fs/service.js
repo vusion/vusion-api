@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.extendToLibrary = exports.extendToPath = exports.addPackage = exports.addDocs = exports.addAPI = exports.addModuleCSS = exports.createMultiFilePackage = exports.createMultiFileWithScreenshots = exports.createMultiFileWithSubdocs = exports.createMultiFile = exports.createSingleFile = exports.rename = exports.deleteFile = exports.moveFileToTrash = exports.createDirectory = exports.listAllFiles = exports.listFiles = exports.batchReplace = exports.handleSame = exports.FileExistsError = void 0;
 const fs = require("fs-extra");
 const path = require("path");
 const babel = require("@babel/core");

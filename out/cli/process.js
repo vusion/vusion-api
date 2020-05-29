@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.exec = exports.justExecSync = exports.execSync = void 0;
 const child_process_1 = require("child_process");
 const logger = require("./logger");
 /**

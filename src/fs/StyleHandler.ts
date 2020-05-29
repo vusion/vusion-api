@@ -1,6 +1,10 @@
 import * as postcss from 'postcss';
-import { uniqueInMap } from '../utils';
+import { uniqueInMap } from '../utils/mini';
 
+/**
+ * 样式 AST 处理器
+ * 该 class 可以在两端(node, browser)运行
+ */
 class StyleHandler {
     code: string;
     ast: postcss.Root;

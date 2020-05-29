@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.normalizeName = exports.avoidSameName = exports.Camel2kebab = exports.kebab2Camel = void 0;
 const fs = require("fs-extra");
 const path = require("path");
 /**
@@ -45,10 +46,4 @@ function normalizeName(componentName) {
         return { baseName: 'u-sample', componentName: 'USample' };
 }
 exports.normalizeName = normalizeName;
-function uniqueInMap(key, map, start = 1) {
-    while (map.has(key))
-        key = key.replace(/\d*$/, (m) => String(m === '' ? start : +m + 1));
-    return key;
-}
-exports.uniqueInMap = uniqueInMap;
 //# sourceMappingURL=index.js.map

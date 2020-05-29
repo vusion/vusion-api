@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.clearConsole = exports.error = exports.warn = exports.done = exports.info = exports.log = exports.events = void 0;
 const chalk_1 = require("chalk");
 const EventEmitter = require("events");
 const readline = require("readline");

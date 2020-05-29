@@ -91,6 +91,9 @@ class TemplateHandler {
             shouldFormat = false;
 
         const attrs = Object.keys(el.attrsMap).map((key) => {
+            if (key.startsWith('vusion-'))
+                return '';
+
             const value = el.attrsMap[key];
             if (value === '') {
                 const attr = (el as any).rawAttrsMap[key];
@@ -103,6 +106,8 @@ class TemplateHandler {
         let attrsLength = 0;
         let attrsString = '';
         attrs.forEach((attr) => {
+            if (!attr)
+                return;
             if (attrsLength >= 120 || attr.length >= 120) {
                 attrsString += '\n' + tabs + ' '.repeat(3) // ' '.repeat(el.tag.length + 1);
                 attrsLength = 0;

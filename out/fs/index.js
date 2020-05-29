@@ -1,32 +1,39 @@
 "use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !exports.hasOwnProperty(p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var FSEntry_1 = require("./FSEntry");
-exports.FSEntry = FSEntry_1.default;
+Object.defineProperty(exports, "FSEntry", { enumerable: true, get: function () { return FSEntry_1.default; } });
 var File_1 = require("./File");
-exports.File = File_1.default;
+Object.defineProperty(exports, "File", { enumerable: true, get: function () { return File_1.default; } });
 var Directory_1 = require("./Directory");
-exports.Directory = Directory_1.default;
+Object.defineProperty(exports, "Directory", { enumerable: true, get: function () { return Directory_1.default; } });
 var VueFile_1 = require("./VueFile");
-exports.VueFile = VueFile_1.default;
-exports.VueFileExtendMode = VueFile_1.VueFileExtendMode;
+Object.defineProperty(exports, "VueFile", { enumerable: true, get: function () { return VueFile_1.default; } });
+Object.defineProperty(exports, "VueFileExtendMode", { enumerable: true, get: function () { return VueFile_1.VueFileExtendMode; } });
 var JSFile_1 = require("./JSFile");
-exports.JSFile = JSFile_1.default;
+Object.defineProperty(exports, "JSFile", { enumerable: true, get: function () { return JSFile_1.default; } });
 var Library_1 = require("./Library");
-exports.Library = Library_1.default;
-exports.LibraryType = Library_1.LibraryType;
+Object.defineProperty(exports, "Library", { enumerable: true, get: function () { return Library_1.default; } });
+Object.defineProperty(exports, "LibraryType", { enumerable: true, get: function () { return Library_1.LibraryType; } });
 var View_1 = require("./View");
-exports.View = View_1.default;
-exports.ViewType = View_1.ViewType;
+Object.defineProperty(exports, "View", { enumerable: true, get: function () { return View_1.default; } });
+Object.defineProperty(exports, "ViewType", { enumerable: true, get: function () { return View_1.ViewType; } });
 var TemplateHandler_1 = require("./TemplateHandler");
-exports.TemplateHandler = TemplateHandler_1.default;
+Object.defineProperty(exports, "TemplateHandler", { enumerable: true, get: function () { return TemplateHandler_1.default; } });
 var ScriptHandler_1 = require("./ScriptHandler");
-exports.ScriptHandler = ScriptHandler_1.default;
+Object.defineProperty(exports, "ScriptHandler", { enumerable: true, get: function () { return ScriptHandler_1.default; } });
 var StyleHandler_1 = require("./StyleHandler");
-exports.StyleHandler = StyleHandler_1.default;
+Object.defineProperty(exports, "StyleHandler", { enumerable: true, get: function () { return StyleHandler_1.default; } });
 var APIHandler_1 = require("./APIHandler");
-exports.APIHandler = APIHandler_1.default;
-__export(require("./service"));
+Object.defineProperty(exports, "APIHandler", { enumerable: true, get: function () { return APIHandler_1.default; } });
+__exportStar(require("./service"), exports);
 //# sourceMappingURL=index.js.map

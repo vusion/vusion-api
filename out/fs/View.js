@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RESERVED_DIRS = exports.ViewType = void 0;
 const fs = require("fs-extra");
 const path = require("path");
 const FSEntry_1 = require("./FSEntry");
