@@ -34,6 +34,7 @@ export default class View extends FSEntry {
     // vueFile: VueFile;
     routePath: string;
     vueFilePath: string;
+    routeMeta: Object;
 
     constructor(fullPath: string, viewType: ViewType = ViewType.branch, isDirectory: boolean = true, routePath?: string) {
         super(fullPath, isDirectory);
