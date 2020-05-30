@@ -9,12 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeServiceApis = exports.addServiceApis = exports.saveServiceApis = exports.loadServiceApis = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
+exports.removeServiceApis = exports.addServiceApis = exports.saveServiceApis = exports.loadServiceApis = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = require("path");
 const fs = require("fs-extra");
 const babel = require("@babel/core");
 const vfs = require("../fs");
 const compiler = require("vue-template-compiler");
+const javascript_stringify_1 = require("javascript-stringify");
 function addLayout(fullPath, route, type) {
     return __awaiter(this, void 0, void 0, function* () {
         const vueFile = new vfs.VueFile(fullPath);
@@ -69,15 +70,188 @@ function initView(viewInfo) {
         return new vfs.View(viewInfo.fullPath, viewInfo.viewType, isDirectory, viewInfo.routePath);
     });
 }
+function js2json(data) {
+    const content = data.trim().replace(/export default |module\.exports +=/, '');
+    let json;
+    try {
+        json = eval('(function(){return ' + content + '})()');
+    }
+    catch (e) {
+    }
+    return json;
+}
+class EntryMetaData {
+    getMetaData(viewInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fullPath = viewInfo.fullPath;
+            const index = fullPath.indexOf('src');
+            const pageJsonPath = path.join(fullPath.slice(0, index), 'pages.json');
+            const data = {
+                title: '',
+            };
+            if (fs.existsSync(pageJsonPath)) {
+                const pageJsonFile = yield fs.readFile(pageJsonPath, 'utf8');
+                const pageJson = JSON.parse(pageJsonFile);
+                data.title = pageJson[viewInfo.baseName] && pageJson[viewInfo.baseName].title;
+            }
+            return data;
+        });
+    }
+    saveMetaData(viewInfo, params, moduleInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fullPath = viewInfo.fullPath;
+            const index = fullPath.indexOf('src');
+            const pageJsonPath = path.join(fullPath.slice(0, index), 'pages.json');
+            if (fs.existsSync(pageJsonPath)) {
+                const pageJsonFile = yield fs.readFile(pageJsonPath, 'utf8');
+                const pageJson = JSON.parse(pageJsonFile);
+                if (pageJson[viewInfo.baseName])
+                    Object.assign(pageJson[viewInfo.baseName], params);
+                const file = new vfs.File(pageJsonPath);
+                file.content = JSON.stringify(pageJson, null, 4);
+                return file.save();
+            }
+            return 'success';
+        });
+    }
+}
+class ModuleMetaData {
+    getMetaData(viewInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fullPath = viewInfo.fullPath;
+            const baseJsPath = path.join(fullPath, 'module', 'base.js');
+            const data = {
+                title: '',
+            };
+            if (fs.existsSync(baseJsPath)) {
+                const baseJs = yield fs.readFile(baseJsPath, 'utf8');
+                let baseJsJson = js2json(baseJs);
+                if (baseJsJson && baseJsJson.sidebar && baseJsJson.sidebar.title) {
+                    data.title = baseJsJson.sidebar.title;
+                }
+            }
+            return data;
+        });
+    }
+    saveMetaData(viewInfo, params, moduleInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fullPath = viewInfo.fullPath;
+            const baseJsPath = path.join(fullPath, 'module', 'base.js');
+            if (fs.existsSync(baseJsPath)) {
+                const baseJs = yield fs.readFile(baseJsPath, 'utf8');
+                let baseJsJson = js2json(baseJs);
+                if (baseJsJson && baseJsJson.sidebar) {
+                    Object.assign(baseJsJson.sidebar, params);
+                }
+                else {
+                    baseJsJson.sidebar = Object.assign({}, params);
+                }
+                const file = new vfs.File(baseJsPath);
+                file.content = 'export default ' + javascript_stringify_1.stringify(baseJsJson, null, 4);
+                return file.save();
+            }
+            return 'success';
+        });
+    }
+}
+class PageMetaData {
+    getMetaData(viewInfo, moduleInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!moduleInfo)
+                return {};
+            const modulePath = moduleInfo.fullPath;
+            const routePath = path.join(modulePath, 'routesMap.js');
+            const data = {
+                title: '',
+                routeMeta: {},
+            };
+            if (fs.existsSync(routePath)) {
+                const routeData = yield fs.readFile(routePath, 'utf8');
+                let reouteJson = js2json(routeData);
+                let currentPath = viewInfo.routePath.replace(moduleInfo.routePath, '');
+                if (viewInfo.viewType === 'branch') {
+                    currentPath = currentPath.slice(0, currentPath.length - 1);
+                }
+                if (reouteJson[currentPath] && reouteJson[currentPath].meta && reouteJson[currentPath].meta.title) {
+                    data.title = reouteJson[currentPath].meta.title;
+                }
+                data.routeMeta = reouteJson[currentPath];
+            }
+            return data;
+        });
+    }
+    saveMetaData(viewInfo, params, moduleInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!moduleInfo)
+                return {};
+            const modulePath = moduleInfo.fullPath;
+            const routePath = path.join(modulePath, 'routesMap.js');
+            if (fs.existsSync(routePath)) {
+                const routeData = yield fs.readFile(routePath, 'utf8');
+                let reouteJson = js2json(routeData);
+                let currentPath = viewInfo.routePath.replace(moduleInfo.routePath, '');
+                if (viewInfo.viewType === 'branch') {
+                    currentPath = currentPath.slice(0, currentPath.length - 1);
+                }
+                if (reouteJson[currentPath] && reouteJson[currentPath].meta && reouteJson[currentPath].meta.title) {
+                    Object.assign(reouteJson[currentPath].meta, params);
+                    const file = new vfs.File(routePath);
+                    file.content = 'export default ' + javascript_stringify_1.stringify(reouteJson, null, 4);
+                    return file.save();
+                }
+            }
+            return 'success';
+        });
+    }
+}
+function getMetaData(viewInfo, moduleInfo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let instance;
+        let meta = {};
+        if (viewInfo.viewType === 'entry') {
+            instance = new EntryMetaData();
+            meta = yield instance.getMetaData(viewInfo);
+        }
+        if (viewInfo.viewType === 'module') {
+            instance = new ModuleMetaData();
+            meta = yield instance.getMetaData(viewInfo);
+        }
+        if (viewInfo.viewType === 'branch' || viewInfo.viewType === 'vue') {
+            instance = new PageMetaData();
+            meta = yield instance.getMetaData(viewInfo, moduleInfo);
+        }
+        Object.assign(viewInfo, meta);
+        return viewInfo;
+    });
+}
+function saveMetaData(viewInfo, params, moduleInfo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let instance;
+        if (viewInfo.viewType === 'entry') {
+            instance = new EntryMetaData();
+        }
+        if (viewInfo.viewType === 'module') {
+            instance = new ModuleMetaData();
+        }
+        if (viewInfo.viewType === 'branch' || viewInfo.viewType === 'vue') {
+            instance = new PageMetaData();
+        }
+        return instance.saveMetaData(viewInfo, params, moduleInfo);
+    });
+}
+exports.saveMetaData = saveMetaData;
 /**
  * 获取页面列表
  * @param viewInfo 父页面的信息
  */
-function loadViews(viewInfo) {
+function loadViews(viewInfo, moduleInfo) {
     return __awaiter(this, void 0, void 0, function* () {
         const view = viewInfo instanceof vfs.View ? viewInfo : yield initView(viewInfo);
         yield view.open();
-        yield Promise.all(view.children.map((child) => child.preOpen()));
+        yield Promise.all(view.children.map((child) => __awaiter(this, void 0, void 0, function* () {
+            yield child.preOpen();
+            return yield getMetaData(child, moduleInfo);
+        })));
         return view.children;
     });
 }
