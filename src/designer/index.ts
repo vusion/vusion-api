@@ -2,8 +2,10 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as babel from '@babel/core';
 import * as vfs from '../fs';
+import * as vms from '../ms';
 import * as compiler from 'vue-template-compiler';
 import { stringify } from "javascript-stringify";
+import * as utils from '../utils';
 
 export async function addLayout(fullPath: string, route: string, type: string) {
     const vueFile = new vfs.VueFile(fullPath);
@@ -306,12 +308,12 @@ export async function saveCode(fullPath: string, type: 'template' | 'script' | '
     await vueFile.save();
 }
 
-export async function mergeCode(fullPath: string, content: string, nodePath?: string) {
+export async function mergeCode(fullPath: string, content: string | vfs.VueFile, nodePath?: string) {
     const vueFile = new vfs.VueFile(fullPath);
     await vueFile.open();
     vueFile.parseAll();
 
-    const blockVue = vfs.VueFile.from(content);
+    const blockVue = typeof content === 'string' ? vfs.VueFile.from(content) : content;
     blockVue.parseAll();
     vueFile.merge(blockVue, nodePath);
     await vueFile.save();
@@ -756,4 +758,134 @@ export async function removeServiceApis(fullPath: string) {
     Promise.all(tasks).then(()=>{
         fs.rmdirSync(fullPath);
     });
+}
+
+/**
+ * 区块的复杂程度类型
+ */
+const enum BlockComplexity {
+    onlyTemplate, // Just add
+    hasScriptOrStyle, // Can merge
+    hasAssetsOrExtra, // Must external
+}
+
+/**
+ * 组件或区块信息
+ */
+interface BlockInfo {
+    name: string,
+    title: string,
+    tagName: string,
+    dependencies: any,
+    registry: string,
+    uuid?: string,
+}
+
+/**
+ * 删除占位符
+ * @param fullPath 文件路径
+ * @param blockInfo 组件或区块信息
+ */
+async function removePlaceholder(fullPath: string, blockInfo: BlockInfo) {
+    const vueFile = new vfs.VueFile(fullPath);
+    await vueFile.forceOpen();
+
+    vueFile.parseTemplate();
+    vueFile.templateHandler.traverse((nodePath) => {
+        const node = nodePath.node as compiler.ASTElement;
+        if (node.tag === 'd-progress' && node.attrsMap.uuid === blockInfo.uuid){
+            nodePath.remove();
+        }
+    });
+    await vueFile.save();
+}
+
+/**
+ * 在有其它代码或 Assets 的情况下，直接添加为外部区块
+ */
+async function external(fullPath: string, block: BlockInfo, blockVue: vfs.VueFile, nodePath: string) {
+    if(!fs.existsSync(path.join(fullPath.replace(/\.vue$/, '.blocks'), block.tagName + '.vue'))){
+        await vms.addBlockExternally(blockVue, fullPath, block.tagName);
+    }
+    const content = `<template><${block.tagName}></${block.tagName}></template>`
+    await mergeCode(fullPath, content, nodePath);
+}
+
+/**
+ * 添加区块
+ * @param fullPath 文件路径
+ * @param libraryPath 全局组件路径，components/index.js所在路径
+ * @param blockInfo 组件或区块信息
+ * @param tpl 组件代码字符串
+ * @param nodePath 节点路径
+ */
+export async function addBlock(fullPath: string, blockInfo: BlockInfo, nodePath?: string){
+    const options = {
+        source: {
+            type: 'file',
+            registry: blockInfo.registry,
+            name: blockInfo.name,
+            fileName: blockInfo.tagName + '.vue',
+            baseName: blockInfo.tagName,
+        },
+        target: fullPath,
+        name: blockInfo.tagName,
+    };
+    const blockPath = await vms.fetchBlock(options);
+    let blockVue: vfs.VueFile;
+    blockVue = new vfs.VueFile(blockPath.replace(/\.vue@.+$/, '.vue'));
+    blockVue.fullPath = blockPath;
+    await blockVue.open();
+
+    // 区块的复杂程度
+    let blockComplexity: BlockComplexity;
+    if (blockVue.hasAssets() || blockVue.hasExtra())
+        blockComplexity = BlockComplexity.hasAssetsOrExtra;
+    else if (blockVue.hasScript(true) || blockVue.hasStyle(true))
+        blockComplexity = BlockComplexity.hasScriptOrStyle;
+    else
+        blockComplexity = BlockComplexity.onlyTemplate;
+
+    // 删除占位符
+    await removePlaceholder(fullPath, blockInfo);
+
+    if (blockComplexity === BlockComplexity.hasAssetsOrExtra) {
+        return await external(fullPath, blockInfo, blockVue, nodePath);
+    }else{
+        return await mergeCode(fullPath, blockVue, nodePath);
+    }
+}
+
+export async function removeBlock(fullPath: string, blockInfo: BlockInfo) {
+    return await vms.removeBlock(fullPath, blockInfo.tagName);
+}
+
+/**
+ * 添加业务组件
+ * @param fullPath 文件路径
+ * @param libraryPath 全局组件路径，components/index.js所在路径
+ * @param blockInfo 组件或区块信息
+ * @param tpl 组件代码字符串
+ * @param nodePath 节点路径
+ */
+export async function addCustom(fullPath: string, libraryPath: string, blockInfo: BlockInfo, tpl: string, nodePath: string) {
+    // 删除占位符
+    await removePlaceholder(fullPath, blockInfo);
+
+    const library = new vfs.Library(libraryPath, vfs.LibraryType.internal);
+    await library.open();
+    const indexFile = library.componentsIndexFile;
+    if(indexFile){
+        await indexFile.forceOpen();
+        const $js = indexFile.parse();
+        $js.export('*').from(blockInfo.name);
+        await indexFile.save();
+    }
+
+    await mergeCode(fullPath, tpl, nodePath);
+}
+
+export async function loadPackageJson(rootPath: string) {
+    const pkg = JSON.parse(await fs.readFile(path.resolve(rootPath, 'package.json'), 'utf8'));
+    return pkg;
 }
