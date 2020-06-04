@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeServiceApis = exports.addServiceApis = exports.saveServiceApis = exports.loadServiceApis = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
+exports.loadPackageJson = exports.addCustom = exports.removeBlock = exports.addBlock = exports.removeServiceApis = exports.addServiceApis = exports.saveServiceApis = exports.loadServiceApis = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = require("path");
 const fs = require("fs-extra");
 const babel = require("@babel/core");
 const vfs = require("../fs");
+const vms = require("../ms");
 const compiler = require("vue-template-compiler");
 const javascript_stringify_1 = require("javascript-stringify");
 function addLayout(fullPath, route, type) {
@@ -160,7 +161,7 @@ class PageMetaData {
             if (!moduleInfo)
                 return {};
             const modulePath = moduleInfo.fullPath;
-            const routePath = path.join(modulePath, 'routesMap.js');
+            const routePath = path.join(modulePath, 'routes.map.js');
             const data = {
                 title: '',
                 routeMeta: {},
@@ -185,7 +186,7 @@ class PageMetaData {
             if (!moduleInfo)
                 return {};
             const modulePath = moduleInfo.fullPath;
-            const routePath = path.join(modulePath, 'routesMap.js');
+            const routePath = path.join(modulePath, 'routes.map.js');
             if (fs.existsSync(routePath)) {
                 const routeData = yield fs.readFile(routePath, 'utf8');
                 let reouteJson = js2json(routeData);
@@ -308,7 +309,7 @@ function mergeCode(fullPath, content, nodePath) {
         const vueFile = new vfs.VueFile(fullPath);
         yield vueFile.open();
         vueFile.parseAll();
-        const blockVue = vfs.VueFile.from(content);
+        const blockVue = typeof content === 'string' ? vfs.VueFile.from(content) : content;
         blockVue.parseAll();
         vueFile.merge(blockVue, nodePath);
         yield vueFile.save();
@@ -718,4 +719,118 @@ function removeServiceApis(fullPath) {
     });
 }
 exports.removeServiceApis = removeServiceApis;
+/**
+ * 删除占位符
+ * @param fullPath 文件路径
+ * @param blockInfo 组件或区块信息
+ */
+function removePlaceholder(fullPath, blockInfo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const vueFile = new vfs.VueFile(fullPath);
+        yield vueFile.forceOpen();
+        vueFile.parseTemplate();
+        vueFile.templateHandler.traverse((nodePath) => {
+            const node = nodePath.node;
+            if (node.tag === 'd-progress' && node.attrsMap.uuid === blockInfo.uuid) {
+                nodePath.remove();
+            }
+        });
+        yield vueFile.save();
+    });
+}
+/**
+ * 在有其它代码或 Assets 的情况下，直接添加为外部区块
+ */
+function external(fullPath, block, blockVue, nodePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!fs.existsSync(path.join(fullPath.replace(/\.vue$/, '.blocks'), block.tagName + '.vue'))) {
+            yield vms.addBlockExternally(blockVue, fullPath, block.tagName);
+        }
+        const content = `<template><${block.tagName}></${block.tagName}></template>`;
+        yield mergeCode(fullPath, content, nodePath);
+    });
+}
+/**
+ * 添加区块
+ * @param fullPath 文件路径
+ * @param libraryPath 全局组件路径，components/index.js所在路径
+ * @param blockInfo 组件或区块信息
+ * @param tpl 组件代码字符串
+ * @param nodePath 节点路径
+ */
+function addBlock(fullPath, blockInfo, nodePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const options = {
+            source: {
+                type: 'file',
+                registry: blockInfo.registry,
+                name: blockInfo.name,
+                fileName: blockInfo.tagName + '.vue',
+                baseName: blockInfo.tagName,
+            },
+            target: fullPath,
+            name: blockInfo.tagName,
+        };
+        const blockPath = yield vms.fetchBlock(options);
+        let blockVue;
+        blockVue = new vfs.VueFile(blockPath.replace(/\.vue@.+$/, '.vue'));
+        blockVue.fullPath = blockPath;
+        yield blockVue.open();
+        // 区块的复杂程度
+        let blockComplexity;
+        if (blockVue.hasAssets() || blockVue.hasExtra())
+            blockComplexity = 2 /* hasAssetsOrExtra */;
+        else if (blockVue.hasScript(true) || blockVue.hasStyle(true))
+            blockComplexity = 1 /* hasScriptOrStyle */;
+        else
+            blockComplexity = 0 /* onlyTemplate */;
+        // 删除占位符
+        yield removePlaceholder(fullPath, blockInfo);
+        if (blockComplexity === 2 /* hasAssetsOrExtra */) {
+            return yield external(fullPath, blockInfo, blockVue, nodePath);
+        }
+        else {
+            return yield mergeCode(fullPath, blockVue, nodePath);
+        }
+    });
+}
+exports.addBlock = addBlock;
+function removeBlock(fullPath, blockInfo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield vms.removeBlock(fullPath, blockInfo.tagName);
+    });
+}
+exports.removeBlock = removeBlock;
+/**
+ * 添加业务组件
+ * @param fullPath 文件路径
+ * @param libraryPath 全局组件路径，components/index.js所在路径
+ * @param blockInfo 组件或区块信息
+ * @param tpl 组件代码字符串
+ * @param nodePath 节点路径
+ */
+function addCustom(fullPath, libraryPath, blockInfo, tpl, nodePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // 删除占位符
+        yield removePlaceholder(fullPath, blockInfo);
+        const library = new vfs.Library(libraryPath, vfs.LibraryType.internal);
+        yield library.open();
+        const indexFile = library.componentsIndexFile;
+        if (indexFile) {
+            yield indexFile.forceOpen();
+            const $js = indexFile.parse();
+            $js.export('*').from(blockInfo.name);
+            yield indexFile.save();
+        }
+        yield mergeCode(fullPath, tpl, nodePath);
+    });
+}
+exports.addCustom = addCustom;
+function loadPackageJson(rootPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pkg = JSON.parse(yield fs.readFile(path.resolve(rootPath, 'package.json'), 'utf8'));
+        return pkg;
+    });
+}
+exports.loadPackageJson = loadPackageJson;
 //# sourceMappingURL=index.js.map

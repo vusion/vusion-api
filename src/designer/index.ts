@@ -176,7 +176,7 @@ class PageMetaData implements MetaData {
         if(!moduleInfo)
             return {};
         const modulePath = moduleInfo.fullPath;
-        const routePath = path.join(modulePath, 'routesMap.js');
+        const routePath = path.join(modulePath, 'routes.map.js');
         const data = {
             title: '',
             routeMeta: {},
@@ -199,7 +199,7 @@ class PageMetaData implements MetaData {
         if(!moduleInfo)
             return {};
         const modulePath = moduleInfo.fullPath;
-        const routePath = path.join(modulePath, 'routesMap.js');
+        const routePath = path.join(modulePath, 'routes.map.js');
         if (fs.existsSync(routePath)){
             const routeData = await fs.readFile(routePath, 'utf8');
             let reouteJson =js2json(routeData);
