@@ -709,6 +709,8 @@ export async function loadExternalLibrary(fullPath: string, parseTypes: ParseTyp
  */
 export async function loadServiceApis(fullPath: string) {
      const servicePath = path.join(fullPath, 'service');
+     if (!fs.existsSync(servicePath))
+            return {};
      const directory = new vfs.Directory(servicePath);
      await directory.forceOpen();
      const tasks = directory.children.filter((item)=>{
@@ -822,7 +824,7 @@ async function external(fullPath: string, block: BlockInfo, blockVue: vfs.VueFil
                 .ensure('components', '{}')
                 .get('components')
                 .set(componentName, componentName);
-                
+
             await vueFile.save();
         }   
     }
