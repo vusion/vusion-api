@@ -3,7 +3,7 @@ import * as babel from '@babel/core';
 import generate from '@babel/generator';
 import * as prettier from 'prettier';
 
-export class ASTNodePath {
+export class ASTNodeInfo {
     constructor(
         public node: compiler.ASTNode,
         public parent: compiler.ASTElement,
@@ -120,16 +120,16 @@ class TemplateHandler {
         return `<${el.tag}${attrs.length ? attrsString : ''}>` + content + (shouldFormat ? '\n' + tabs : '') + `</${el.tag}>`;
     }
 
-    traverse(func: (nodePath: ASTNodePath) => any) {
-        let queue: Array<ASTNodePath> = [];
-        queue = queue.concat(new ASTNodePath(this.ast, null, ''));
-        let nodePath: ASTNodePath;
-        while ((nodePath = queue.shift())) {
-            if (nodePath.node.type === 1) {
-                const parent = nodePath.node as ASTElement;
-                queue = queue.concat(parent.children.map((node, index) => new ASTNodePath(node, parent, nodePath.route + '/' + index)));
+    traverse(func: (nodeInfo: ASTNodeInfo) => any) {
+        let queue: Array<ASTNodeInfo> = [];
+        queue = queue.concat(new ASTNodeInfo(this.ast, null, ''));
+        let nodeInfo: ASTNodeInfo;
+        while ((nodeInfo = queue.shift())) {
+            if (nodeInfo.node.type === 1) {
+                const parent = nodeInfo.node as ASTElement;
+                queue = queue.concat(parent.children.map((node, index) => new ASTNodeInfo(node, parent, nodeInfo.route + '/' + index)));
             }
-            const result = func(nodePath);
+            const result = func(nodeInfo);
             if (result !== undefined)
                 return result;
         }
@@ -137,22 +137,26 @@ class TemplateHandler {
 
     /**
      * 根据路径查找子节点
-     * @param route 节点路径，/1/2 表示根节点的第1个子节点的第2个子节点
+     * @param nodePath 节点路径，/1/2 表示根节点的第1个子节点的第2个子节点
      * @param node 查找的起始节点
      * @examples
-     * - findByRoute('', root) 指根节点本身
-     * - findByRoute('/', root) 指根节点本身
-     * - findByRoute('/0', root) 指第0个子节点
-     * - findByRoute('/2/1', root) 指第2个子节点的第1个子节点
+     * - findByNodePath('', root) 指根节点本身
+     * - findByNodePath('/', root) 指根节点本身
+     * - findByNodePath('/0', root) 指第0个子节点
+     * - findByNodePath('/2/1', root) 指第2个子节点的第1个子节点
      */
-    findByRoute(route: string, node: compiler.ASTNode): compiler.ASTNode {
-        if (route[0] === '/') // 这个里边相对和绝对是一样的
-            route = route.slice(1);
-        const arr = route.split('/');
-        if (!route || !arr.length)
+    findByNodePath(nodePath: string, node: compiler.ASTNode): compiler.ASTNode {
+        if (nodePath[0] === '/') // 这个里边相对和绝对是一样的
+            nodePath = nodePath.slice(1);
+        const arr = nodePath.split('/');
+        if (!nodePath || !arr.length)
             return node;
         else
-            return this.findByRoute(arr.slice(1).join('/'), (node as compiler.ASTElement).children[+arr[0]]);
+            return this.findByNodePath(arr.slice(1).join('/'), (node as compiler.ASTElement).children[+arr[0]]);
+    }
+
+    findByRoute(route: string, node: compiler.ASTNode): compiler.ASTNode {
+        return this.findByNodePath(route, node);
     }
 
     /**
@@ -170,8 +174,8 @@ class TemplateHandler {
         }
 
         let found: compiler.ASTNode;
-        this.traverse((nodePath) => {
-            const node = nodePath.node as any;
+        this.traverse((nodeInfo) => {
+            const node = nodeInfo.node as any;
             if (node.start <= position && position < node.end)
                 found = node as compiler.ASTNode;
         });
@@ -205,16 +209,16 @@ class TemplateHandler {
                 let changed = false;
                 // 替换是个小概率事件，而且主要是替换 Block，因此不用考虑太多情况
                 babel.traverse(ast, {
-                    Identifier(nodePath) {
-                        if (nodePath.parent.type === 'MemberExpression' && nodePath.parent.object.type !== 'ThisExpression' && nodePath.parent.property === nodePath.node)
-                            return nodePath.skip();
-                        if (identifierMap[nodePath.node.name]) {
-                            nodePath.node.name = identifierMap[nodePath.node.name];
+                    Identifier(nodeInfo) {
+                        if (nodeInfo.parent.type === 'MemberExpression' && nodeInfo.parent.object.type !== 'ThisExpression' && nodeInfo.parent.property === nodeInfo.node)
+                            return nodeInfo.skip();
+                        if (identifierMap[nodeInfo.node.name]) {
+                            nodeInfo.node.name = identifierMap[nodeInfo.node.name];
                             changed = true;
                         }
                     },
-                    Function(nodePath) { // @TODO: Function 作用域的问题
-                        nodePath.skip();
+                    Function(nodeInfo) { // @TODO: Function 作用域的问题
+                        nodeInfo.skip();
                     },
                 });
                 return changed ? generate(((ast as babel.types.File).program.body[0] as babel.types.VariableDeclaration).declarations[0].init, { concise: true }).code : expr;
@@ -222,9 +226,9 @@ class TemplateHandler {
 
             // @TODO: v-for 内部作用域的问题
             // @TODO: classBinding, styleBinding
-            that.traverse((nodePath) => {
-                if (nodePath.node.type === 1) {
-                    const node = nodePath.node;
+            that.traverse((nodeInfo) => {
+                if (nodeInfo.node.type === 1) {
+                    const node = nodeInfo.node;
                     if (classKeys.length && node.classBinding) {
                         classKeys.forEach((key) => {
                             node.attrsMap[':class'] = node.classBinding = node.classBinding
@@ -306,8 +310,8 @@ class TemplateHandler {
                             }
                         }
                     }
-                } else if (nodePath.node.type === 2) {
-                    const node = nodePath.node;
+                } else if (nodeInfo.node.type === 2) {
+                    const node = nodeInfo.node;
                     let changed = false;
                     const text = node.tokens.map((token) => {
                         if (typeof token !== 'string') {
@@ -335,8 +339,8 @@ class TemplateHandler {
             const arr = route.split('/');
             const last = arr[arr.length - 1];
 
-            const parentRoute = arr.slice(0, -1).join('/');
-            el = this.findByRoute(parentRoute, this.ast) as compiler.ASTElement;
+            const parentNodePath = arr.slice(0, -1).join('/');
+            el = this.findByNodePath(parentNodePath, this.ast) as compiler.ASTElement;
             index = last === undefined || last === '' ? el.children.length : +last;
         } else {
             el = this.findByPosition(route) as compiler.ASTElement;

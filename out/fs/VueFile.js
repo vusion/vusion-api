@@ -576,17 +576,17 @@ class VueFile extends FSEntry_1.default {
                 return filePath;
         }
         traverse_1.default(this.scriptHandler.ast, {
-            ImportDeclaration(nodePath) {
-                if (nodePath.node.source)
-                    nodePath.node.source.value = isDirectory ? shortenPath(nodePath.node.source.value) : lengthenPath(nodePath.node.source.value);
+            ImportDeclaration(nodeInfo) {
+                if (nodeInfo.node.source)
+                    nodeInfo.node.source.value = isDirectory ? shortenPath(nodeInfo.node.source.value) : lengthenPath(nodeInfo.node.source.value);
             },
-            ExportAllDeclaration(nodePath) {
-                if (nodePath.node.source)
-                    nodePath.node.source.value = isDirectory ? shortenPath(nodePath.node.source.value) : lengthenPath(nodePath.node.source.value);
+            ExportAllDeclaration(nodeInfo) {
+                if (nodeInfo.node.source)
+                    nodeInfo.node.source.value = isDirectory ? shortenPath(nodeInfo.node.source.value) : lengthenPath(nodeInfo.node.source.value);
             },
-            ExportNamedDeclaration(nodePath) {
-                if (nodePath.node.source)
-                    nodePath.node.source.value = isDirectory ? shortenPath(nodePath.node.source.value) : lengthenPath(nodePath.node.source.value);
+            ExportNamedDeclaration(nodeInfo) {
+                if (nodeInfo.node.source)
+                    nodeInfo.node.source.value = isDirectory ? shortenPath(nodeInfo.node.source.value) : lengthenPath(nodeInfo.node.source.value);
             },
         });
         this.styleHandler.ast.walkAtRules((node) => {

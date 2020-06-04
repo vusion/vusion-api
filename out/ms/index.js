@@ -476,9 +476,9 @@ function removeBlock(vueFilePath, baseName) {
         const obj = vueFile.$js.export().default().object().get('components');
         obj && obj.delete(componentName);
         vueFile.parseTemplate();
-        vueFile.templateHandler.traverse((nodePath) => {
-            if (nodePath.node.tag === baseName)
-                nodePath.remove();
+        vueFile.templateHandler.traverse((nodeInfo) => {
+            if (nodeInfo.node.tag === baseName)
+                nodeInfo.remove();
         });
         yield vueFile.save();
         const localBlocksPath = vueFile.fullPath.replace(/\.vue$/, '.blocks');
@@ -581,8 +581,8 @@ function addModule(options) {
                 jsFile.parse();
                 let changed = false;
                 babel.traverse(jsFile.handler.ast, {
-                    ExportDefaultDeclaration(nodePath) {
-                        const declaration = nodePath.node.declaration;
+                    ExportDefaultDeclaration(nodeInfo) {
+                        const declaration = nodeInfo.node.declaration;
                         if (declaration && declaration.type === 'ArrayExpression') {
                             const element = Object.assign(babel.types.stringLiteral(opts.name), { raw: `'${opts.name}'` });
                             declaration.elements.push(element);
@@ -613,8 +613,8 @@ function removeModule(options) {
             jsFile.parse();
             let changed = false;
             babel.traverse(jsFile.handler.ast, {
-                ExportDefaultDeclaration(nodePath) {
-                    const declaration = nodePath.node.declaration;
+                ExportDefaultDeclaration(nodeInfo) {
+                    const declaration = nodeInfo.node.declaration;
                     if (declaration && declaration.type === 'ArrayExpression') {
                         for (let i = 0; i < declaration.elements.length; i++) {
                             const element = declaration.elements[i];

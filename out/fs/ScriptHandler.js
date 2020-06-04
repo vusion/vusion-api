@@ -403,8 +403,8 @@ class ScriptHandler {
     default() {
         let result;
         babel.traverse(this.ast, {
-            ExportDefaultDeclaration(nodePath) {
-                result = new DeclarationHandler(nodePath.node.declaration);
+            ExportDefaultDeclaration(nodeInfo) {
+                result = new DeclarationHandler(nodeInfo.node.declaration);
             },
         });
         return result;
@@ -676,10 +676,10 @@ class ScriptHandler {
         /* 处理代码中的 this */
         const identifierMap = Object.assign(Object.assign(Object.assign(Object.assign({}, replacements['props']), replacements['data']), replacements['computed']), replacements['method']);
         babel.traverse(that.ast, {
-            Identifier(nodePath) {
-                if (nodePath.parent.type === 'MemberExpression' && nodePath.parent.object.type === 'ThisExpression') {
-                    if (identifierMap[nodePath.node.name])
-                        nodePath.node.name = identifierMap[nodePath.node.name];
+            Identifier(nodeInfo) {
+                if (nodeInfo.parent.type === 'MemberExpression' && nodeInfo.parent.object.type === 'ThisExpression') {
+                    if (identifierMap[nodeInfo.node.name])
+                        nodeInfo.node.name = identifierMap[nodeInfo.node.name];
                 }
             },
         });

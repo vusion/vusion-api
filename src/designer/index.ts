@@ -7,7 +7,7 @@ import * as compiler from 'vue-template-compiler';
 import { stringify } from "javascript-stringify";
 import * as utils from '../utils';
 
-export async function addLayout(fullPath: string, route: string, type: string) {
+export async function addLayout(fullPath: string, nodePath: string, type: string) {
     const vueFile = new vfs.VueFile(fullPath);
     await vueFile.open();
 
@@ -17,7 +17,7 @@ export async function addLayout(fullPath: string, route: string, type: string) {
     let tpl = await fs.readFile(tplPath, 'utf8');
     tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '') + '\n';
     const rootEl = vueFile.templateHandler.ast;
-    const selectedEl = vueFile.templateHandler.findByRoute(route, rootEl) as compiler.ASTElement;
+    const selectedEl = vueFile.templateHandler.findByNodePath(nodePath, rootEl) as compiler.ASTElement;
     selectedEl.children.push(compiler.compile(tpl).ast);
 
     await vueFile.save();
@@ -38,7 +38,7 @@ export async function initLayout(fullPath: string, type: string) {
     await vueFile.save();
 }
 
-export async function addCode(fullPath: string, route: string, tpl: string) {
+export async function addCode(fullPath: string, nodePath: string, tpl: string) {
     const vueFile = new vfs.VueFile(fullPath);
     await vueFile.open();
 
@@ -46,7 +46,7 @@ export async function addCode(fullPath: string, route: string, tpl: string) {
 
     tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '');
     const rootEl = vueFile.templateHandler.ast;
-    const selectedEl = vueFile.templateHandler.findByRoute(route, rootEl) as compiler.ASTElement;
+    const selectedEl = vueFile.templateHandler.findByNodePath(nodePath, rootEl) as compiler.ASTElement;
     selectedEl.children.push(compiler.compile(tpl).ast);
 
     await vueFile.save();
@@ -558,16 +558,16 @@ export async function addBranchWrapper(parentInfo: ViewInfo | vfs.View, moduleIn
 
     let hasImportedLWrapper = false;
     babel.traverse(jsFile.handler.ast, {
-        ImportDefaultSpecifier(nodePath) {
-            if (nodePath.node.local.name === 'LWrapper') {
+        ImportDefaultSpecifier(nodeInfo) {
+            if (nodeInfo.node.local.name === 'LWrapper') {
                 hasImportedLWrapper = true;
-                nodePath.stop();
+                nodeInfo.stop();
             }
         },
-        ImportSpecifier(nodePath) {
-            if (nodePath.node.local.name === 'LWrapper') {
+        ImportSpecifier(nodeInfo) {
+            if (nodeInfo.node.local.name === 'LWrapper') {
                 hasImportedLWrapper = true;
-                nodePath.stop();
+                nodeInfo.stop();
             }
         },
     });
@@ -650,16 +650,16 @@ export async function removeView(viewInfo: ViewInfo | vfs.View, moduleInfo?: Vie
                     String(jsFile.content).replace(/LWrapper/, () => String(wrapperCount++));
                     if (wrapperCount === 2) {
                         babel.traverse(jsFile.handler.ast, {
-                            ImportDefaultSpecifier(nodePath) {
-                                if (nodePath.node.local.name === 'LWrapper') {
-                                    nodePath.remove();
-                                    nodePath.stop();
+                            ImportDefaultSpecifier(nodeInfo) {
+                                if (nodeInfo.node.local.name === 'LWrapper') {
+                                    nodeInfo.remove();
+                                    nodeInfo.stop();
                                 }
                             },
-                            ImportSpecifier(nodePath) {
-                                if (nodePath.node.local.name === 'LWrapper') {
-                                    nodePath.remove();
-                                    nodePath.stop();
+                            ImportSpecifier(nodeInfo) {
+                                if (nodeInfo.node.local.name === 'LWrapper') {
+                                    nodeInfo.remove();
+                                    nodeInfo.stop();
                                 }
                             },
                         });
@@ -793,10 +793,10 @@ async function removePlaceholder(fullPath: string, blockInfo: BlockInfo) {
     await vueFile.forceOpen();
 
     vueFile.parseTemplate();
-    vueFile.templateHandler.traverse((nodePath) => {
-        const node = nodePath.node as compiler.ASTElement;
+    vueFile.templateHandler.traverse((nodeInfo) => {
+        const node = nodeInfo.node as compiler.ASTElement;
         if (node.tag === 'd-progress' && node.attrsMap.uuid === blockInfo.uuid){
-            nodePath.remove();
+            nodeInfo.remove();
         }
     });
     await vueFile.save();
@@ -889,7 +889,7 @@ export async function removeBlock(fullPath: string, blockInfo: BlockInfo) {
  * @param tpl 组件代码字符串
  * @param nodePath 节点路径
  */
-export async function addCustom(fullPath: string, libraryPath: string, blockInfo: BlockInfo, tpl: string, nodePath: string) {
+export async function addCustomComponent(fullPath: string, libraryPath: string, blockInfo: BlockInfo, tpl: string, nodePath: string) {
     // 删除占位符
     await removePlaceholder(fullPath, blockInfo);
 
@@ -906,7 +906,6 @@ export async function addCustom(fullPath: string, libraryPath: string, blockInfo
     await mergeCode(fullPath, tpl, nodePath);
 }
 
-export async function loadPackageJson(rootPath: string) {
-    const pkg = JSON.parse(await fs.readFile(path.resolve(rootPath, 'package.json'), 'utf8'));
-    return pkg;
+export async function loadPackageJSON(rootPath: string) {
+    return JSON.parse(await fs.readFile(path.resolve(rootPath, 'package.json'), 'utf8'));
 }

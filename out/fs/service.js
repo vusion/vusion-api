@@ -386,14 +386,14 @@ function extendToLibrary(vueFile, from, to, mode, subDir) {
             // const getExportSpecifiers = () => {
             const exportNames = [];
             babel.traverse(vueFile.scriptHandler.ast, {
-                ExportNamedDeclaration(nodePath) {
-                    if (nodePath.node.declaration) {
-                        nodePath.node.declaration.declarations.forEach((declaration) => {
+                ExportNamedDeclaration(nodeInfo) {
+                    if (nodeInfo.node.declaration) {
+                        nodeInfo.node.declaration.declarations.forEach((declaration) => {
                             exportNames.push(declaration.id.name);
                         });
                     }
-                    if (nodePath.node.specifiers) {
-                        nodePath.node.specifiers.forEach((specifier) => {
+                    if (nodeInfo.node.specifiers) {
+                        nodeInfo.node.specifiers.forEach((specifier) => {
                             exportNames.push(specifier.exported.name);
                         });
                     }
@@ -408,34 +408,34 @@ function extendToLibrary(vueFile, from, to, mode, subDir) {
             };
             let exportNamed;
             babel.traverse(parentIndexFile.handler.ast, {
-                enter(nodePath) {
+                enter(nodeInfo) {
                     // 只遍历顶级节点
-                    if (nodePath.parentPath && nodePath.parentPath.isProgram())
-                        nodePath.skip();
-                    if (nodePath.isExportAllDeclaration() || nodePath.isExportNamedDeclaration()) {
-                        if (!nodePath.node.source) {
+                    if (nodeInfo.parentPath && nodeInfo.parentPath.isProgram())
+                        nodeInfo.skip();
+                    if (nodeInfo.isExportAllDeclaration() || nodeInfo.isExportNamedDeclaration()) {
+                        if (!nodeInfo.node.source) {
                             // 有可能是 declarations
                         }
-                        else if (relativePath === nodePath.node.source.value) {
-                            if (nodePath.isExportAllDeclaration) {
+                        else if (relativePath === nodeInfo.node.source.value) {
+                            if (nodeInfo.isExportAllDeclaration) {
                                 exportNamed = createExportNamed();
-                                nodePath.replaceWith(exportNamed);
+                                nodeInfo.replaceWith(exportNamed);
                             }
                             else {
-                                // exportNamed = nodePath.node;
+                                // exportNamed = nodeInfo.node;
                             }
-                            nodePath.stop();
+                            nodeInfo.stop();
                         }
-                        else if (relativePath < nodePath.node.source.value) {
+                        else if (relativePath < nodeInfo.node.source.value) {
                             exportNamed = createExportNamed();
-                            nodePath.insertBefore(exportNamed);
-                            nodePath.stop();
+                            nodeInfo.insertBefore(exportNamed);
+                            nodeInfo.stop();
                         }
                     }
-                    else if (nodePath.isExportDefaultDeclaration() && !exportNamed) {
+                    else if (nodeInfo.isExportDefaultDeclaration() && !exportNamed) {
                         exportNamed = createExportNamed();
-                        nodePath.insertBefore(exportNamed);
-                        nodePath.stop();
+                        nodeInfo.insertBefore(exportNamed);
+                        nodeInfo.stop();
                     }
                 },
             });
@@ -453,29 +453,29 @@ function extendToLibrary(vueFile, from, to, mode, subDir) {
             };
             let exportAll;
             babel.traverse(indexFile.handler.ast, {
-                enter(nodePath) {
+                enter(nodeInfo) {
                     // 只遍历顶级节点
-                    if (nodePath.parentPath && nodePath.parentPath.isProgram())
-                        nodePath.skip();
-                    if (nodePath.isExportAllDeclaration()) {
-                        if (!nodePath.node.source) {
+                    if (nodeInfo.parentPath && nodeInfo.parentPath.isProgram())
+                        nodeInfo.skip();
+                    if (nodeInfo.isExportAllDeclaration()) {
+                        if (!nodeInfo.node.source) {
                             // 有可能是 declarations
                         }
-                        else if (toRelativePath === nodePath.node.source.value) {
-                            exportAll = nodePath.node;
-                            nodePath.stop();
+                        else if (toRelativePath === nodeInfo.node.source.value) {
+                            exportAll = nodeInfo.node;
+                            nodeInfo.stop();
                         }
-                        else if (toRelativePath < nodePath.node.source.value) {
+                        else if (toRelativePath < nodeInfo.node.source.value) {
                             exportAll = createExportAll();
-                            nodePath.insertBefore(exportAll);
-                            nodePath.stop();
+                            nodeInfo.insertBefore(exportAll);
+                            nodeInfo.stop();
                         }
                     }
                 },
-                exit(nodePath) {
-                    if (nodePath.isProgram() && !exportAll) {
+                exit(nodeInfo) {
+                    if (nodeInfo.isProgram() && !exportAll) {
                         exportAll = createExportAll();
-                        nodePath.node.body.push(exportAll);
+                        nodeInfo.node.body.push(exportAll);
                     }
                 },
             });
