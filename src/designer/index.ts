@@ -709,6 +709,8 @@ export async function loadExternalLibrary(fullPath: string, parseTypes: ParseTyp
  */
 export async function loadServiceApis(fullPath: string) {
      const servicePath = path.join(fullPath, 'service');
+     if (!fs.existsSync(servicePath))
+            return {};
      const directory = new vfs.Directory(servicePath);
      await directory.forceOpen();
      const tasks = directory.children.filter((item)=>{
@@ -806,8 +808,27 @@ async function removePlaceholder(fullPath: string, blockInfo: BlockInfo) {
 async function external(fullPath: string, block: BlockInfo, blockVue: vfs.VueFile, nodePath: string) {
     if(!fs.existsSync(path.join(fullPath.replace(/\.vue$/, '.blocks'), block.tagName + '.vue'))){
         await vms.addBlockExternally(blockVue, fullPath, block.tagName);
+    } else {
+        const vueFile = new vfs.VueFile(fullPath);
+        await vueFile.open();
+        /* 添加 import */
+        const relativePath = `./${vueFile.baseName}.blocks/${block.tagName}.vue`;
+        const { componentName } = utils.normalizeName(block.tagName);
+        const $js = vueFile.parseScript();
+        
+        const components = $js.export().default().object().get('components');
+        if (!components || !components.get(componentName)) {
+            $js.import(componentName).from(relativePath);
+            $js.export().default().object()
+                .after(['el','name','parent','functional','delimiters','comments'])
+                .ensure('components', '{}')
+                .get('components')
+                .set(componentName, componentName);
+
+            await vueFile.save();
+        }   
     }
-    const content = `<template><${block.tagName}></${block.tagName}></template>`
+    const content = `<template><${block.tagName}></${block.tagName}></template>`;
     await mergeCode(fullPath, content, nodePath);
 }
 
