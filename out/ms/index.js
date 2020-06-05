@@ -341,10 +341,10 @@ function publishTemplate(params) {
     });
 }
 exports.publishTemplate = publishTemplate;
-function recordMicroVersionURL(params, prefix) {
+function recordMicroVersionURL(data, params, prefix) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios(prefix);
-        return pfAxios.post('app/addAppVersion', params)
+        return pfAxios.post('app/addAppVersion', data, params)
             .then((res) => res.data);
     });
 }

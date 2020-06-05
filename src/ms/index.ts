@@ -364,9 +364,9 @@ export async function publishTemplate(params: object) {
         .then((res) => res.data);
 }
 
-export async function recordMicroVersionURL(params: object, prefix?: string) {
+export async function recordMicroVersionURL(data: object, params: object, prefix?: string) {
     const pfAxios = await getPlatformAxios(prefix);
-    return pfAxios.post('app/addAppVersion', params)
+    return pfAxios.post('app/addAppVersion', data, params)
         .then((res) => res.data);
 }
 
