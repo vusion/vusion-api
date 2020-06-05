@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RESERVED_DIRS = exports.ViewType = void 0;
+exports.HOLDER_DIRS = exports.KEYWORD_DIRS = exports.ViewType = void 0;
 const fs = require("fs-extra");
 const path = require("path");
 const FSEntry_1 = require("./FSEntry");
@@ -22,8 +22,7 @@ var ViewType;
     ViewType["vue"] = "vue";
     ViewType["md"] = "md";
 })(ViewType = exports.ViewType || (exports.ViewType = {}));
-exports.RESERVED_DIRS = [
-    'layout',
+exports.KEYWORD_DIRS = [
     'assets',
     'components',
     'directives',
@@ -33,6 +32,10 @@ exports.RESERVED_DIRS = [
     'styles',
     'service',
     'module',
+];
+exports.HOLDER_DIRS = [
+    'views',
+    'layout',
 ];
 class View extends FSEntry_1.default {
     constructor(fullPath, viewType = ViewType.branch, isDirectory = true, routePath) {
@@ -112,7 +115,7 @@ class View extends FSEntry_1.default {
                     return;
                 if (name === '.DS_Store' || name === '.git')
                     return;
-                if (exports.RESERVED_DIRS.includes(name))
+                if (exports.KEYWORD_DIRS.includes(name) || exports.HOLDER_DIRS.includes(name))
                     return;
                 if (isDirectory && name.endsWith('.blocks'))
                     return;

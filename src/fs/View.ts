@@ -13,8 +13,7 @@ export enum ViewType {
     md = 'md', // leaf
 }
 
-export const RESERVED_DIRS = [
-    'layout',
+export const KEYWORD_DIRS = [
     'assets',
     'components',
     'directives',
@@ -24,6 +23,11 @@ export const RESERVED_DIRS = [
     'styles',
     'service',
     'module',
+];
+
+export const HOLDER_DIRS = [
+    'views',
+    'layout',
 ];
 
 export default class View extends FSEntry {
@@ -113,7 +117,7 @@ export default class View extends FSEntry {
                 return;
             if (name === '.DS_Store' || name === '.git')
                 return;
-            if (RESERVED_DIRS.includes(name))
+            if (KEYWORD_DIRS.includes(name) || HOLDER_DIRS.includes(name))
                 return;
             if (isDirectory && name.endsWith('.blocks'))
                 return;
