@@ -784,20 +784,28 @@ interface BlockInfo {
 }
 
 /**
- * 删除占位符
+ * 替换占位符内容
  * @param fullPath 文件路径
  * @param blockInfo 组件或区块信息
+ * @param content 要替换的内容
  */
-async function removePlaceholder(fullPath: string, blockInfo: BlockInfo) {
+async function replacePlaceholder(fullPath: string, blockInfo: BlockInfo, content: string | vfs.VueFile){
     const vueFile = new vfs.VueFile(fullPath);
     await vueFile.forceOpen();
+    vueFile.parseAll();
 
-    vueFile.parseTemplate();
+    let progressArray: any[] = [];
     vueFile.templateHandler.traverse((nodeInfo) => {
         const node = nodeInfo.node as compiler.ASTElement;
         if (node.tag === 'd-progress' && node.attrsMap.uuid === blockInfo.uuid){
+            progressArray.push(nodeInfo.route);
             nodeInfo.remove();
         }
+    });
+    const blockVue = typeof content === 'string' ? vfs.VueFile.from(content) : content;
+    blockVue.parseAll();
+    progressArray.forEach((route)=>{
+        vueFile.merge(blockVue, route);
     });
     await vueFile.save();
 }
@@ -805,15 +813,15 @@ async function removePlaceholder(fullPath: string, blockInfo: BlockInfo) {
 /**
  * 在有其它代码或 Assets 的情况下，直接添加为外部区块
  */
-async function external(fullPath: string, block: BlockInfo, blockVue: vfs.VueFile, nodePath: string) {
-    if(!fs.existsSync(path.join(fullPath.replace(/\.vue$/, '.blocks'), block.tagName + '.vue'))){
-        await vms.addBlockExternally(blockVue, fullPath, block.tagName);
+async function external(fullPath: string, blockInfo: BlockInfo, blockVue: vfs.VueFile, nodePath: string) {
+    if(!fs.existsSync(path.join(fullPath.replace(/\.vue$/, '.blocks'), blockInfo.tagName + '.vue'))){
+        await vms.addBlockExternally(blockVue, fullPath, blockInfo.tagName);
     } else {
         const vueFile = new vfs.VueFile(fullPath);
         await vueFile.open();
         /* 添加 import */
-        const relativePath = `./${vueFile.baseName}.blocks/${block.tagName}.vue`;
-        const { componentName } = utils.normalizeName(block.tagName);
+        const relativePath = `./${vueFile.baseName}.blocks/${blockInfo.tagName}.vue`;
+        const { componentName } = utils.normalizeName(blockInfo.tagName);
         const $js = vueFile.parseScript();
         
         const components = $js.export().default().object().get('components');
@@ -828,8 +836,8 @@ async function external(fullPath: string, block: BlockInfo, blockVue: vfs.VueFil
             await vueFile.save();
         }   
     }
-    const content = `<template><${block.tagName}></${block.tagName}></template>`;
-    await mergeCode(fullPath, content, nodePath);
+    const content = `<template><${blockInfo.tagName}></${blockInfo.tagName}></template>`;
+    await replacePlaceholder(fullPath, blockInfo, content);
 }
 
 /**
@@ -867,18 +875,11 @@ export async function addBlock(fullPath: string, blockInfo: BlockInfo, nodePath?
     else
         blockComplexity = BlockComplexity.onlyTemplate;
 
-    // 删除占位符
-    await removePlaceholder(fullPath, blockInfo);
-
     if (blockComplexity === BlockComplexity.hasAssetsOrExtra) {
         return await external(fullPath, blockInfo, blockVue, nodePath);
     }else{
-        return await mergeCode(fullPath, blockVue, nodePath);
+        return await replacePlaceholder(fullPath, blockInfo, blockVue);
     }
-}
-
-export async function removeBlock(fullPath: string, blockInfo: BlockInfo) {
-    return await vms.removeBlock(fullPath, blockInfo.tagName);
 }
 
 /**
@@ -889,10 +890,7 @@ export async function removeBlock(fullPath: string, blockInfo: BlockInfo) {
  * @param tpl 组件代码字符串
  * @param nodePath 节点路径
  */
-export async function addCustomComponent(fullPath: string, libraryPath: string, blockInfo: BlockInfo, tpl: string, nodePath: string) {
-    // 删除占位符
-    await removePlaceholder(fullPath, blockInfo);
-
+export async function addCustomComponent(fullPath: string, libraryPath: string, blockInfo: BlockInfo, content: string, nodePath: string) {
     const library = new vfs.Library(libraryPath, vfs.LibraryType.internal);
     await library.open();
     const indexFile = library.componentsIndexFile;
@@ -903,7 +901,7 @@ export async function addCustomComponent(fullPath: string, libraryPath: string, 
         await indexFile.save();
     }
 
-    await mergeCode(fullPath, tpl, nodePath);
+    await replacePlaceholder(fullPath, blockInfo, content);
 }
 
 export async function loadPackageJSON(rootPath: string) {
