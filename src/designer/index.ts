@@ -813,7 +813,7 @@ async function replacePlaceholder(fullPath: string, blockInfo: BlockInfo, conten
 /**
  * 在有其它代码或 Assets 的情况下，直接添加为外部区块
  */
-async function external(fullPath: string, blockInfo: BlockInfo, blockVue: vfs.VueFile, nodePath: string) {
+async function external(fullPath: string, blockInfo: BlockInfo, blockVue: vfs.VueFile) {
     if(!fs.existsSync(path.join(fullPath.replace(/\.vue$/, '.blocks'), blockInfo.tagName + '.vue'))){
         await vms.addBlockExternally(blockVue, fullPath, blockInfo.tagName);
     } else {
@@ -848,7 +848,7 @@ async function external(fullPath: string, blockInfo: BlockInfo, blockVue: vfs.Vu
  * @param tpl 组件代码字符串
  * @param nodePath 节点路径
  */
-export async function addBlock(fullPath: string, blockInfo: BlockInfo, nodePath?: string){
+export async function addBlock(fullPath: string, blockInfo: BlockInfo){
     const options = {
         source: {
             type: 'file',
@@ -876,7 +876,7 @@ export async function addBlock(fullPath: string, blockInfo: BlockInfo, nodePath?
         blockComplexity = BlockComplexity.onlyTemplate;
 
     if (blockComplexity === BlockComplexity.hasAssetsOrExtra) {
-        return await external(fullPath, blockInfo, blockVue, nodePath);
+        return await external(fullPath, blockInfo, blockVue);
     }else{
         return await replacePlaceholder(fullPath, blockInfo, blockVue);
     }
@@ -890,7 +890,7 @@ export async function addBlock(fullPath: string, blockInfo: BlockInfo, nodePath?
  * @param tpl 组件代码字符串
  * @param nodePath 节点路径
  */
-export async function addCustomComponent(fullPath: string, libraryPath: string, blockInfo: BlockInfo, content: string, nodePath: string) {
+export async function addCustomComponent(fullPath: string, libraryPath: string, blockInfo: BlockInfo, content: string) {
     const library = new vfs.Library(libraryPath, vfs.LibraryType.internal);
     await library.open();
     const indexFile = library.componentsIndexFile;
