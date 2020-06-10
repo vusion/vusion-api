@@ -12,7 +12,10 @@ export class ASTNodeInfo {
 
     remove() {
         const index = this.parent.children.indexOf(this.node);
-        ~index && this.parent.children.splice(index, 1);
+        if (~index)
+            this.parent.children.splice(index, 1);
+        else if (this.parent.scopedSlots && this.parent.scopedSlots[(this.node as ASTElement).slotTarget] === this.node)
+            delete this.parent.scopedSlots[(this.node as ASTElement).slotTarget];
     }
 }
 
@@ -71,7 +74,8 @@ class TemplateHandler {
         const insideTabs = ' '.repeat(options.tabLength*(level + 1));
 
         let shouldFormat = true;
-        const content: string = el.children.map((node) => {
+        const children = [].concat(el.children, !el.scopedSlots ? [] : Object.keys(el.scopedSlots).map((key) => el.scopedSlots[key]));
+        const content: string = children.map((node) => {
             let text = '';
 
             if (node.type === 1)
@@ -127,7 +131,8 @@ class TemplateHandler {
         while ((nodeInfo = queue.shift())) {
             if (nodeInfo.node.type === 1) {
                 const parent = nodeInfo.node as ASTElement;
-                queue = queue.concat(parent.children.map((node, index) => new ASTNodeInfo(node, parent, nodeInfo.route + '/' + index)));
+                const children = [].concat(parent.children, !parent.scopedSlots ? [] : Object.keys(parent.scopedSlots).map((key) => parent.scopedSlots[key]));
+                queue.push(... children.map((node, index) => new ASTNodeInfo(node, parent, nodeInfo.route + '/' + index)));
             }
             const result = func(nodeInfo);
             if (result !== undefined)
@@ -151,8 +156,11 @@ class TemplateHandler {
         const arr = nodePath.split('/');
         if (!nodePath || !arr.length)
             return node;
-        else
-            return this.findByNodePath(arr.slice(1).join('/'), (node as compiler.ASTElement).children[+arr[0]]);
+        else {
+            const parent = node as ASTElement;
+            const children = [].concat(parent.children, !parent.scopedSlots ? [] : Object.keys(parent.scopedSlots).map((key) => parent.scopedSlots[key]));
+            return this.findByNodePath(arr.slice(1).join('/'), children[+arr[0]]);
+        }
     }
 
     findByRoute(route: string, node: compiler.ASTNode): compiler.ASTNode {

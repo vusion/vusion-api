@@ -12,7 +12,10 @@ class ASTNodeInfo {
     }
     remove() {
         const index = this.parent.children.indexOf(this.node);
-        ~index && this.parent.children.splice(index, 1);
+        if (~index)
+            this.parent.children.splice(index, 1);
+        else if (this.parent.scopedSlots && this.parent.scopedSlots[this.node.slotTarget] === this.node)
+            delete this.parent.scopedSlots[this.node.slotTarget];
     }
 }
 exports.ASTNodeInfo = ASTNodeInfo;
@@ -48,7 +51,8 @@ class TemplateHandler {
         const tabs = ' '.repeat(options.tabLength * level);
         const insideTabs = ' '.repeat(options.tabLength * (level + 1));
         let shouldFormat = true;
-        const content = el.children.map((node) => {
+        const children = [].concat(el.children, !el.scopedSlots ? [] : Object.keys(el.scopedSlots).map((key) => el.scopedSlots[key]));
+        const content = children.map((node) => {
             let text = '';
             if (node.type === 1)
                 text = (shouldFormat ? '\n' + insideTabs : '') + this.generateElement(node, level + 1, options);
@@ -95,7 +99,8 @@ class TemplateHandler {
         while ((nodeInfo = queue.shift())) {
             if (nodeInfo.node.type === 1) {
                 const parent = nodeInfo.node;
-                queue = queue.concat(parent.children.map((node, index) => new ASTNodeInfo(node, parent, nodeInfo.route + '/' + index)));
+                const children = [].concat(parent.children, !parent.scopedSlots ? [] : Object.keys(parent.scopedSlots).map((key) => parent.scopedSlots[key]));
+                queue.push(...children.map((node, index) => new ASTNodeInfo(node, parent, nodeInfo.route + '/' + index)));
             }
             const result = func(nodeInfo);
             if (result !== undefined)
@@ -118,8 +123,11 @@ class TemplateHandler {
         const arr = nodePath.split('/');
         if (!nodePath || !arr.length)
             return node;
-        else
-            return this.findByNodePath(arr.slice(1).join('/'), node.children[+arr[0]]);
+        else {
+            const parent = node;
+            const children = [].concat(parent.children, !parent.scopedSlots ? [] : Object.keys(parent.scopedSlots).map((key) => parent.scopedSlots[key]));
+            return this.findByNodePath(arr.slice(1).join('/'), children[+arr[0]]);
+        }
     }
     findByRoute(route, node) {
         return this.findByNodePath(route, node);
