@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadPackageJSON = exports.addCustomComponent = exports.removeBlock = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
+exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = require("path");
 const fs = require("fs-extra");
 const babel = require("@babel/core");
@@ -692,20 +692,28 @@ function removeService(fullPath) {
 }
 exports.removeService = removeService;
 /**
- * 删除占位符
+ * 替换占位符内容
  * @param fullPath 文件路径
  * @param blockInfo 组件或区块信息
+ * @param content 要替换的内容
  */
-function removePlaceholder(fullPath, blockInfo) {
+function replacePlaceholder(fullPath, blockInfo, content) {
     return __awaiter(this, void 0, void 0, function* () {
         const vueFile = new vfs.VueFile(fullPath);
         yield vueFile.forceOpen();
-        vueFile.parseTemplate();
+        vueFile.parseAll();
+        let progressArray = [];
         vueFile.templateHandler.traverse((nodeInfo) => {
             const node = nodeInfo.node;
             if (node.tag === 'd-progress' && node.attrsMap.uuid === blockInfo.uuid) {
+                progressArray.push(nodeInfo.route);
                 nodeInfo.remove();
             }
+        });
+        const blockVue = typeof content === 'string' ? vfs.VueFile.from(content) : content;
+        blockVue.parseAll();
+        progressArray.forEach((route) => {
+            vueFile.merge(blockVue, route);
         });
         yield vueFile.save();
     });
@@ -713,17 +721,17 @@ function removePlaceholder(fullPath, blockInfo) {
 /**
  * 在有其它代码或 Assets 的情况下，直接添加为外部区块
  */
-function external(fullPath, block, blockVue, nodePath) {
+function external(fullPath, blockInfo, blockVue) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!fs.existsSync(path.join(fullPath.replace(/\.vue$/, '.blocks'), block.tagName + '.vue'))) {
-            yield vms.addBlockExternally(blockVue, fullPath, block.tagName);
+        if (!fs.existsSync(path.join(fullPath.replace(/\.vue$/, '.blocks'), blockInfo.tagName + '.vue'))) {
+            yield vms.addBlockExternally(blockVue, fullPath, blockInfo.tagName);
         }
         else {
             const vueFile = new vfs.VueFile(fullPath);
             yield vueFile.open();
             /* 添加 import */
-            const relativePath = `./${vueFile.baseName}.blocks/${block.tagName}.vue`;
-            const { componentName } = utils.normalizeName(block.tagName);
+            const relativePath = `./${vueFile.baseName}.blocks/${blockInfo.tagName}.vue`;
+            const { componentName } = utils.normalizeName(blockInfo.tagName);
             const $js = vueFile.parseScript();
             const components = $js.export().default().object().get('components');
             if (!components || !components.get(componentName)) {
@@ -736,8 +744,8 @@ function external(fullPath, block, blockVue, nodePath) {
                 yield vueFile.save();
             }
         }
-        const content = `<template><${block.tagName}></${block.tagName}></template>`;
-        yield mergeCode(fullPath, content, nodePath);
+        const content = `<template><${blockInfo.tagName}></${blockInfo.tagName}></template>`;
+        yield replacePlaceholder(fullPath, blockInfo, content);
     });
 }
 /**
@@ -748,7 +756,7 @@ function external(fullPath, block, blockVue, nodePath) {
  * @param tpl 组件代码字符串
  * @param nodePath 节点路径
  */
-function addBlock(fullPath, blockInfo, nodePath) {
+function addBlock(fullPath, blockInfo) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = {
             source: {
@@ -774,23 +782,15 @@ function addBlock(fullPath, blockInfo, nodePath) {
             blockComplexity = 1 /* hasScriptOrStyle */;
         else
             blockComplexity = 0 /* onlyTemplate */;
-        // 删除占位符
-        yield removePlaceholder(fullPath, blockInfo);
         if (blockComplexity === 2 /* hasAssetsOrExtra */) {
-            return yield external(fullPath, blockInfo, blockVue, nodePath);
+            return yield external(fullPath, blockInfo, blockVue);
         }
         else {
-            return yield mergeCode(fullPath, blockVue, nodePath);
+            return yield replacePlaceholder(fullPath, blockInfo, blockVue);
         }
     });
 }
 exports.addBlock = addBlock;
-function removeBlock(fullPath, blockInfo) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield vms.removeBlock(fullPath, blockInfo.tagName);
-    });
-}
-exports.removeBlock = removeBlock;
 /**
  * 添加业务组件
  * @param fullPath 文件路径
@@ -799,10 +799,8 @@ exports.removeBlock = removeBlock;
  * @param tpl 组件代码字符串
  * @param nodePath 节点路径
  */
-function addCustomComponent(fullPath, libraryPath, blockInfo, tpl, nodePath) {
+function addCustomComponent(fullPath, libraryPath, blockInfo, content) {
     return __awaiter(this, void 0, void 0, function* () {
-        // 删除占位符
-        yield removePlaceholder(fullPath, blockInfo);
         const library = new vfs.Library(libraryPath, vfs.LibraryType.internal);
         yield library.open();
         const indexFile = library.componentsIndexFile;
@@ -812,7 +810,7 @@ function addCustomComponent(fullPath, libraryPath, blockInfo, tpl, nodePath) {
             $js.export('*').from(blockInfo.name);
             yield indexFile.save();
         }
-        yield mergeCode(fullPath, tpl, nodePath);
+        yield replacePlaceholder(fullPath, blockInfo, content);
     });
 }
 exports.addCustomComponent = addCustomComponent;

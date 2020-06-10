@@ -200,7 +200,7 @@ class TemplateHandler {
         if (replacements) {
             const classKeys = Object.keys(replacements['class']);
             // @TODO: 'directives', 'filters'
-            const identifierMap = { ...replacements['props'], ...replacements['data'], ...replacements['computed'], ...replacements['method'] };
+            const identifierMap = { ...replacements['props'], ...replacements['data'], ...replacements['computed'], ...replacements['methods'] };
             const identifierKeys = Object.keys(identifierMap);
             function fix(expr: string) {
                 const ast = babel.parse('const __RESULT__ = ' + expr, {

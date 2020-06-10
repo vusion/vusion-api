@@ -798,7 +798,7 @@ class ScriptHandler {
         });
 
         /* 处理代码中的 this */
-        const identifierMap = { ...replacements['props'], ...replacements['data'], ...replacements['computed'], ...replacements['method'] };
+        const identifierMap = { ...replacements['props'], ...replacements['data'], ...replacements['computed'], ...replacements['methods'] };
         babel.traverse(that.ast, {
             Identifier(nodeInfo) {
                 if (nodeInfo.parent.type === 'MemberExpression' && nodeInfo.parent.object.type === 'ThisExpression') {
