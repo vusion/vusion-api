@@ -1,6 +1,6 @@
 import * as babel from '@babel/core';
 import generate from '@babel/generator';
-import { uniqueInMap } from '../utils/mini';
+import { uniqueInMap } from '../utils/shared';
 
 import { Options as PrettierOptions } from 'prettier';
 import * as prettier from 'prettier/standalone';

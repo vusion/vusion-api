@@ -4,7 +4,6 @@ import * as babel from '@babel/core';
 import * as vfs from '../fs';
 import * as vms from '../ms';
 import * as compiler from 'vue-template-compiler';
-import { stringify } from "javascript-stringify";
 import * as utils from '../utils';
 
 export async function addLayout(fullPath: string, nodePath: string, type: string) {
@@ -23,6 +22,11 @@ export async function addLayout(fullPath: string, nodePath: string, type: string
     await vueFile.save();
 }
 
+/**
+ * 添加页面时初始化布局
+ * @param fullPath Vue 文件路径
+ * @param type 布局类型
+ */
 export async function initLayout(fullPath: string, type: string) {
     const vueFile = new vfs.VueFile(fullPath);
     await vueFile.open();
@@ -91,145 +95,133 @@ async function initView(viewInfo: ViewInfo) {
     return new vfs.View(viewInfo.fullPath, viewInfo.viewType, isDirectory, viewInfo.routePath);
 }
 
-function js2json(data: string){
-    const content = data.trim().replace(/export default |module\.exports +=/, '');
-    let json;
-    try {
-        json = eval('(function(){return ' + content + '})()');
-    }catch(e) {
-    }
-    return json;
-}
+
 interface MetaData {
-    getMetaData(viewInfo: vfs.View, moduleInfo?: ViewInfo|vfs.View): void,
-    saveMetaData(viewInfo: vfs.View, params: AddParams, moduleInfo?: vfs.View): void,
+    getMetaData(viewInfo: vfs.View, moduleInfo?: ViewInfo | vfs.View): void,
+    saveMetaData(viewInfo: vfs.View, params: AddParams, moduleInfo?: ViewInfo | vfs.View): void,
 }
 class EntryMetaData implements MetaData {
     async getMetaData(viewInfo: vfs.View) {
         const fullPath = viewInfo.fullPath;
+        // @TODO?
         const index = fullPath.indexOf('src');
-        const pageJsonPath = path.join(fullPath.slice(0, index), 'pages.json');
+        const pagesJSONPath = path.join(fullPath.slice(0, index), 'pages.json');
+        
         const data = {
             title: '',
         }
-        if (fs.existsSync(pageJsonPath)){
-            const pageJsonFile = await fs.readFile(pageJsonPath, 'utf8');
-            const pageJson = JSON.parse(pageJsonFile);
-            data.title =  pageJson[viewInfo.baseName] && pageJson[viewInfo.baseName].title;
-        }
+        if (!fs.existsSync(pagesJSONPath))
+            throw new Error('Cannot find pagesJSONPath');
+
+        const pagesJSON = JSON.parse(await fs.readFile(pagesJSONPath, 'utf8'));
+        data.title = pagesJSON[viewInfo.baseName] && pagesJSON[viewInfo.baseName].title;
+
         return data;
     }
-    async saveMetaData(viewInfo: vfs.View, params: AddParams, moduleInfo?: vfs.View) {
+    async saveMetaData(viewInfo: vfs.View, params: AddParams, moduleInfo?: ViewInfo | vfs.View) {
         const fullPath = viewInfo.fullPath;
+
         const index = fullPath.indexOf('src');
-        const pageJsonPath = path.join(fullPath.slice(0, index), 'pages.json');
-        if (fs.existsSync(pageJsonPath)){
-            const pageJsonFile = await fs.readFile(pageJsonPath, 'utf8');
-            const pageJson = JSON.parse(pageJsonFile);
-            if(pageJson[viewInfo.baseName])
-                Object.assign(pageJson[viewInfo.baseName], params);
-            const file = new vfs.File(pageJsonPath);
-            file.content = JSON.stringify(pageJson, null, 4);
-            return file.save();
-        }
-        return 'success';
+        const pagesJSONPath = path.join(fullPath.slice(0, index), 'pages.json');
+
+        if (!fs.existsSync(pagesJSONPath))
+            throw new Error('Cannot find pagesJSONPath');
+
+        const pagesJSON = JSON.parse(await fs.readFile(pagesJSONPath, 'utf8'));
+        if (pagesJSON[viewInfo.baseName])
+            Object.assign(pagesJSON[viewInfo.baseName], params);
+            
+        return fs.writeFile(pagesJSONPath, JSON.stringify(pagesJSON, null, 4));
     }
 }
 
 class ModuleMetaData implements MetaData {
     async getMetaData(viewInfo: vfs.View) {
         const fullPath = viewInfo.fullPath;
-        const baseJsPath = path.join(fullPath, 'module', 'base.js');
+        const baseJSPath = path.join(fullPath, 'module', 'base.js');
+        
         const data = {
             title: '',
         }
-        if (fs.existsSync(baseJsPath)){
-            const baseJs = await fs.readFile(baseJsPath, 'utf8');
-            let baseJsJson = js2json(baseJs);
-            if(baseJsJson && baseJsJson.sidebar && baseJsJson.sidebar.title){
-                data.title = baseJsJson.sidebar.title;
+        if (fs.existsSync(baseJSPath)) {
+            let baseJS = utils.JS.parse(await fs.readFile(baseJSPath, 'utf8'));
+            if (baseJS) {
+                data.title = baseJS.title;
             }
         }
+
         return data;
     }
     async saveMetaData(viewInfo: vfs.View, params: AddParams, moduleInfo?: vfs.View) {
         const fullPath = viewInfo.fullPath;
-        const baseJsPath = path.join(fullPath, 'module', 'base.js');
-        if (fs.existsSync(baseJsPath)){
-            const baseJs = await fs.readFile(baseJsPath, 'utf8');
-            let baseJsJson = js2json(baseJs);
-            if(baseJsJson && baseJsJson.sidebar){
-                Object.assign(baseJsJson.sidebar, params);
-            }else{
-                baseJsJson.sidebar = Object.assign({}, params);
-            }
-            const file = new vfs.File(baseJsPath);
-            file.content ='export default '+ stringify(baseJsJson, null, 4);
-            return file.save();
-        }
-        return 'success';
+        const baseJSPath = path.join(fullPath, 'module', 'base.js');
+
+        let baseJS = {};
+        if (fs.existsSync(baseJSPath))
+            baseJS = utils.JS.parse(await fs.readFile(baseJSPath, 'utf8')) || {};
+        // else baseJS = {}
+
+        Object.assign(baseJS, params);
+        return fs.writeFile(baseJSPath, 'export default ' + utils.JS.stringify(baseJS, null, 4));
     }
 }
 
 class PageMetaData implements MetaData {
-    async getMetaData(viewInfo: vfs.View, moduleInfo: ViewInfo|vfs.View) {
-        if(!moduleInfo)
+    async getMetaData(viewInfo: vfs.View, moduleInfo: ViewInfo | vfs.View) {
+        if (!moduleInfo)
             return {};
         const modulePath = moduleInfo.fullPath;
         const routePath = path.join(modulePath, 'routes.map.js');
         const data = {
             title: '',
-            routeMeta: {},
+            first: false,
+            meta: {},
         }
-        if (fs.existsSync(routePath)){
-            const routeData = await fs.readFile(routePath, 'utf8');
-            let reouteJson =js2json(routeData);
-            let currentPath = viewInfo.routePath.replace(moduleInfo.routePath, '');
-            if(viewInfo.viewType === 'branch'){
-                currentPath = currentPath.slice(0, currentPath.length - 1);
+        if (fs.existsSync(routePath)) {
+            let routeJSON = utils.JS.parse(await fs.readFile(routePath, 'utf8'));
+            let currentPath = viewInfo.routePath.replace(moduleInfo.routePath, '').replace(/\/$/, '');
+            if (routeJSON[currentPath]) {
+                data.meta = routeJSON[currentPath].meta;
+                data.title = data.meta && routeJSON[currentPath].meta.title;
             }
-            if(reouteJson[currentPath] && reouteJson[currentPath].meta && reouteJson[currentPath].meta.title){
-                data.title = reouteJson[currentPath].meta.title;
-            }
-            data.routeMeta = reouteJson[currentPath];
         }
         return data;
     }
     async saveMetaData(viewInfo: vfs.View, params: AddParams, moduleInfo?: vfs.View) {
-        if(!moduleInfo)
+        if (!moduleInfo)
             return {};
         const modulePath = moduleInfo.fullPath;
         const routePath = path.join(modulePath, 'routes.map.js');
-        if (fs.existsSync(routePath)){
-            const routeData = await fs.readFile(routePath, 'utf8');
-            let reouteJson =js2json(routeData);
-            let currentPath = viewInfo.routePath.replace(moduleInfo.routePath, '');
-            if(viewInfo.viewType === 'branch'){
-                currentPath = currentPath.slice(0, currentPath.length - 1);
-            }
-            if(reouteJson[currentPath] && reouteJson[currentPath].meta && reouteJson[currentPath].meta.title){
-                Object.assign(reouteJson[currentPath].meta, params);
-                const file = new vfs.File(routePath);
-                file.content ='export default '+ stringify(reouteJson, null, 4);
-                return file.save();
-            }
+
+        const data = {
+            title: params.title,
+            first: false,
+            meta: {},
         }
-        return 'success';
+        let routeJSON: { [name: string]: { meta?: { title: string } } } = {};
+        if (fs.existsSync(routePath))
+            routeJSON = utils.JS.parse(await fs.readFile(routePath, 'utf8'));
+
+        let currentPath = viewInfo.routePath.replace(moduleInfo.routePath, '').replace(/\/$/, '');
+        if (!routeJSON[currentPath])
+            routeJSON[currentPath] = {};
+        routeJSON[currentPath].meta = Object.assign(routeJSON[currentPath].meta || {});
+        routeJSON[currentPath].meta.title = params.title;
+
+        return fs.writeFile(routePath, 'export default ' + utils.JS.stringify(routeJSON, null, 4));
     }
 }
 
-async function getMetaData(viewInfo: vfs.View,  moduleInfo: ViewInfo|vfs.View){
+async function getMetaData(viewInfo: vfs.View, moduleInfo: ViewInfo | vfs.View) {
     let instance;
     let meta = {};
-    if(viewInfo.viewType === 'entry'){
+    if (viewInfo.viewType === 'entry') {
         instance = new EntryMetaData();
         meta = await instance.getMetaData(viewInfo);
-    }
-    if(viewInfo.viewType === 'module'){
+    } else if(viewInfo.viewType === 'module') {
         instance = new ModuleMetaData();
         meta = await instance.getMetaData(viewInfo);
-    }
-    if(viewInfo.viewType === 'branch' || viewInfo.viewType === 'vue'){
+    } else if(viewInfo.viewType === 'branch' || viewInfo.viewType === 'vue') {
         instance = new PageMetaData();
         meta = await instance.getMetaData(viewInfo, moduleInfo);
     }
@@ -239,13 +231,11 @@ async function getMetaData(viewInfo: vfs.View,  moduleInfo: ViewInfo|vfs.View){
 
 export async function saveMetaData(viewInfo: vfs.View, params: AddParams, moduleInfo?: vfs.View){
     let instance;
-    if(viewInfo.viewType === 'entry'){
+    if (viewInfo.viewType === 'entry') {
         instance = new EntryMetaData();
-    }
-    if(viewInfo.viewType === 'module'){
+    } else if(viewInfo.viewType === 'module') {
         instance = new ModuleMetaData();
-    }
-    if(viewInfo.viewType === 'branch' || viewInfo.viewType === 'vue'){
+    } else if(viewInfo.viewType === 'branch' || viewInfo.viewType === 'vue') {
         instance = new PageMetaData();
     }
     return instance.saveMetaData(viewInfo, params, moduleInfo);
@@ -258,9 +248,9 @@ export async function saveMetaData(viewInfo: vfs.View, params: AddParams, module
 export async function loadViews(viewInfo: ViewInfo | vfs.View, moduleInfo?: ViewInfo | vfs.View) {
     const view = viewInfo instanceof vfs.View ? viewInfo : await initView(viewInfo);
     await view.open();
-    await Promise.all(view.children.map(async(child) => {
+    await Promise.all(view.children.map(async (child) => {
         await child.preOpen();
-        return await getMetaData(child,  moduleInfo);
+        return await getMetaData(child, moduleInfo);
     }));
     return view.children;
 }
@@ -605,6 +595,9 @@ export async function addBranchWrapper(parentInfo: ViewInfo | vfs.View, moduleIn
     return dest;
 }
 
+/**
+ * @TODO remove page metaData
+ */
 export async function removeView(view: vfs.View): Promise<void>;
 export async function removeView(view: vfs.View, module: vfs.View): Promise<void>;
 export async function removeView(viewInfo: ViewInfo, moduleInfo: ViewInfo): Promise<void>;
@@ -705,61 +698,53 @@ export async function loadExternalLibrary(fullPath: string, parseTypes: ParseTyp
 }
 
 /**
- * 获取接口信息
+ * 获取服务信息
  */
-export async function loadServiceApis(fullPath: string) {
-     const servicePath = path.join(fullPath, 'service');
-     if (!fs.existsSync(servicePath))
-            return {};
-     const directory = new vfs.Directory(servicePath);
-     await directory.forceOpen();
-     const tasks = directory.children.filter((item)=>{
-         if(item.isDirectory){
-            item.fullPath = path.join(item.fullPath, 'api.json');
-         }
-         return item.fullPath.endsWith('.json');
-     }).map(async (item)=>{
-        const apis = await fs.readFile(item.fullPath, 'utf8');
-        return {
-            filePath: item.fullPath, 
-            serviceName: item.isDirectory? item.baseName : 'default', 
-            apis: JSON.parse(apis),
-        };
-     });
+export async function loadServices(modulePath: string) {
+     const servicesPath = path.join(modulePath, 'services');
+     if (!fs.existsSync(servicesPath)) {
+        return [];
+     }
+     const directory = new vfs.Directory(servicesPath);
+     await directory.open();
+     const tasks = directory.children.filter((item) => item.isDirectory && item.fileName[0] !== '.')
+        .map(async (subdir) => {
+            const service = new vfs.Service(subdir.fullPath);
+            await service.open();
+            return service;
+        });
      return Promise.all(tasks);
 }
 
-export async function saveServiceApis(services: any[]) {
-    const tasks = services.map((item)=>{
-        const file = new vfs.File(item.filePath);
-        file.content = JSON.stringify(item.apis, null, 4);
-        return file.save();
-    });
-    await Promise.all(tasks);
-}
-
-export async function addServiceApis(fullPath: string, newName: string, name: string) {
-    if(!name){
-        const dir = path.join(fullPath, 'service', newName);
+/**
+ * @deprecated
+ * @param fullPath 
+ * @param newName 
+ * @param name 
+ */
+export async function addOrRenameService(fullPath: string, newName: string, name: string) {
+    if (!name) {
+        const dir = path.join(fullPath, 'services', newName);
         let tplPath = path.resolve(__dirname, '../../templates/service');
         await fs.copy(tplPath, dir);
         return path.join(dir, 'api.json');
-    }else{
-        const oldPath = path.join(fullPath, 'service', name);
-        const newPath = path.join(fullPath, 'service', newName);
+    } else {
+        const oldPath = path.join(fullPath, 'services', name);
+        const newPath = path.join(fullPath, 'services', newName);
         await fs.rename(oldPath, newPath);
         return path.join(newPath, 'api.json');
     }
 }
 
-export async function removeServiceApis(fullPath: string) {
-    const fileNames = await fs.readdir(fullPath);
-    const tasks = fileNames.map(async (name) =>{
-        return await fs.remove(path.join(fullPath, name));
-    })
-    Promise.all(tasks).then(()=>{
-        fs.rmdirSync(fullPath);
-    });
+export async function saveService(serviceInfo: vfs.Service) {
+    const service = new vfs.Service(serviceInfo.fullPath);
+    await service.open();
+    Object.assign(service, serviceInfo);
+    await service.save();
+}
+
+export async function removeService(fullPath: string) {
+    return fs.remove(fullPath);
 }
 
 /**

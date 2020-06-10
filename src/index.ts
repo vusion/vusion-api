@@ -12,5 +12,6 @@ export {
     VueFile, VueFileExtendMode,
     Library, LibraryType,
     View, ViewType,
+    Service,
 } from './fs';
 export { default as PackageJSON } from './types/PackageJSON';

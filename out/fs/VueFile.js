@@ -24,7 +24,7 @@ const StyleHandler_1 = require("./StyleHandler");
 const APIHandler_1 = require("./APIHandler");
 const ExamplesHandler_1 = require("./ExamplesHandler");
 const traverse_1 = require("@babel/traverse");
-const service_1 = require("./service");
+const fs_1 = require("./fs");
 const fetchPartialContent = (content, tag, attrs = '') => {
     const reg = new RegExp(`<${tag}${attrs ? ' ' + attrs : ''}.*?>([\\s\\S]+)<\\/${tag}>`);
     const m = content.match(reg);
@@ -490,7 +490,7 @@ class VueFile extends FSEntry_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             this.warnIfNotOpen();
             if (fs.existsSync(fullPath))
-                throw new service_1.FileExistsError(fullPath);
+                throw new fs_1.FileExistsError(fullPath);
             if (this.templateHandler) {
                 if (!this.isDirectory)
                     this.templateHandler.options.startLevel = 1;

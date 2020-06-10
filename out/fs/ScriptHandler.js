@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatementHandler = exports.ImportsHandler = exports.FromsHandler = exports.DeclarationHandler = exports.ORDER_IN_COMPONENTS_MAP = exports.ORDER_IN_COMPONENTS = exports.LIFECYCLE_HOOKS = exports.SIMPLIFIED_NODE_TYPE = void 0;
 const babel = require("@babel/core");
 const generator_1 = require("@babel/generator");
-const mini_1 = require("../utils/mini");
+const shared_1 = require("../utils/shared");
 const prettier = require("prettier/standalone");
 const parserBabylon = require("prettier/parser-babylon");
 /**
@@ -118,8 +118,14 @@ class DeclarationHandler {
         });
         if (pos === undefined)
             pos = this.node.properties.length;
-        const valueDeclaration = babel.template(`const value = ${value}`)();
-        const objectProperty = babel.types.objectProperty(babel.types.identifier(key), valueDeclaration.declarations[0].init);
+        let valueNode;
+        if (typeof value === 'string') {
+            const valueDeclaration = babel.template(`const value = ${value}`)();
+            valueNode = valueDeclaration.declarations[0].init;
+        }
+        else
+            valueNode = value;
+        const objectProperty = babel.types.objectProperty(babel.types.identifier(key), valueNode);
         if (~index)
             force && this.node.properties.splice(index, 1, objectProperty);
         else
@@ -143,6 +149,25 @@ class DeclarationHandler {
     set(key, value) {
         return this._set(key, value, true);
     }
+    setMethod(key, objectMethod) {
+        if (this.node.type !== 'ObjectExpression')
+            throw new Error(`setMethod method can only be called on an objectExpression`);
+        let pos;
+        const after = this.state.after || [];
+        let index = this.node.properties.findIndex((property, index) => {
+            if ((property.type === 'ObjectProperty' || property.type === 'ObjectMethod') && after.includes(property.key.name))
+                pos = index;
+            return (property.type === 'ObjectProperty' || property.type === 'ObjectMethod') && property.key.name === key;
+        });
+        if (pos === undefined)
+            pos = this.node.properties.length;
+        if (~index)
+            this.node.properties.splice(index, 1, objectMethod);
+        else
+            this.node.properties.splice(pos, 0, objectMethod);
+        this.resetState();
+        return this;
+    }
     /**
      * 获取对象的属性值
      * @param key 键的名称
@@ -154,6 +179,13 @@ class DeclarationHandler {
             return property.type === 'ObjectProperty' && property.key.name === key;
         });
         return objectProperty && new DeclarationHandler(objectProperty.value);
+    }
+    getMethod(key) {
+        if (this.node.type !== 'ObjectExpression')
+            throw new Error('getMethod can only be called on an objectExpression');
+        return this.node.properties.find((property, index) => {
+            return property.type === 'ObjectMethod' && property.key.name === key;
+        });
     }
     has(key) {
         return !!this.get(key);
@@ -454,7 +486,7 @@ class ScriptHandler {
         const replacements = {};
         thatObject.properties.forEach((property) => {
             if (property.type !== 'SpreadElement') {
-                const newName = mini_1.uniqueInMap(property.key.name, thisKeys);
+                const newName = shared_1.uniqueInMap(property.key.name, thisKeys);
                 if (newName !== property.key.name)
                     property.key.name = replacements[property.key.name] = newName;
             }
@@ -484,7 +516,7 @@ class ScriptHandler {
             if (node.type === 'VariableDeclaration') {
                 node.declarations.forEach((declarator) => {
                     if (declarator.id.type === 'Identifier') {
-                        const newName = mini_1.uniqueInMap(declarator.id.name, thisVariables);
+                        const newName = shared_1.uniqueInMap(declarator.id.name, thisVariables);
                         if (newName !== declarator.id.name)
                             declarator.id.name = replacements['variables'][declarator.id.name] = newName;
                     }
@@ -648,7 +680,7 @@ class ScriptHandler {
             else if (node.type === 'VariableDeclaration') {
                 node.declarations.forEach((declarator) => {
                     if (declarator.id.type === 'Identifier') {
-                        const newName = mini_1.uniqueInMap(declarator.id.name, thisVariables);
+                        const newName = shared_1.uniqueInMap(declarator.id.name, thisVariables);
                         if (newName !== declarator.id.name)
                             declarator.id.name = replacements['variables'][declarator.id.name] = newName;
                     }

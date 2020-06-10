@@ -15,7 +15,7 @@ import ExamplesHandler from './ExamplesHandler';
 
 import traverse from '@babel/traverse';
 import PackageJSON from '../types/PackageJSON';
-import { FileExistsError } from './service';
+import { FileExistsError } from './fs';
 
 const fetchPartialContent = (content: string, tag: string, attrs: string = '') => {
     const reg = new RegExp(`<${tag}${attrs ? ' ' + attrs : ''}.*?>([\\s\\S]+)<\\/${tag}>`);

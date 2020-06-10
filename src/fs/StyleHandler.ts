@@ -1,5 +1,5 @@
 import * as postcss from 'postcss';
-import { uniqueInMap } from '../utils/mini';
+import { uniqueInMap } from '../utils/shared';
 
 /**
  * 样式 AST 处理器

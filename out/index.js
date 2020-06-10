@@ -26,4 +26,5 @@ Object.defineProperty(exports, "Library", { enumerable: true, get: function () {
 Object.defineProperty(exports, "LibraryType", { enumerable: true, get: function () { return fs_1.LibraryType; } });
 Object.defineProperty(exports, "View", { enumerable: true, get: function () { return fs_1.View; } });
 Object.defineProperty(exports, "ViewType", { enumerable: true, get: function () { return fs_1.ViewType; } });
+Object.defineProperty(exports, "Service", { enumerable: true, get: function () { return fs_1.Service; } });
 //# sourceMappingURL=index.js.map

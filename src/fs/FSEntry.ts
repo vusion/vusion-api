@@ -55,6 +55,14 @@ export default class FSEntry {
         setTimeout(() => this.isSaving = false, 1200); // 避免自身保存引发 watch
     }
 
+    /**
+     * 删除当前文件
+     * 该操作只删除实际文件，不清空文件内容。因此可以再次 save。
+     */
+    async remove() {
+        return fs.remove(this.fullPath);
+    }
+
     async onMiniChange(event: string, filePath: string, key?: string, hash?: string) {
         console.log('[vusion-api] onMiniChange:', event, filePath, key, hash);
         if (this.isOpen && fs.existsSync(this.fullPath))

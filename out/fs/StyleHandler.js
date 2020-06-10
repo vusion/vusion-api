@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const postcss = require("postcss");
-const mini_1 = require("../utils/mini");
+const shared_1 = require("../utils/shared");
 /**
  * 样式 AST 处理器
  * 该 class 可以在两端(node, browser)运行
@@ -43,7 +43,7 @@ class StyleHandler {
             const re = /\.[-_a-zA-Z0-9]+/g;
             let cap;
             while (cap = re.exec(rule.selector)) {
-                let cls = mini_1.uniqueInMap(cap[0], thisClasses);
+                let cls = shared_1.uniqueInMap(cap[0], thisClasses);
                 if (cls !== cap[0]) {
                     classMap[cap[0].slice(1)] = cls.slice(1);
                     rule.selector = rule.selector.slice(0, cap.index) + cls + rule.selector.slice(cap.index + cap[0].length);
