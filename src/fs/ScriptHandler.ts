@@ -123,7 +123,7 @@ export class DeclarationHandler {
         return this.node.properties;
     }
 
-    private _set(key: string, value: string, force?: boolean) {
+    private _set(key: string, value: string | babel.types.Expression | babel.types.PatternLike, force?: boolean) {
         if (this.node.type !== 'ObjectExpression')
             throw new Error(`${force ? 'set' : 'ensure'} method can only be called on an objectExpression`);
 
@@ -137,8 +137,14 @@ export class DeclarationHandler {
         if (pos === undefined)
             pos = this.node.properties.length;
 
-        const valueDeclaration = babel.template(`const value = ${value}`)() as babel.types.VariableDeclaration;
-        const objectProperty = babel.types.objectProperty(babel.types.identifier(key), valueDeclaration.declarations[0].init);
+        let valueNode: babel.types.Expression | babel.types.PatternLike;
+        if (typeof value === 'string') {
+            const valueDeclaration = babel.template(`const value = ${value}`)() as babel.types.VariableDeclaration;
+            valueNode = valueDeclaration.declarations[0].init;
+        } else
+            valueNode = value;
+
+        const objectProperty = babel.types.objectProperty(babel.types.identifier(key), valueNode);
         if (~index)
             force && this.node.properties.splice(index, 1, objectProperty);
         else
@@ -153,7 +159,7 @@ export class DeclarationHandler {
      * @param key
      * @param value
      */
-    ensure(key: string, value: string = 'undefined') {
+    ensure(key: string, value: string | babel.types.Expression | babel.types.PatternLike = 'undefined') {
         return this._set(key, value);
     }
 
@@ -162,8 +168,31 @@ export class DeclarationHandler {
      * @param key 键的名称
      * @param value 值的名称
      */
-    set(key: string, value: string) {
+    set(key: string, value: string | babel.types.Expression | babel.types.PatternLike) {
         return this._set(key, value, true);
+    }
+
+    setMethod(key: string, objectMethod: babel.types.ObjectMethod) {
+        if (this.node.type !== 'ObjectExpression')
+        throw new Error(`setMethod method can only be called on an objectExpression`);
+
+        let pos;
+        const after = this.state.after || [];
+        let index = this.node.properties.findIndex((property, index) => {
+            if ((property.type === 'ObjectProperty' || property.type === 'ObjectMethod') && after.includes(property.key.name))
+                pos = index;
+            return (property.type === 'ObjectProperty' || property.type === 'ObjectMethod') && property.key.name === key;
+        });
+        if (pos === undefined)
+            pos = this.node.properties.length;
+
+        if (~index)
+            this.node.properties.splice(index, 1, objectMethod);
+        else
+            this.node.properties.splice(pos, 0, objectMethod);
+
+        this.resetState();
+        return this;
     }
 
     /**
@@ -179,6 +208,15 @@ export class DeclarationHandler {
         }) as babel.types.ObjectProperty;
 
         return objectProperty && new DeclarationHandler(objectProperty.value);
+    }
+
+    getMethod(key: string) {
+        if (this.node.type !== 'ObjectExpression')
+            throw new Error('getMethod can only be called on an objectExpression');
+
+        return this.node.properties.find((property, index) => {
+            return property.type === 'ObjectMethod' && property.key.name === key;
+        }) as babel.types.ObjectMethod;
     }
 
     has(key: string) {

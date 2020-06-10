@@ -60,7 +60,7 @@ export default class Service extends FSEntry {
         if (fs.existsSync(apiConfigPath))
             this.apiConfig = await fs.readFile(apiConfigPath, 'utf8');
         else
-            this.apiConfig = 'export default {}';
+            this.apiConfig = 'export default {};\n';
 
         const indexJSPath = path.resolve(this.fullPath, 'index.js');
         if (fs.existsSync(indexJSPath))
