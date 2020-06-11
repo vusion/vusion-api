@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
+exports.loadComponentData = exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = require("path");
 const fs = require("fs-extra");
 const babel = require("@babel/core");
@@ -120,11 +120,13 @@ class ModuleMetaData {
             const baseJSPath = path.join(fullPath, 'module', 'base.js');
             const data = {
                 title: '',
+                meta: {},
             };
             if (fs.existsSync(baseJSPath)) {
                 let baseJS = utils.JS.parse(yield fs.readFile(baseJSPath, 'utf8'));
                 if (baseJS) {
                     data.title = baseJS.title;
+                    Object.assign(data.meta, baseJS);
                 }
             }
             return data;
@@ -831,4 +833,22 @@ function loadPackageJSON(rootPath) {
     });
 }
 exports.loadPackageJSON = loadPackageJSON;
+function loadComponentData(fullPath, parseTypes = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const vueFile = new vfs.VueFile(fullPath);
+        yield vueFile.open();
+        if (parseTypes.template)
+            vueFile.parseTemplate();
+        if (parseTypes.script)
+            vueFile.parseScript();
+        if (parseTypes.style)
+            vueFile.parseStyle();
+        if (parseTypes.api)
+            vueFile.parseAPI();
+        if (parseTypes.examples)
+            vueFile.parseExamples();
+        return vueFile;
+    });
+}
+exports.loadComponentData = loadComponentData;
 //# sourceMappingURL=index.js.map
