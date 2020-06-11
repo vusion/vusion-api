@@ -142,11 +142,13 @@ class ModuleMetaData implements MetaData {
         
         const data = {
             title: '',
+            meta: {},
         }
         if (fs.existsSync(baseJSPath)) {
             let baseJS = utils.JS.parse(await fs.readFile(baseJSPath, 'utf8'));
             if (baseJS) {
                 data.title = baseJS.title;
+                Object.assign(data.meta, baseJS);
             }
         }
 
@@ -891,4 +893,20 @@ export async function addCustomComponent(fullPath: string, libraryPath: string, 
 
 export async function loadPackageJSON(rootPath: string) {
     return JSON.parse(await fs.readFile(path.resolve(rootPath, 'package.json'), 'utf8'));
+}
+
+export async function loadComponentData(fullPath: string, parseTypes: ParseTypes = {}){
+    const vueFile = new vfs.VueFile(fullPath);
+    await vueFile.open();
+    if (parseTypes.template)
+        vueFile.parseTemplate();
+    if (parseTypes.script)
+        vueFile.parseScript();
+    if (parseTypes.style)
+        vueFile.parseStyle();
+    if (parseTypes.api)
+        vueFile.parseAPI();
+    if (parseTypes.examples)
+        vueFile.parseExamples();
+    return vueFile;
 }
