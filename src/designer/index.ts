@@ -56,6 +56,10 @@ export async function addCode(fullPath: string, nodePath: string, tpl: string) {
     await vueFile.save();
 }
 
+export async function openFile(fullPath: string, content: string) {
+    return fs.readFile(fullPath, content);
+}
+
 export async function saveFile(fullPath: string, content: string) {
     return fs.writeFile(fullPath, content);
 }
@@ -158,12 +162,18 @@ class ModuleMetaData implements MetaData {
         const fullPath = viewInfo.fullPath;
         const baseJSPath = path.join(fullPath, 'module', 'base.js');
 
-        let baseJS = {};
+        let baseJS: { sidebar?: { title: string }, navbar?: { title: string } } = {};
         if (fs.existsSync(baseJSPath))
             baseJS = utils.JS.parse(await fs.readFile(baseJSPath, 'utf8')) || {};
-        // else baseJS = {}
 
         Object.assign(baseJS, params);
+        if (params.title) {
+            if (baseJS.sidebar)
+                baseJS.sidebar.title = params.title;
+            if (baseJS.navbar)
+                baseJS.navbar.title = params.title;
+        }
+
         return fs.writeFile(baseJSPath, 'export default ' + utils.JS.stringify(baseJS, null, 4));
     }
 }

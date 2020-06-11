@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
+exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = require("path");
 const fs = require("fs-extra");
 const babel = require("@babel/core");
@@ -64,6 +64,12 @@ function addCode(fullPath, nodePath, tpl) {
     });
 }
 exports.addCode = addCode;
+function openFile(fullPath, content) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return fs.readFile(fullPath, content);
+    });
+}
+exports.openFile = openFile;
 function saveFile(fullPath, content) {
     return __awaiter(this, void 0, void 0, function* () {
         return fs.writeFile(fullPath, content);
@@ -131,8 +137,13 @@ class ModuleMetaData {
             let baseJS = {};
             if (fs.existsSync(baseJSPath))
                 baseJS = utils.JS.parse(yield fs.readFile(baseJSPath, 'utf8')) || {};
-            // else baseJS = {}
             Object.assign(baseJS, params);
+            if (params.title) {
+                if (baseJS.sidebar)
+                    baseJS.sidebar.title = params.title;
+                if (baseJS.navbar)
+                    baseJS.navbar.title = params.title;
+            }
             return fs.writeFile(baseJSPath, 'export default ' + utils.JS.stringify(baseJS, null, 4));
         });
     }

@@ -232,9 +232,9 @@ class TemplateHandler {
                                     if (attr.name.startsWith('v-on:'))
                                         pureName = attr.name.slice(5);
                                     if (pureName) {
-                                        const event = node.events[pureName];
+                                        const event = node.events && node.events[pureName];
                                         event && (event.value = newExpr);
-                                        const nativeEvent = node.nativeEvents[pureName];
+                                        const nativeEvent = node.nativeEvents && node.nativeEvents[pureName];
                                         nativeEvent && (nativeEvent.value = newExpr);
                                         return;
                                     }
