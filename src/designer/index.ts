@@ -902,10 +902,20 @@ export async function addCustomComponent(fullPath: string, libraryPath: string, 
 }
 
 export async function loadPackageJSON(rootPath: string) {
-    return JSON.parse(await fs.readFile(path.resolve(rootPath, 'package.json'), 'utf8'));
+    const pkgPath = path.resolve(rootPath, 'package.json');
+    if(!fs.existsSync(pkgPath))
+        return {};
+    return JSON.parse(await fs.readFile(pkgPath, 'utf8'));
 }
 
+/**
+ * 获取单个控件信息
+ * @param fullPath 控件路径
+ * @param parseTypes 需要获取的信息
+ */
 export async function loadComponentData(fullPath: string, parseTypes: ParseTypes = {}){
+    if(!fs.existsSync(fullPath))
+        return {};
     const vueFile = new vfs.VueFile(fullPath);
     await vueFile.open();
     if (parseTypes.template)
@@ -919,4 +929,24 @@ export async function loadComponentData(fullPath: string, parseTypes: ParseTypes
     if (parseTypes.examples)
         vueFile.parseExamples();
     return vueFile;
+}
+
+/**
+ * 获取自定义组件信息，packages.json中有的组件，并且是以.vue结尾
+ * @param rootPath package.json所在的目录路径
+ * @param parseTypes 需要获取的信息
+ * @param baseName 组件信息，有该信息则获取该组件信息
+ */
+export async function loadCustomComponentsData(rootPath: string, parseTypes: ParseTypes = {}, baseName?: string){
+    const pkg = await loadPackageJSON(rootPath);
+    const pkgDeps = pkg.dependencies || {};
+    const components = Object.keys(pkgDeps).filter((name) => {
+        if(baseName)
+            return name.includes(baseName + '.vue');
+        else
+            return name.endsWith('.vue');
+    });
+    const tasks = components.map(async (name)=> await loadComponentData(`${rootPath}/node_modules/${name}`, parseTypes));
+    const datas = await Promise.all(tasks);
+    return datas;
 }
