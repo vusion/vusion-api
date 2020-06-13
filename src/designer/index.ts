@@ -92,6 +92,7 @@ export interface AddParams {
     title: string,
     ext?: string,
     layout?: string,
+    crumb?: string,
 }
 
 async function initView(viewInfo: ViewInfo) {
@@ -210,7 +211,7 @@ class PageMetaData implements MetaData {
             first: false,
             meta: {},
         }
-        let routeJSON: { [name: string]: { meta?: { title: string } } } = {};
+        let routeJSON: { [name: string]: { meta?: { title: string, crumb?: string } } } = {};
         if (fs.existsSync(routePath))
             routeJSON = utils.JS.parse(await fs.readFile(routePath, 'utf8'));
 
@@ -219,6 +220,7 @@ class PageMetaData implements MetaData {
             routeJSON[currentPath] = {};
         routeJSON[currentPath].meta = Object.assign(routeJSON[currentPath].meta || {});
         routeJSON[currentPath].meta.title = params.title;
+        routeJSON[currentPath].meta.crumb = params.crumb || '';
 
         return fs.writeFile(routePath, 'export default ' + utils.JS.stringify(routeJSON, null, 4));
     }
