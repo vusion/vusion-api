@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadComponentData = exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
+exports.loadCustomComponentsData = exports.loadComponentData = exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = require("path");
 const fs = require("fs-extra");
 const babel = require("@babel/core");
@@ -192,6 +192,7 @@ class PageMetaData {
                 routeJSON[currentPath] = {};
             routeJSON[currentPath].meta = Object.assign(routeJSON[currentPath].meta || {});
             routeJSON[currentPath].meta.title = params.title;
+            routeJSON[currentPath].meta.crumb = params.crumb || '';
             return fs.writeFile(routePath, 'export default ' + utils.JS.stringify(routeJSON, null, 4));
         });
     }
@@ -829,12 +830,22 @@ function addCustomComponent(fullPath, libraryPath, blockInfo, content) {
 exports.addCustomComponent = addCustomComponent;
 function loadPackageJSON(rootPath) {
     return __awaiter(this, void 0, void 0, function* () {
-        return JSON.parse(yield fs.readFile(path.resolve(rootPath, 'package.json'), 'utf8'));
+        const pkgPath = path.resolve(rootPath, 'package.json');
+        if (!fs.existsSync(pkgPath))
+            return {};
+        return JSON.parse(yield fs.readFile(pkgPath, 'utf8'));
     });
 }
 exports.loadPackageJSON = loadPackageJSON;
+/**
+ * 获取单个控件信息
+ * @param fullPath 控件路径
+ * @param parseTypes 需要获取的信息
+ */
 function loadComponentData(fullPath, parseTypes = {}) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (!fs.existsSync(fullPath))
+            return {};
         const vueFile = new vfs.VueFile(fullPath);
         yield vueFile.open();
         if (parseTypes.template)
@@ -851,4 +862,26 @@ function loadComponentData(fullPath, parseTypes = {}) {
     });
 }
 exports.loadComponentData = loadComponentData;
+/**
+ * 获取自定义组件信息，packages.json中有的组件，并且是以.vue结尾
+ * @param rootPath package.json所在的目录路径
+ * @param parseTypes 需要获取的信息
+ * @param baseName 组件信息，有该信息则获取该组件信息
+ */
+function loadCustomComponentsData(rootPath, parseTypes = {}, baseName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pkg = yield loadPackageJSON(rootPath);
+        const pkgDeps = pkg.dependencies || {};
+        const components = Object.keys(pkgDeps).filter((name) => {
+            if (baseName)
+                return name.includes(baseName + '.vue');
+            else
+                return name.endsWith('.vue');
+        });
+        const tasks = components.map((name) => __awaiter(this, void 0, void 0, function* () { return yield loadComponentData(`${rootPath}/node_modules/${name}`, parseTypes); }));
+        const datas = yield Promise.all(tasks);
+        return datas;
+    });
+}
+exports.loadCustomComponentsData = loadCustomComponentsData;
 //# sourceMappingURL=index.js.map
