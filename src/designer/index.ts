@@ -6,6 +6,8 @@ import * as vms from '../ms';
 import * as compiler from 'vue-template-compiler';
 import * as utils from '../utils';
 
+export * from './nuims';
+
 export async function addLayout(fullPath: string, nodePath: string, type: string) {
     const vueFile = new vfs.VueFile(fullPath);
     await vueFile.open();
