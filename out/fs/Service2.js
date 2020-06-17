@@ -110,4 +110,4 @@ class Service extends FSEntry_1.default {
     }
 }
 exports.default = Service;
-//# sourceMappingURL=Service.js.map
+//# sourceMappingURL=Service2.js.map

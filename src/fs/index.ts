@@ -5,7 +5,7 @@ export { default as VueFile, VueFileExtendMode } from './VueFile';
 export { default as JSFile } from './JSFile';
 export { default as Library, LibraryType } from './Library';
 export { default as View, ViewType } from './View';
-export { default as Service } from './Service';
+export { default as Service } from './Service2';
 export { default as TemplateHandler } from './TemplateHandler';
 export { default as ScriptHandler } from './ScriptHandler';
 export { default as StyleHandler } from './StyleHandler';
