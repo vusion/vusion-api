@@ -19,7 +19,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadCustomComponentsData = exports.loadComponentData = exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
+exports.loadCustomComponentsData = exports.loadComponentData = exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadAllViews = exports.loadViews = exports.saveMetaData = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = require("path");
 const fs = require("fs-extra");
 const babel = require("@babel/core");
@@ -260,6 +260,21 @@ function loadViews(viewInfo, moduleInfo) {
     });
 }
 exports.loadViews = loadViews;
+function loadAllViews(viewInfo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const view = viewInfo instanceof vfs.View ? viewInfo : yield initView(viewInfo);
+        yield view.open();
+        if (view.children) {
+            yield Promise.all(view.children.map((child) => __awaiter(this, void 0, void 0, function* () {
+                yield child.open();
+                yield getMetaData(child);
+                yield loadAllViews(child);
+            })));
+        }
+        return view;
+    });
+}
+exports.loadAllViews = loadAllViews;
 /**
  * 获取页面内容
  * @param viewInfo 父页面的信息

@@ -228,7 +228,7 @@ class PageMetaData implements MetaData {
     }
 }
 
-async function getMetaData(viewInfo: vfs.View, moduleInfo: ViewInfo | vfs.View) {
+async function getMetaData(viewInfo: vfs.View, moduleInfo?: ViewInfo | vfs.View) {
     let instance;
     let meta = {};
     if (viewInfo.viewType === 'entry') {
@@ -269,6 +269,21 @@ export async function loadViews(viewInfo: ViewInfo | vfs.View, moduleInfo?: View
         return await getMetaData(child, moduleInfo);
     }));
     return view.children;
+}
+
+export async function loadAllViews(viewInfo: ViewInfo | vfs.View) {
+    const view = viewInfo instanceof vfs.View ? viewInfo : await initView(viewInfo);
+    await view.open();
+
+    if (view.children) {
+        await Promise.all(view.children.map(async (child) => {
+            await child.open();
+            await getMetaData(child);
+            await loadAllViews(child);
+        }));
+    }
+
+    return view;
 }
 
 /**
