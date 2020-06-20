@@ -74,7 +74,7 @@ exports.upload = {
         return __awaiter(this, void 0, void 0, function* () {
             const formData = exports.upload.getFormData(files);
             const pfAxios = yield getPlatformAxios();
-            return pfAxios.post('nos/upload', formData, {
+            return pfAxios.post('api/v1/nos/upload', formData, {
                 headers: formData.getHeaders(),
             }).then((res) => res.data);
         });
@@ -83,7 +83,7 @@ exports.upload = {
         return __awaiter(this, void 0, void 0, function* () {
             const formData = exports.upload.getFormData(files);
             const pfAxios = yield getPlatformAxios(prefix);
-            return pfAxios.post('micro/upload', formData, {
+            return pfAxios.post('api/v1/micro/upload', formData, {
                 headers: formData.getHeaders(),
             }).then((res) => res.data);
         });
@@ -93,7 +93,7 @@ exports.upload = {
             const formData = exports.upload.getFormData(files);
             formData.append('ui', framework);
             const pfAxios = yield getPlatformAxios();
-            return pfAxios.post('framework/upload', formData, {
+            return pfAxios.post('api/v1/framework/upload', formData, {
                 headers: formData.getHeaders(),
             }).then((res) => res.data);
         });
@@ -232,7 +232,7 @@ exports.processOptions = processOptions;
 function getTemplate(packageName) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.get('template/info', {
+        return pfAxios.get('api/v1/template/info', {
             params: {
                 name: packageName,
             },
@@ -246,7 +246,7 @@ exports.getTemplate = getTemplate;
 function getBlock(packageName) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.get('block/info', {
+        return pfAxios.get('api/v1/block/info', {
             params: {
                 name: packageName,
             },
@@ -263,7 +263,7 @@ exports.getBlock = getBlock;
 function getBlocks() {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.get('block/list')
+        return pfAxios.get('api/v1/block/list')
             .then((res) => {
             const blocks = res.data.result.rows;
             blocks.forEach((block) => {
@@ -279,7 +279,7 @@ exports.getBlocks = getBlocks;
 function getComponent(packageName) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.get('component/info', {
+        return pfAxios.get('api/v1/component/info', {
             params: {
                 name: packageName,
             },
@@ -296,7 +296,7 @@ exports.getComponent = getComponent;
 function getComponents() {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.get('component/list')
+        return pfAxios.get('api/v1/component/list')
             .then((res) => {
             const components = res.data.result.rows;
             components.forEach((component) => {
@@ -312,7 +312,7 @@ exports.getComponents = getComponents;
 function teamExist(teamName) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.get('team/exist', { params: { teamName } })
+        return pfAxios.get('api/v1/team/exist', { params: { teamName } })
             .then((res) => res.data.result.isExist);
     });
 }
@@ -320,7 +320,7 @@ exports.teamExist = teamExist;
 function publishBlock(params) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.post('block/publish', params)
+        return pfAxios.post('api/v1/block/publish', params)
             .then((res) => res.data);
     });
 }
@@ -328,7 +328,7 @@ exports.publishBlock = publishBlock;
 function publishComponent(params) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.post('component/publish', params)
+        return pfAxios.post('api/v1/component/publish', params)
             .then((res) => res.data);
     });
 }
@@ -336,7 +336,7 @@ exports.publishComponent = publishComponent;
 function publishTemplate(params) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.post('template/publish', params)
+        return pfAxios.post('api/v1/template/publish', params)
             .then((res) => res.data);
     });
 }
@@ -344,7 +344,7 @@ exports.publishTemplate = publishTemplate;
 function recordMicroVersionURL(data, params, prefix) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios(prefix);
-        return pfAxios.post('app/addAppVersion', data, params)
+        return pfAxios.post('api/v1/app/addAppVersion', data, params)
             .then((res) => res.data);
     });
 }
@@ -352,7 +352,7 @@ exports.recordMicroVersionURL = recordMicroVersionURL;
 function recordMicroAppVersion(params) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.post('micro/app/version/create', params)
+        return pfAxios.post('api/v1/micro/app/version/create', params)
             .then((res) => res.data);
     });
 }
@@ -360,7 +360,7 @@ exports.recordMicroAppVersion = recordMicroAppVersion;
 function refreshMicroVersion(params) {
     return __awaiter(this, void 0, void 0, function* () {
         const pfAxios = yield getPlatformAxios();
-        return pfAxios.post('micro/relation/updateApp', params)
+        return pfAxios.post('api/v1/micro/relation/updateApp', params)
             .then((res) => res.data);
     });
 }
