@@ -75,14 +75,14 @@ export const upload = {
     async nos(files: string | FormFile | Array<string | FormFile>) {
         const formData = upload.getFormData(files);
         const pfAxios = await getPlatformAxios();
-        return pfAxios.post('nos/upload', formData, {
+        return pfAxios.post('api/v1/nos/upload', formData, {
             headers: formData.getHeaders(),
         }).then((res) => res.data);
     },
     async micro(files: string | FormFile | Array<string | FormFile>, prefix?: string) {
         const formData = upload.getFormData(files);
         const pfAxios = await getPlatformAxios(prefix);
-        return pfAxios.post('micro/upload', formData, {
+        return pfAxios.post('api/v1/micro/upload', formData, {
             headers: formData.getHeaders(),
         }).then((res) => res.data);
     },
@@ -90,7 +90,7 @@ export const upload = {
         const formData = upload.getFormData(files);
         formData.append('ui', framework);
         const pfAxios = await getPlatformAxios();
-        return pfAxios.post('framework/upload', formData, {
+        return pfAxios.post('api/v1/framework/upload', formData, {
             headers: formData.getHeaders(),
         }).then((res) => res.data);
     },
@@ -272,7 +272,7 @@ export function processOptions(options: MaterialOptions): ProcessedMaterialOptio
 
 export async function getTemplate(packageName: string): Promise<Template> {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.get('template/info', {
+    return pfAxios.get('api/v1/template/info', {
         params: {
             name: packageName,
         },
@@ -284,7 +284,7 @@ export async function getTemplate(packageName: string): Promise<Template> {
 
 export async function getBlock(packageName: string): Promise<Block> {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.get('block/info', {
+    return pfAxios.get('api/v1/block/info', {
         params: {
             name: packageName,
         },
@@ -299,7 +299,7 @@ export async function getBlock(packageName: string): Promise<Block> {
 
 export async function getBlocks(): Promise<Block[]> {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.get('block/list')
+    return pfAxios.get('api/v1/block/list')
         .then((res) => {
             const blocks = res.data.result.rows as Block[];
             blocks.forEach((block) => {
@@ -313,7 +313,7 @@ export async function getBlocks(): Promise<Block[]> {
 
 export async function getComponent(packageName: string): Promise<Component> {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.get('component/info', {
+    return pfAxios.get('api/v1/component/info', {
         params: {
             name: packageName,
         },
@@ -328,7 +328,7 @@ export async function getComponent(packageName: string): Promise<Component> {
 
 export async function getComponents(): Promise<Component[]> {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.get('component/list')
+    return pfAxios.get('api/v1/component/list')
         .then((res) => {
             const components = res.data.result.rows as Component[];
             components.forEach((component) => {
@@ -342,43 +342,43 @@ export async function getComponents(): Promise<Component[]> {
 
 export async function teamExist(teamName: string) {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.get('team/exist', { params: { teamName } })
+    return pfAxios.get('api/v1/team/exist', { params: { teamName } })
         .then((res) => res.data.result.isExist);
 }
 
 export async function publishBlock(params: object) {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.post('block/publish', params)
+    return pfAxios.post('api/v1/block/publish', params)
         .then((res) => res.data);
 }
 
 export async function publishComponent(params: object) {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.post('component/publish', params)
+    return pfAxios.post('api/v1/component/publish', params)
         .then((res) => res.data);
 }
 
 export async function publishTemplate(params: object) {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.post('template/publish', params)
+    return pfAxios.post('api/v1/template/publish', params)
         .then((res) => res.data);
 }
 
 export async function recordMicroVersionURL(data: object, params: object, prefix?: string) {
     const pfAxios = await getPlatformAxios(prefix);
-    return pfAxios.post('app/addAppVersion', data, params)
+    return pfAxios.post('api/v1/app/addAppVersion', data, params)
         .then((res) => res.data);
 }
 
 export async function recordMicroAppVersion(params: object) {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.post('micro/app/version/create', params)
+    return pfAxios.post('api/v1/micro/app/version/create', params)
         .then((res) => res.data);
 }
 
 export async function refreshMicroVersion(params: object) {
     const pfAxios = await getPlatformAxios();
-    return pfAxios.post('micro/relation/updateApp', params)
+    return pfAxios.post('api/v1/micro/relation/updateApp', params)
         .then((res) => res.data);
 }
 
