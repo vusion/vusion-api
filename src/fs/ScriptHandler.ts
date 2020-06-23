@@ -75,8 +75,7 @@ export class DeclarationHandler {
 
     constructor(
         public node: babel.types.Node,
-        // public parent: babel.types.Node,
-        // public key: string,
+        public parent?: babel.types.Node,
     ) {
         this.resetState();
     }
@@ -207,7 +206,7 @@ export class DeclarationHandler {
             return property.type === 'ObjectProperty' && property.key.type === 'Identifier' && property.key.name === key;
         }) as babel.types.ObjectProperty;
 
-        return objectProperty && new DeclarationHandler(objectProperty.value);
+        return objectProperty && new DeclarationHandler(objectProperty.value, objectProperty);
     }
 
     getMethod(key: string) {
@@ -299,6 +298,24 @@ export class ImportsHandler {
     }
 }
 
+export class ExportsHandler {
+    constructor(public body: babel.types.Statement[]) {}
+
+    lastIndex() {
+        let i;
+        for (i = this.body.length - 1; i >= 0; i--) {
+            const node = this.body[i];
+            if (node.type === 'ExportNamedDeclaration' || node.type === 'ExportAllDeclaration')
+                break;
+        }
+        return i;
+    }
+
+    last() {
+        return this.body[this.lastIndex()];
+    }
+}
+
 /**
  * 没有处理析构的情形
  */
@@ -317,7 +334,7 @@ export class StatementHandler {
 
     get(identifier: string) {
         const declarator = this.declarators.find((declarator) => (declarator.id as babel.types.Identifier).name === identifier);
-        return declarator && new DeclarationHandler(declarator.init);
+        return declarator && new DeclarationHandler(declarator.init, declarator);
     }
 
     return(value?: string) {
@@ -415,6 +432,13 @@ class ScriptHandler {
         return new ImportsHandler(this.ast.program.body);
     }
 
+    /**
+     * 用于在全部的 export 集合中处理查找、删除等操作
+     */
+    exports() {
+        return new ExportsHandler(this.ast.program.body);
+    }
+
     export(specifier?: string | { [imported: string]: string }) {
         if (typeof specifier === 'object') {
             const insideString = Object.keys(specifier).map((imported) => {
@@ -498,7 +522,7 @@ class ScriptHandler {
         let result: DeclarationHandler;
         babel.traverse(this.ast, {
             ExportDefaultDeclaration(nodeInfo) {
-                result = new DeclarationHandler(nodeInfo.node.declaration);
+                result = new DeclarationHandler(nodeInfo.node.declaration, nodeInfo.node);
             },
         });
         return result;

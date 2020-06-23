@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StatementHandler = exports.ImportsHandler = exports.FromsHandler = exports.DeclarationHandler = exports.ORDER_IN_COMPONENTS_MAP = exports.ORDER_IN_COMPONENTS = exports.LIFECYCLE_HOOKS = exports.SIMPLIFIED_NODE_TYPE = void 0;
+exports.StatementHandler = exports.ExportsHandler = exports.ImportsHandler = exports.FromsHandler = exports.DeclarationHandler = exports.ORDER_IN_COMPONENTS_MAP = exports.ORDER_IN_COMPONENTS = exports.LIFECYCLE_HOOKS = exports.SIMPLIFIED_NODE_TYPE = void 0;
 const babel = require("@babel/core");
 const generator_1 = require("@babel/generator");
 const shared_1 = require("../utils/shared");
@@ -68,8 +68,9 @@ exports.ORDER_IN_COMPONENTS.forEach((key, index) => {
         exports.ORDER_IN_COMPONENTS_MAP[key] = index;
 });
 class DeclarationHandler {
-    constructor(node) {
+    constructor(node, parent) {
         this.node = node;
+        this.parent = parent;
         this.resetState();
     }
     resetState() {
@@ -178,7 +179,7 @@ class DeclarationHandler {
         const objectProperty = this.node.properties.find((property, index) => {
             return property.type === 'ObjectProperty' && property.key.type === 'Identifier' && property.key.name === key;
         });
-        return objectProperty && new DeclarationHandler(objectProperty.value);
+        return objectProperty && new DeclarationHandler(objectProperty.value, objectProperty);
     }
     getMethod(key) {
         if (this.node.type !== 'ObjectExpression')
@@ -256,6 +257,24 @@ class ImportsHandler {
     }
 }
 exports.ImportsHandler = ImportsHandler;
+class ExportsHandler {
+    constructor(body) {
+        this.body = body;
+    }
+    lastIndex() {
+        let i;
+        for (i = this.body.length - 1; i >= 0; i--) {
+            const node = this.body[i];
+            if (node.type === 'ExportNamedDeclaration' || node.type === 'ExportAllDeclaration')
+                break;
+        }
+        return i;
+    }
+    last() {
+        return this.body[this.lastIndex()];
+    }
+}
+exports.ExportsHandler = ExportsHandler;
 /**
  * 没有处理析构的情形
  */
@@ -273,7 +292,7 @@ class StatementHandler {
     }
     get(identifier) {
         const declarator = this.declarators.find((declarator) => declarator.id.name === identifier);
-        return declarator && new DeclarationHandler(declarator.init);
+        return declarator && new DeclarationHandler(declarator.init, declarator);
     }
     return(value) {
         let result = this.body.find((node) => node.type === 'ReturnStatement');
@@ -354,6 +373,12 @@ class ScriptHandler {
      */
     imports() {
         return new ImportsHandler(this.ast.program.body);
+    }
+    /**
+     * 用于在全部的 export 集合中处理查找、删除等操作
+     */
+    exports() {
+        return new ExportsHandler(this.ast.program.body);
     }
     export(specifier) {
         if (typeof specifier === 'object') {
@@ -436,7 +461,7 @@ class ScriptHandler {
         let result;
         babel.traverse(this.ast, {
             ExportDefaultDeclaration(nodeInfo) {
-                result = new DeclarationHandler(nodeInfo.node.declaration);
+                result = new DeclarationHandler(nodeInfo.node.declaration, nodeInfo.node);
             },
         });
         return result;
