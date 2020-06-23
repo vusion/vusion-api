@@ -50,5 +50,5 @@ describe('transform', () => {
     it('should check transform correctly - extra-blocks/single', async () => {
         const vueFile = new VueFile('extra-blocks/single.vue');
         expect(vueFile.checkTransform()).to.be.true;
-    });
+    });    
 });

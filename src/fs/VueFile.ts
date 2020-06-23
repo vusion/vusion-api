@@ -16,6 +16,7 @@ import ExamplesHandler from './ExamplesHandler';
 import traverse from '@babel/traverse';
 import PackageJSON from '../types/PackageJSON';
 import { FileExistsError } from './fs';
+import { connect } from 'http2';
 
 const fetchPartialContent = (content: string, tag: string, attrs: string = '') => {
     const reg = new RegExp(`<${tag}${attrs ? ' ' + attrs : ''}.*?>([\\s\\S]+)<\\/${tag}>`);
@@ -97,6 +98,10 @@ export default class VueFile extends FSEntry {
      * 是否为子组件
      */
     isChild: boolean;
+    /**
+     * 是否为完全分解的形式
+     */
+    isComposed: boolean;
 
     /**
      * 单文件读取的内容，或者 generate() 后的内容
@@ -154,6 +159,7 @@ export default class VueFile extends FSEntry {
             throw new Error('Not a vue file: ' + fullPath);
         super(fullPath, undefined);
         this.isVue = true;
+        this.isComposed = true;
         this.tagName = VueFile.resolveTagName(fullPath);
         this.componentName = kebab2Camel(this.tagName);
     }
@@ -168,9 +174,10 @@ export default class VueFile extends FSEntry {
             return;
         const stats = fs.statSync(this.fullPath);
         this.isDirectory = stats.isDirectory();
-        if (this.isDirectory)
+        if (this.isDirectory) {
             await this.loadDirectory();
-        else {
+            this.isComposed = fs.existsSync(path.join(this.fullPath, 'index.vue'));
+        } else {
             this.subfiles = [];
             this.children = [];
         }
@@ -219,7 +226,7 @@ export default class VueFile extends FSEntry {
         this.subfiles = await fs.readdir(this.fullPath);
 
         this.subfiles.forEach((name) => {
-            if (!name.endsWith('.vue'))
+            if (!name.endsWith('.vue') || name === 'index.vue')
                 return;
 
             const fullPath = path.join(this.fullPath, name);
@@ -298,12 +305,14 @@ export default class VueFile extends FSEntry {
 
         if (!this.isDirectory)
             return this.content = await fs.readFile(this.fullPath, 'utf8');
+        else if (this.isComposed)
+            return this.content = await fs.readFile(path.join(this.fullPath, 'index.vue'), 'utf8');
     }
 
     async loadScript() {
         await this.preload();
 
-        if (this.isDirectory) {
+        if (this.isDirectory && !this.isComposed) {
             if (fs.existsSync(path.join(this.fullPath, 'index.js')))
                 return this.script = await fs.readFile(path.join(this.fullPath, 'index.js'), 'utf8');
             else
@@ -316,7 +325,7 @@ export default class VueFile extends FSEntry {
     async loadTemplate() {
         await this.preload();
 
-        if (this.isDirectory) {
+        if (this.isDirectory && !this.isComposed) {
             if (fs.existsSync(path.join(this.fullPath, 'index.html')))
                 return this.template = await fs.readFile(path.join(this.fullPath, 'index.html'), 'utf8');
         } else {
@@ -327,7 +336,7 @@ export default class VueFile extends FSEntry {
     async loadStyle() {
         await this.preload();
 
-        if (this.isDirectory) {
+        if (this.isDirectory && !this.isComposed) {
             if (fs.existsSync(path.join(this.fullPath, 'module.css')))
                 return this.style = await fs.readFile(path.join(this.fullPath, 'module.css'), 'utf8');
         } else {
@@ -522,6 +531,7 @@ export default class VueFile extends FSEntry {
         vueFile.title = this.title;
         vueFile.isDirectory = this.isDirectory;
         vueFile.isVue = this.isVue;
+        vueFile.isComposed = this.isComposed;
         vueFile.isOpen = this.isOpen;
         vueFile.isSaving = this.isSaving;
         vueFile.tagName = this.tagName;
@@ -559,14 +569,19 @@ export default class VueFile extends FSEntry {
         if (this.isDirectory) {
             fs.ensureDirSync(this.fullPath);
 
-            const promises = [];
-            this.template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), this.template));
-            this.script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), this.script));
-            this.style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), this.style));
-            if (this.package && typeof this.package === 'object')
-                promises.push(fs.writeFile(path.resolve(this.fullPath, 'package.json'), JSON.stringify(this.package, null, 2) + '\n'));
+            if (this.isComposed)
+                await fs.writeFile(path.join(this.fullPath, 'index.vue'), this.content);
+            else {
+                const promises = [];
 
-            await Promise.all(promises);
+                this.template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), this.template));
+                this.script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), this.script));
+                this.style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), this.style));
+                if (this.package && typeof this.package === 'object')
+                    promises.push(fs.writeFile(path.resolve(this.fullPath, 'package.json'), JSON.stringify(this.package, null, 2) + '\n'));
+    
+                await Promise.all(promises);
+            }
         } else {
             await fs.writeFile(this.fullPath, this.content);
         }
@@ -606,6 +621,7 @@ export default class VueFile extends FSEntry {
         // vueFile.title = this.title;
         vueFile.isDirectory = isDirectory === undefined ? this.isDirectory : isDirectory;
         vueFile.isVue = this.isVue;
+        vueFile.isComposed = this.isComposed;
         vueFile.isOpen = this.isOpen;
         vueFile.isSaving = this.isSaving;
         // vueFile.tagName = this.tagName;
@@ -719,6 +735,73 @@ export default class VueFile extends FSEntry {
         this.isDirectory = !this.isDirectory;
     }
 
+    transformExportStyle() {
+        this.parseScript();
+        const exportDefault = this.$js.export().default();
+        if (exportDefault.is('id')) {
+            const name = (exportDefault.node as babel.types.Identifier).name;
+            // const object = this.$js.variables().get(name);
+            
+            const body = this.$js.variables().body;
+            let object: babel.types.ObjectExpression;
+            const index = body.findIndex((node) => {
+                if (node.type !== 'ExportNamedDeclaration')
+                    return false;
+                
+                if (node.declaration.type === 'VariableDeclaration') {
+                    let declarator = node.declaration.declarations.find((declarator: babel.types.VariableDeclarator) => (declarator.id as babel.types.Identifier).name === name);
+                    if (declarator) {
+                        object = declarator.init;
+                        return true;
+                    }
+                }
+            });
+            if (!~index)
+                return;
+            Object.assign(exportDefault.node, object);
+
+            for (let i = body.length - 1; i >= 0; i--) {
+                const node = body[i];
+                if (node.type === 'ExportNamedDeclaration' || node.type === 'ExportAllDeclaration') {
+                    body.splice(i, 1);
+                    i++;
+                }
+            }
+        }
+    }
+
+    /**
+     * 只验证将分解式转换为合并式
+     * 不打算支持逆向了
+     */
+    transformDecomposed() {
+        if (this.isComposed)
+            return;
+
+        shell.rm('-rf', path.join(this.fullPath, 'index.js'));
+        shell.rm('-rf', path.join(this.fullPath, 'index.html'));
+        shell.rm('-rf', path.join(this.fullPath, 'module.css'));
+
+        this.transformExportStyle();
+
+        if (this.children.length) {
+            const content = [];
+            content.push(`import ${this.componentName} from './index.vue';`);
+            this.children.forEach((child) => content.push(`import ${child.componentName} from './${child.fileName}';`));
+            content.push('');
+            content.push('export {');
+            content.push(`    ${this.componentName},`);
+            this.children.forEach((child) => content.push(`    ${child.componentName},`));
+            content.push('};');
+            content.push('');
+            content.push(`export default ${this.componentName};`);
+
+            fs.writeFileSync(path.join(this.fullPath, 'index.js'), content.join('\n') + '\n');
+        }
+
+        this.isComposed = true;
+    }
+
     /**
      * 与另一个 Vue 文件合并模板、逻辑和样式
      * 两个 VueFile 必须先 parseAll()
@@ -742,6 +825,7 @@ export default class VueFile extends FSEntry {
     extend(mode: VueFileExtendMode, fullPath: string, fromPath: string) {
         const vueFile = new VueFile(fullPath);
         vueFile.isDirectory = true;
+        vueFile.isComposed = true;
 
         // JS
         const tempComponentName = this.componentName.replace(/^[A-Z]/, 'O');
@@ -834,6 +918,7 @@ export default ${vueFile.componentName};
         const vueFile = new VueFile('temp.vue');
         vueFile.isOpen = true;
         vueFile.isDirectory = false;
+        vueFile.isComposed = true;
         vueFile.subfiles = [];
         vueFile.children = [];
         vueFile.content = code;
