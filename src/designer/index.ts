@@ -969,3 +969,34 @@ export async function loadCustomComponentsData(rootPath: string, parseTypes: Par
     const datas = await Promise.all(tasks);
     return datas;
 }
+
+export async function addAuthCache(name: string, filePath: string) {
+    await fs.ensureFile(filePath);
+
+    let json: any = {};
+    try {
+        json = JSON.parse(await fs.readFile(filePath, 'utf8'));
+    } catch(e) {}
+
+    json[name] = true;
+    await fs.writeFile(filePath, JSON.stringify(json, null, 4));
+}
+
+export async function removeAuthCache(name: string, filePath: string) {
+    await fs.ensureFile(filePath);
+
+    let json: any = {};
+    try {
+        json = JSON.parse(await fs.readFile(filePath, 'utf8'));
+    } catch(e) {}
+
+    delete json[name];
+    await fs.writeFile(filePath, JSON.stringify(json, null, 4));
+}
+export async function loadAuthCache(filePath: string) {
+    try {
+        return JSON.parse(await fs.readFile(filePath, 'utf8'));
+    } catch(e) {
+        return {};
+    }
+}

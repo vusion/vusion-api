@@ -72,9 +72,9 @@ class TemplateHandler {
                 return '';
             const value = el.attrsMap[key];
             if (value === '') {
-                const attr = el.rawAttrsMap[key];
-                if (attr && attr.end - attr.start === key.length)
-                    return key;
+                // const attr = (el as any).rawAttrsMap[key];
+                // if (attr && attr.end - attr.start === key.length)
+                return key;
             }
             return `${key}="${value}"`;
         });
