@@ -732,7 +732,7 @@ export async function loadExternalLibrary(fullPath: string, parseTypes: ParseTyp
  * 获取服务信息
  */
 export async function loadServices(modulePath: string) {
-     const servicesPath = path.join(modulePath, 'services');
+     const servicesPath = path.join(modulePath, 'global', 'services');
      if (!fs.existsSync(servicesPath)) {
         return [];
      }
@@ -755,13 +755,13 @@ export async function loadServices(modulePath: string) {
  */
 export async function addOrRenameService(fullPath: string, newName: string, name: string) {
     if (!name) {
-        const dir = path.join(fullPath, 'services', newName);
+        const dir = path.join(fullPath, 'global', 'services', newName);
         let tplPath = path.resolve(__dirname, '../../templates/service');
         await fs.copy(tplPath, dir);
         return path.join(dir, 'api.json');
     } else {
-        const oldPath = path.join(fullPath, 'services', name);
-        const newPath = path.join(fullPath, 'services', newName);
+        const oldPath = path.join(fullPath, 'global', 'services', name);
+        const newPath = path.join(fullPath, 'global', 'services', newName);
         await fs.rename(oldPath, newPath);
         return path.join(newPath, 'api.json');
     }
