@@ -169,8 +169,8 @@ export interface MaterialSource {
 
 export interface MaterialOptions {
     /**
-     * file: ./templates/moduleA
-     * file: /Users/alice/templates/moduleA
+     * file: ./templates/componentA
+     * file: /Users/alice/templates/componentA
      * npm: s-basic-form
      * npm: s-basic-form.vue
      * npm: s-basic-form.vue@0.3.2
@@ -190,8 +190,8 @@ export interface MaterialOptions {
 
 export interface ProcessedMaterialOptions {
     /**
-     * file: ./templates/moduleA
-     * file: /Users/alice/templates/moduleA
+     * file: ./templates/componentA
+     * file: /Users/alice/templates/componentA
      * npm: s-basic-form
      * npm: s-basic-form.vue
      * npm: s-basic-form.vue@0.3.2
@@ -594,203 +594,4 @@ export async function createMultiFileWithSubdocs(dir: string, componentName?: st
     });
 
     return dest;
-}
-
-/**
- * @deprecated
- * 从业务模板中添加模块
- */
-export async function addModule(options: MaterialOptions) {
-    const opts = processOptions(options);
-
-    const moduleCacheDir = getCacheDir('modules');
-    await fs.emptyDir(moduleCacheDir);
-    if (opts.source.type === 'file') {
-        const temp = path.resolve(moduleCacheDir, opts.source.fileName + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
-        const dest = path.resolve(opts.target, opts.name);
-
-        // 先在临时文件地方处理掉，防止 Webpack 加载多次
-        await fs.copy(path.resolve(opts.source.path), temp);
-        await formatTemplate(moduleCacheDir, {
-            name: opts.name,
-            camelName: utils.kebab2Camel(opts.name),
-            title: opts.title,
-        });
-        await fs.move(temp, dest);
-
-        // 修改 modules.order 配置
-        const modulesOrderPath = path.resolve(opts.target, 'modules.order.js');
-        if (fs.existsSync(modulesOrderPath)) {
-            const jsFile = new vfs.JSFile(modulesOrderPath);
-            await jsFile.open();
-            jsFile.parse();
-
-            let changed = false;
-            babel.traverse(jsFile.handler.ast, {
-                ExportDefaultDeclaration(nodeInfo) {
-                    const declaration = nodeInfo.node.declaration;
-                    if (declaration && declaration.type === 'ArrayExpression') {
-                        const element = Object.assign(
-                            babel.types.stringLiteral(opts.name),
-                            { raw: `'${opts.name}'` },
-                        );
-                        declaration.elements.push(element);
-                        changed = true;
-                    }
-                }
-            });
-
-            if (changed)
-                await jsFile.save();
-        }
-    }
-}
-
-/**
- * @deprecated
- * @param options
- */
-export async function removeModule(options: MaterialOptions) {
-    const dest = path.resolve(options.target, options.name);
-    await fs.remove(dest);
-
-    // 修改 modules.order 配置
-    const modulesOrderPath = path.resolve(options.target, 'modules.order.js');
-    if (fs.existsSync(modulesOrderPath)) {
-        const jsFile = new vfs.JSFile(modulesOrderPath);
-        await jsFile.open();
-        jsFile.parse();
-
-        let changed = false;
-        babel.traverse(jsFile.handler.ast, {
-            ExportDefaultDeclaration(nodeInfo) {
-                const declaration = nodeInfo.node.declaration;
-                if (declaration && declaration.type === 'ArrayExpression') {
-                    for (let i = 0; i < declaration.elements.length; i++) {
-                        const element = declaration.elements[i];
-                        if (element.type === 'StringLiteral' && element.value === options.name) {
-                            declaration.elements.splice(i, 1);
-                            changed = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        });
-
-        await jsFile.save();
-    }
-}
-
-/**
- * @deprecated
- */
-export async function addLeafView(parent: vfs.View, name: string, title: string, ext: string = '.vue') {
-    return designer.addLeafView(parent, { name, title, ext });
-}
-
-/**
- * @deprecated
- */
-export async function addLeafViewFromBlock(source: MaterialSource, parent: vfs.View, name: string, title: string) {
-    // parent view 必然是个目录
-    const dest = vfs.handleSame(path.join(parent.fullPath, parent.viewsPath), name);
-
-    const blockCacheDir = getCacheDir('blocks');
-    const tempPath = await download.npm({
-        registry: source.registry,
-        name: source.name,
-    }, blockCacheDir);
-
-    await fs.copy(tempPath, dest);
-    await fs.remove(path.join(dest, 'public'));
-    await fs.remove(path.join(dest, 'screenshots'));
-    await fs.remove(path.join(dest, 'package.json'));
-    await fs.remove(path.join(dest, 'README.md'));
-
-    const vueFile = new vfs.VueFile(dest);
-    await vueFile.preOpen();
-
-    if (vueFile.checkTransform() === true) {
-        await vueFile.open();
-        vueFile.transform();
-        await vueFile.save();
-    }
-
-    // 目前只支持在 module 层添加路由
-    let module = parent;
-    while (module && module.viewType !== vfs.ViewType.module)
-        module = module.parent;
-    if (!module)
-        return;
-    await designer.addLeafViewRoute(parent, module, { name, title });
-    return dest;
-}
-
-export async function addBranchView(parent: vfs.View, name: string, title: string, ext: string = '.vue') {
-    return designer.addBranchView(parent, { name, title, ext });
-}
-
-/**
- * @deprecated
- */
-export async function addBranchViewFromBlock(source: MaterialSource, parent: vfs.View, name: string, title: string) {
-    // parent view 必然是个目录
-    const dir = path.join(parent.fullPath, parent.viewsPath, name);
-
-    const tplPath = path.resolve(__dirname, '../../templates/branch-view');
-    await fs.copy(tplPath, dir);
-
-    const dest = path.join(dir, 'index.vue');
-    const blockCacheDir = getCacheDir('blocks');
-    const tempPath = await download.npm({
-        registry: source.registry,
-        name: source.name,
-    }, blockCacheDir);
-
-    await fs.remove(dest);
-    await fs.copy(tempPath, dest);
-    await fs.remove(path.join(dest, 'public'));
-    await fs.remove(path.join(dest, 'screenshots'));
-    await fs.remove(path.join(dest, 'package.json'));
-    await fs.remove(path.join(dest, 'README.md'));
-
-    const vueFile = new vfs.VueFile(dest);
-    await vueFile.preOpen();
-
-    if (vueFile.checkTransform() === true) {
-        await vueFile.open();
-        vueFile.transform();
-        await vueFile.save();
-    }
-
-    // 目前只支持在 module 层添加路由
-    let module = parent;
-    while (module && module.viewType !== vfs.ViewType.module)
-        module = module.parent;
-    if (!module)
-        return;
-    await designer.addBranchViewRoute(parent, module, { name, title });
-    return dest;
-}
-
-/**
- * @deprecated
- */
-export async function addBranchWrapper(parent: vfs.View, name: string, title: string) {
-    // 目前只支持在 module 层添加路由
-    let module = parent;
-    while (module && module.viewType !== vfs.ViewType.module)
-        module = module.parent;
-    if (!module)
-        return;
-
-    return designer.addBranchWrapper(parent, module, { name, title });
-}
-
-/**
- * @deprecated
- */
-export async function removeLeafView(view: vfs.View) {
-    return designer.removeView(view);
 }

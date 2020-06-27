@@ -110,7 +110,7 @@ class EntryMetaData {
             return data;
         });
     }
-    saveMetaData(viewInfo, params, moduleInfo) {
+    saveMetaData(viewInfo, params) {
         return __awaiter(this, void 0, void 0, function* () {
             const fullPath = viewInfo.fullPath;
             const index = fullPath.indexOf('src');
@@ -124,50 +124,13 @@ class EntryMetaData {
         });
     }
 }
-class ModuleMetaData {
-    getMetaData(viewInfo) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const fullPath = viewInfo.fullPath;
-            const baseJSPath = path.join(fullPath, 'module', 'base.js');
-            const data = {
-                title: '',
-                meta: {},
-            };
-            if (fs.existsSync(baseJSPath)) {
-                let baseJS = utils.JS.parse(yield fs.readFile(baseJSPath, 'utf8'));
-                if (baseJS) {
-                    data.title = baseJS.title;
-                    Object.assign(data.meta, baseJS);
-                }
-            }
-            return data;
-        });
-    }
-    saveMetaData(viewInfo, params, moduleInfo) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const fullPath = viewInfo.fullPath;
-            const baseJSPath = path.join(fullPath, 'module', 'base.js');
-            let baseJS = {};
-            if (fs.existsSync(baseJSPath))
-                baseJS = utils.JS.parse(yield fs.readFile(baseJSPath, 'utf8')) || {};
-            Object.assign(baseJS, params);
-            if (params.title) {
-                if (baseJS.sidebar)
-                    baseJS.sidebar.title = params.title;
-                if (baseJS.navbar)
-                    baseJS.navbar.title = params.title;
-            }
-            return fs.writeFile(baseJSPath, 'export default ' + utils.JS.stringify(baseJS, null, 4));
-        });
-    }
-}
 class PageMetaData {
-    getMetaData(viewInfo, moduleInfo) {
+    getMetaData(viewInfo, baseViewInfo) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!moduleInfo)
+            if (!baseViewInfo)
                 return {};
-            const modulePath = moduleInfo.fullPath;
-            const routePath = path.join(modulePath, 'routes.map.js');
+            const baseViewPath = baseViewInfo.fullPath;
+            const routePath = path.join(baseViewPath, 'routes.map.js');
             const data = {
                 title: '',
                 first: false,
@@ -175,7 +138,7 @@ class PageMetaData {
             };
             if (fs.existsSync(routePath)) {
                 let routeJSON = utils.JS.parse(yield fs.readFile(routePath, 'utf8'));
-                let currentPath = viewInfo.routePath.replace(moduleInfo.routePath, '').replace(/\/$/, '');
+                let currentPath = viewInfo.routePath.replace(baseViewInfo.routePath, '').replace(/\/$/, '');
                 if (routeJSON[currentPath]) {
                     data.meta = routeJSON[currentPath].meta;
                     data.title = data.meta && routeJSON[currentPath].meta.title;
@@ -184,12 +147,12 @@ class PageMetaData {
             return data;
         });
     }
-    saveMetaData(viewInfo, params, moduleInfo) {
+    saveMetaData(viewInfo, params, baseViewInfo) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!moduleInfo)
+            if (!baseViewInfo)
                 return {};
-            const modulePath = moduleInfo.fullPath;
-            const routePath = path.join(modulePath, 'routes.map.js');
+            const baseViewPath = baseViewInfo.fullPath;
+            const routePath = path.join(baseViewPath, 'routes.map.js');
             const data = {
                 title: params.title,
                 first: false,
@@ -198,7 +161,7 @@ class PageMetaData {
             let routeJSON = {};
             if (fs.existsSync(routePath))
                 routeJSON = utils.JS.parse(yield fs.readFile(routePath, 'utf8'));
-            let currentPath = viewInfo.routePath.replace(moduleInfo.routePath, '').replace(/\/$/, '');
+            let currentPath = viewInfo.routePath.replace(baseViewInfo.routePath, '').replace(/\/$/, '');
             if (!routeJSON[currentPath])
                 routeJSON[currentPath] = {};
             routeJSON[currentPath].meta = Object.assign(routeJSON[currentPath].meta || {});
@@ -208,7 +171,7 @@ class PageMetaData {
         });
     }
 }
-function getMetaData(viewInfo, moduleInfo) {
+function getMetaData(viewInfo, baseViewInfo) {
     return __awaiter(this, void 0, void 0, function* () {
         let instance;
         let meta = {};
@@ -216,31 +179,24 @@ function getMetaData(viewInfo, moduleInfo) {
             instance = new EntryMetaData();
             meta = yield instance.getMetaData(viewInfo);
         }
-        else if (viewInfo.viewType === 'module') {
-            instance = new ModuleMetaData();
-            meta = yield instance.getMetaData(viewInfo);
-        }
         else if (viewInfo.viewType === 'branch' || viewInfo.viewType === 'vue') {
             instance = new PageMetaData();
-            meta = yield instance.getMetaData(viewInfo, moduleInfo);
+            meta = yield instance.getMetaData(viewInfo, baseViewInfo);
         }
         Object.assign(viewInfo, meta);
         return viewInfo;
     });
 }
-function saveMetaData(viewInfo, params, moduleInfo) {
+function saveMetaData(viewInfo, params, baseViewInfo) {
     return __awaiter(this, void 0, void 0, function* () {
         let instance;
         if (viewInfo.viewType === 'entry') {
             instance = new EntryMetaData();
         }
-        else if (viewInfo.viewType === 'module') {
-            instance = new ModuleMetaData();
-        }
         else if (viewInfo.viewType === 'branch' || viewInfo.viewType === 'vue') {
             instance = new PageMetaData();
         }
-        return instance.saveMetaData(viewInfo, params, moduleInfo);
+        return instance.saveMetaData(viewInfo, params, baseViewInfo);
     });
 }
 exports.saveMetaData = saveMetaData;
@@ -248,13 +204,13 @@ exports.saveMetaData = saveMetaData;
  * 获取页面列表
  * @param viewInfo 父页面的信息
  */
-function loadViews(viewInfo, moduleInfo) {
+function loadViews(viewInfo, baseViewInfo) {
     return __awaiter(this, void 0, void 0, function* () {
         const view = viewInfo instanceof vfs.View ? viewInfo : yield initView(viewInfo);
         yield view.open();
         yield Promise.all(view.children.map((child) => __awaiter(this, void 0, void 0, function* () {
             yield child.preOpen();
-            return yield getMetaData(child, moduleInfo);
+            return yield getMetaData(child, baseViewInfo);
         })));
         return view.children;
     });
@@ -368,15 +324,16 @@ function findRouteObjectAndParentArray(objectExpression, relativePath, createChi
     }
 }
 exports.findRouteObjectAndParentArray = findRouteObjectAndParentArray;
-function addLeafViewRoute(parent, module, params) {
+function addLeafViewRoute(parent, baseView, params) {
     return __awaiter(this, void 0, void 0, function* () {
-        const routesPath = path.join(module.fullPath, 'routes.js');
-        if (!fs.existsSync(routesPath))
+        const routesPath = path.join(baseView.fullPath, 'routes.js');
+        const routesMapPath = path.join(baseView.fullPath, 'routes.map.js');
+        if (!fs.existsSync(routesPath) || fs.existsSync(routesMapPath))
             return;
         const jsFile = new vfs.JSFile(routesPath);
         yield jsFile.open();
         const $js = jsFile.parse();
-        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, params.name + params.ext)).replace(/\\/g, '/');
+        const relativePath = path.relative(baseView.fullPath, path.join(parent.fullPath, parent.viewsPath, params.name + params.ext)).replace(/\\/g, '/');
         let changed = false;
         const exportDefault = $js.export().default();
         if (exportDefault.is('object')) {
@@ -384,7 +341,7 @@ function addLeafViewRoute(parent, module, params) {
             if (parentArray && !routeObject) {
                 const tpl = babel.parse(`[{
                 path: '${params.name}',
-                component: () => import(/* webpackChunkName: '${module.baseName}' */ './${relativePath}'),
+                component: () => import(/* webpackChunkName: '${baseView.baseName}' */ './${relativePath}'),
                 ${params.title ? "meta: { title: '" + params.title + "' }," : ''}
             }]`, {
                     filename: 'file.js',
@@ -401,24 +358,24 @@ function addLeafViewRoute(parent, module, params) {
     });
 }
 exports.addLeafViewRoute = addLeafViewRoute;
-function addLeafView(parentInfo, moduleInfo, params) {
+function addLeafView(parentInfo, baseViewInfo, params) {
     return __awaiter(this, void 0, void 0, function* () {
         let parent;
-        let module;
+        let baseView;
         if (!params) {
             parent = parentInfo;
-            params = moduleInfo;
-            module = parent;
-            while (module && module.viewType !== vfs.ViewType.module)
-                module = module.parent;
-            if (!module)
+            params = baseViewInfo;
+            baseView = parent;
+            while (baseView && baseView.viewType !== vfs.ViewType.entry)
+                baseView = baseView.parent;
+            if (!baseView)
                 return;
         }
         else {
             parent = parentInfo instanceof vfs.View ? parentInfo : yield initView(parentInfo);
-            module = moduleInfo instanceof vfs.View ? moduleInfo : yield initView(moduleInfo);
+            baseView = baseViewInfo instanceof vfs.View ? baseViewInfo : yield initView(baseViewInfo);
             yield parent.preOpen();
-            yield module.preOpen();
+            yield baseView.preOpen();
         }
         params.ext = params.ext || '.vue';
         // parent view 必然是个目录
@@ -431,22 +388,23 @@ function addLeafView(parentInfo, moduleInfo, params) {
         yield fs.copy(tplPath, dest);
         if (params.layout)
             yield initLayout(dest, params.layout);
-        if (module)
-            yield addLeafViewRoute(parent, module, params);
+        if (baseView)
+            yield addLeafViewRoute(parent, baseView, params);
         return dest;
     });
 }
 exports.addLeafView = addLeafView;
-function addBranchViewRoute(parent, module, params) {
+function addBranchViewRoute(parent, baseView, params) {
     return __awaiter(this, void 0, void 0, function* () {
-        const routesPath = path.join(module.fullPath, 'routes.js');
-        if (!fs.existsSync(routesPath))
+        const routesPath = path.join(baseView.fullPath, 'routes.js');
+        const routesMapPath = path.join(baseView.fullPath, 'routes.map.js');
+        if (!fs.existsSync(routesPath) || fs.existsSync(routesMapPath))
             return;
         const jsFile = new vfs.JSFile(routesPath);
         yield jsFile.open();
         const $js = jsFile.parse();
         // 纯目录，不带 /index.vue 的
-        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, params.name)).replace(/\\/g, '/');
+        const relativePath = path.relative(baseView.fullPath, path.join(parent.fullPath, parent.viewsPath, params.name)).replace(/\\/g, '/');
         let changed = false;
         const exportDefault = $js.export().default();
         if (exportDefault.is('object')) {
@@ -454,7 +412,7 @@ function addBranchViewRoute(parent, module, params) {
             if (parentArray && !routeObject) {
                 const tpl = babel.parse(`[{
                 path: '${params.name}',
-                component: () => import(/* webpackChunkName: '${module.baseName}' */ './${relativePath + '/index' + params.ext}'),
+                component: () => import(/* webpackChunkName: '${baseView.baseName}' */ './${relativePath + '/index' + params.ext}'),
                 ${params.title ? "meta: { title: '" + params.title + "' }," : ''}
                 children: [],
             }]`, {
@@ -472,24 +430,24 @@ function addBranchViewRoute(parent, module, params) {
     });
 }
 exports.addBranchViewRoute = addBranchViewRoute;
-function addBranchView(parentInfo, moduleInfo, params) {
+function addBranchView(parentInfo, baseViewInfo, params) {
     return __awaiter(this, void 0, void 0, function* () {
         let parent;
-        let module;
+        let baseView;
         if (!params) {
             parent = parentInfo;
-            params = moduleInfo;
-            module = parent;
-            while (module && module.viewType !== vfs.ViewType.module)
-                module = module.parent;
-            if (!module)
+            params = baseViewInfo;
+            baseView = parent;
+            while (baseView && baseView.viewType !== vfs.ViewType.entry)
+                baseView = baseView.parent;
+            if (!baseView)
                 return;
         }
         else {
             parent = parentInfo instanceof vfs.View ? parentInfo : yield initView(parentInfo);
-            module = moduleInfo instanceof vfs.View ? moduleInfo : yield initView(moduleInfo);
+            baseView = baseViewInfo instanceof vfs.View ? baseViewInfo : yield initView(baseViewInfo);
             yield parent.preOpen();
-            yield module.preOpen();
+            yield baseView.preOpen();
         }
         params.ext = params.ext || '.vue';
         // parent view 必然是个目录
@@ -503,29 +461,29 @@ function addBranchView(parentInfo, moduleInfo, params) {
         const dest = path.join(dir, 'index' + params.ext);
         if (params.layout)
             yield initLayout(dest, params.layout);
-        yield addBranchViewRoute(parent, module, params);
+        yield addBranchViewRoute(parent, baseView, params);
         return dest;
     });
 }
 exports.addBranchView = addBranchView;
-function addBranchWrapper(parentInfo, moduleInfo, params) {
+function addBranchWrapper(parentInfo, baseViewInfo, params) {
     return __awaiter(this, void 0, void 0, function* () {
         let parent;
-        let module;
+        let baseView;
         if (!params) {
             parent = parentInfo;
-            params = moduleInfo;
-            module = parent;
-            while (module && module.viewType !== vfs.ViewType.module)
-                module = module.parent;
-            if (!module)
+            params = baseViewInfo;
+            baseView = parent;
+            while (baseView && baseView.viewType !== vfs.ViewType.entry)
+                baseView = baseView.parent;
+            if (!baseView)
                 return;
         }
         else {
             parent = parentInfo instanceof vfs.View ? parentInfo : yield initView(parentInfo);
-            module = moduleInfo instanceof vfs.View ? moduleInfo : yield initView(moduleInfo);
+            baseView = baseViewInfo instanceof vfs.View ? baseViewInfo : yield initView(baseViewInfo);
             yield parent.preOpen();
-            yield module.preOpen();
+            yield baseView.preOpen();
         }
         params.ext = params.ext || '.vue';
         // parent view 必然是个目录
@@ -535,8 +493,9 @@ function addBranchWrapper(parentInfo, moduleInfo, params) {
         let dest = path.join(dir, 'index.vue');
         yield fs.remove(dest);
         dest = path.dirname(dest);
-        const routesPath = path.join(module.fullPath, 'routes.js');
-        if (!fs.existsSync(routesPath))
+        const routesPath = path.join(baseView.fullPath, 'routes.js');
+        const routesMapPath = path.join(baseView.fullPath, 'routes.map.js');
+        if (!fs.existsSync(routesPath) || fs.existsSync(routesMapPath))
             return dest;
         const jsFile = new vfs.JSFile(routesPath);
         yield jsFile.open();
@@ -561,7 +520,7 @@ function addBranchWrapper(parentInfo, moduleInfo, params) {
             jsFile.handler.ast.program.body.unshift(importDeclaration);
         }
         // 纯目录，不带 /index.vue 的
-        const relativePath = path.relative(module.fullPath, path.join(parent.fullPath, parent.viewsPath, params.name)).replace(/\\/g, '/');
+        const relativePath = path.relative(baseView.fullPath, path.join(parent.fullPath, parent.viewsPath, params.name)).replace(/\\/g, '/');
         let changed = false;
         const exportDefault = $js.export().default();
         if (exportDefault.is('object')) {
@@ -587,32 +546,33 @@ function addBranchWrapper(parentInfo, moduleInfo, params) {
     });
 }
 exports.addBranchWrapper = addBranchWrapper;
-function removeView(viewInfo, moduleInfo) {
+function removeView(viewInfo, baseViewInfo) {
     return __awaiter(this, void 0, void 0, function* () {
         let view;
-        let module;
-        if (!moduleInfo) {
+        let baseView;
+        if (!baseViewInfo) {
             view = viewInfo;
-            module = view;
-            while (module && module.viewType !== vfs.ViewType.module)
-                module = module.parent;
-            if (!module)
+            baseView = view;
+            while (baseView && baseView.viewType !== vfs.ViewType.entry)
+                baseView = baseView.parent;
+            if (!baseView)
                 return;
         }
         else {
             view = viewInfo instanceof vfs.View ? viewInfo : yield initView(viewInfo);
-            module = moduleInfo instanceof vfs.View ? moduleInfo : yield initView(moduleInfo);
+            baseView = baseViewInfo instanceof vfs.View ? baseViewInfo : yield initView(baseViewInfo);
             yield view.preOpen();
-            yield module.preOpen();
+            yield baseView.preOpen();
         }
-        if (module) {
-            const routesPath = path.join(module.fullPath, 'routes.js');
-            if (!fs.existsSync(routesPath))
+        if (baseView) {
+            const routesPath = path.join(baseView.fullPath, 'routes.js');
+            const routesMapPath = path.join(baseView.fullPath, 'routes.map.js');
+            if (!fs.existsSync(routesPath) || fs.existsSync(routesMapPath))
                 return;
             const jsFile = new vfs.JSFile(routesPath);
             yield jsFile.open();
             const $js = jsFile.parse();
-            const relativePath = path.relative(module.fullPath, view.fullPath).replace(/\\/g, '/');
+            const relativePath = path.relative(baseView.fullPath, view.fullPath).replace(/\\/g, '/');
             let changed = false;
             const exportDefault = $js.export().default();
             if (exportDefault.is('object')) {
@@ -675,9 +635,9 @@ exports.loadExternalLibrary = loadExternalLibrary;
 /**
  * 获取服务信息
  */
-function loadServices(modulePath) {
+function loadServices(baseViewPath) {
     return __awaiter(this, void 0, void 0, function* () {
-        const servicesPath = path.join(modulePath, 'services');
+        const servicesPath = path.join(baseViewPath, 'services');
         if (!fs.existsSync(servicesPath)) {
             return [];
         }

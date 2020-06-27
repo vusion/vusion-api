@@ -55,7 +55,7 @@ class View extends FSEntry_1.default {
             if (this.viewType === ViewType.root) {
             }
             else if (this.viewType === ViewType.entry) {
-                this.vueFilePath = path.join(this.fullPath, 'layout/views', 'index.vue');
+                this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
             }
             else if (this.viewType === ViewType.module) {
                 this.vueFilePath = path.join(this.fullPath, this.viewsPath, 'index.vue');
@@ -132,7 +132,7 @@ class View extends FSEntry_1.default {
                     view.viewType = ViewType.md;
                 else if (this.viewType === ViewType.root)
                     view.viewType = ViewType.entry;
-                else if (this.viewType === ViewType.entry && fileNames.includes('modules.js'))
+                else if (this.viewType === ViewType.entry && fs.existsSync(path.join(fullPath, 'module/base.js')))
                     view.viewType = ViewType.module;
                 view.parent = this;
                 // view.isChild = true;
