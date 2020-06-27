@@ -1,7 +1,7 @@
 {
   "name": "vusion-api",
   "description": "Vusion Node.js API",
-  "version": "0.7.1",
+  "version": "0.7.10",
   "author": "Forrest <rainforest92@126.com>",
   "scripts": {
     "compile": "tsc -p ./",
