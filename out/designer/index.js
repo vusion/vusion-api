@@ -298,7 +298,8 @@ function findRouteObjectAndParentArray(objectExpression, relativePath, createChi
         throw new Error('Route path error. Cannot find route: ' + arr.join('/'));
     const ext = path.extname(arr[arr.length - 1]);
     const nextName = arr[pos].replace(/\.[^.]*?$/, '');
-    let childrenProperty = objectExpression.properties.find((property) => property.type === 'ObjectProperty' && property.key.name === 'children');
+    let childrenProperty = objectExpression.properties.find((property) => property.type === 'ObjectProperty'
+        && property.key.type === 'Identifier' && property.key.name === 'children');
     if (!childrenProperty) {
         if (createChildrenArrayIfNeeded) {
             childrenProperty = babel.types.objectProperty(babel.types.identifier('children'), babel.types.arrayExpression([]));
@@ -309,8 +310,12 @@ function findRouteObjectAndParentArray(objectExpression, relativePath, createChi
     }
     const arrayExpression = childrenProperty.value;
     const routeObject = arrayExpression.elements.find((element) => {
-        return ((element.type === 'ObjectExpression' && element.properties.some((property) => property.type === 'ObjectProperty' && property.key.name === 'path' && property.value.type === 'StringLiteral' && property.value.value === nextName))
-            || (element.type === 'ObjectExpression' && element.properties.some((property) => property.type === 'ObjectProperty' && property.key.name === 'component' && property.value.type === 'ArrowFunctionExpression'
+        return ((element.type === 'ObjectExpression' && element.properties.some((property) => property.type === 'ObjectProperty'
+            && property.key.type === 'Identifier' && property.key.name === 'path'
+            && property.value.type === 'StringLiteral' && property.value.value === nextName))
+            || (element.type === 'ObjectExpression' && element.properties.some((property) => property.type === 'ObjectProperty'
+                && property.key.type === 'Identifier' && property.key.name === 'component'
+                && property.value.type === 'ArrowFunctionExpression'
                 && property.value.body.arguments[0].value === './' + arr.slice(0, pos + 1).join('/') + (arr[pos].endsWith(ext) ? '' : '/index' + ext))));
     });
     if (pos === arr.length - 1) {
@@ -580,7 +585,9 @@ function removeView(viewInfo, baseViewInfo) {
                 if (routeObject) {
                     parentArray.elements.splice(parentArray.elements.indexOf(routeObject), 1);
                     // 判断是不是 LWrapper
-                    const LWrapper = routeObject.properties.find((property) => property.type === 'ObjectProperty' && property.key.name === 'component' && property.value.type === 'Identifier' && property.value.name === 'LWrapper');
+                    const LWrapper = routeObject.properties.find((property) => property.type === 'ObjectProperty'
+                        && property.key.type === 'Identifier' && property.key.name === 'component'
+                        && property.value.type === 'Identifier' && property.value.name === 'LWrapper');
                     if (LWrapper) {
                         let wrapperCount = 0;
                         String(jsFile.content).replace(/LWrapper/, () => String(wrapperCount++));
