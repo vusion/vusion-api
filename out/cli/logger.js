@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clearConsole = exports.error = exports.warn = exports.done = exports.info = exports.log = exports.events = void 0;
+exports.clearConsole = exports.error = exports.warn = exports.done = exports.info = exports.log = exports.event = void 0;
 const chalk_1 = require("chalk");
-const EventEmitter = require("events");
+const events = require("events");
 const readline = require("readline");
-exports.events = new EventEmitter();
+exports.event = new events.EventEmitter();
 function _log(type, tag, message) {
     if (process.env.VUSION_API_MODE && message) {
-        exports.events.emit('log', {
+        exports.event.emit('log', {
             message,
             type,
             tag,

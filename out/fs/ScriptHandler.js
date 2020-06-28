@@ -112,9 +112,9 @@ class DeclarationHandler {
         let pos;
         const after = this.state.after || [];
         let index = this.node.properties.findIndex((property, index) => {
-            if (property.type === 'ObjectProperty' && after.includes(property.key.name))
+            if (property.type === 'ObjectProperty' && property.key.type === 'Identifier' && after.includes(property.key.name))
                 pos = index;
-            return property.type === 'ObjectProperty' && property.key.name === key;
+            return property.type === 'ObjectProperty' && property.key.type === 'Identifier' && property.key.name === key;
         });
         if (pos === undefined)
             pos = this.node.properties.length;
@@ -155,9 +155,9 @@ class DeclarationHandler {
         let pos;
         const after = this.state.after || [];
         let index = this.node.properties.findIndex((property, index) => {
-            if ((property.type === 'ObjectProperty' || property.type === 'ObjectMethod') && after.includes(property.key.name))
+            if ((property.type === 'ObjectProperty' || property.type === 'ObjectMethod') && property.key.type === 'Identifier' && after.includes(property.key.name))
                 pos = index;
-            return (property.type === 'ObjectProperty' || property.type === 'ObjectMethod') && property.key.name === key;
+            return (property.type === 'ObjectProperty' || property.type === 'ObjectMethod') && property.key.type === 'Identifier' && property.key.name === key;
         });
         if (pos === undefined)
             pos = this.node.properties.length;
@@ -176,7 +176,7 @@ class DeclarationHandler {
         if (this.node.type !== 'ObjectExpression')
             throw new Error('get method can only be called on an objectExpression');
         const objectProperty = this.node.properties.find((property, index) => {
-            return property.type === 'ObjectProperty' && property.key.name === key;
+            return property.type === 'ObjectProperty' && property.key.type === 'Identifier' && property.key.name === key;
         });
         return objectProperty && new DeclarationHandler(objectProperty.value);
     }
@@ -184,7 +184,7 @@ class DeclarationHandler {
         if (this.node.type !== 'ObjectExpression')
             throw new Error('getMethod can only be called on an objectExpression');
         return this.node.properties.find((property, index) => {
-            return property.type === 'ObjectMethod' && property.key.name === key;
+            return property.type === 'ObjectMethod' && property.key.type === 'Identifier' && property.key.name === key;
         });
     }
     has(key) {
@@ -194,7 +194,7 @@ class DeclarationHandler {
         if (this.node.type !== 'ObjectExpression')
             throw new Error('get method can only be called on an objectExpression');
         let index = this.node.properties.findIndex((property, index) => {
-            return property.type === 'ObjectProperty' && property.key.name === key;
+            return property.type === 'ObjectProperty' && property.key.type === 'Identifier' && property.key.name === key;
         });
         ~index && this.node.properties.splice(index, 1);
         return this;
@@ -480,12 +480,12 @@ class ScriptHandler {
     mergeObject(thisObject, thatObject) {
         const thisKeys = new Map();
         thisObject.properties.forEach((property) => {
-            if (property.type !== 'SpreadElement')
+            if (property.type !== 'SpreadElement' && property.key.type === 'Identifier')
                 thisKeys.set(property.key.name, true);
         });
         const replacements = {};
         thatObject.properties.forEach((property) => {
-            if (property.type !== 'SpreadElement') {
+            if (property.type !== 'SpreadElement' && property.key.type === 'Identifier') {
                 const newName = shared_1.uniqueInMap(property.key.name, thisKeys);
                 if (newName !== property.key.name)
                     property.key.name = replacements[property.key.name] = newName;
@@ -539,7 +539,7 @@ class ScriptHandler {
         const thisProperties = thisObject.properties;
         const thisPropertiesMap = {};
         thisProperties.forEach((property) => {
-            if (property.type !== 'SpreadElement')
+            if (property.type !== 'SpreadElement' && property.key.type === 'Identifier')
                 thisPropertiesMap[property.key.name] = property;
         });
         let thatOrderIndex = -1;
@@ -551,7 +551,7 @@ class ScriptHandler {
         const replacements = {};
         thatObject.properties.forEach((thatProperty) => {
             // 直接合并 { ...obj } 的情况
-            if (thatProperty.type === 'SpreadElement')
+            if (thatProperty.type === 'SpreadElement' || thatProperty.key.type !== 'Identifier')
                 return thisProperties.push(thatProperty);
             const thatKey = thatProperty.key.name;
             let insertIndex = thisProperties.length;
@@ -630,7 +630,7 @@ class ScriptHandler {
                 let thisOrderIndex = -1;
                 for (let i = 0; i < thisProperties.length; i++) {
                     const thisProperty = thisProperties[i];
-                    if (thisProperty.type !== 'SpreadElement') {
+                    if (thisProperty.type !== 'SpreadElement' && thisProperty.key.type === 'Identifier') {
                         thisOrderIndex = orderIndexOf(thisProperty.key.name, thisOrderIndex);
                         if (thisProperty.key.name === thatProperty.key.name) {
                             insertIndex = i + 1;

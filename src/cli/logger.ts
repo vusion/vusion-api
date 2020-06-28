@@ -1,12 +1,12 @@
 import chalk from 'chalk';
-import * as EventEmitter from 'events';
+import * as events from 'events';
 import * as readline from 'readline';
 
-export const events = new EventEmitter();
+export const event = new events.EventEmitter();
 
 function _log(type: string, tag: string, message: string) {
     if (process.env.VUSION_API_MODE && message) {
-        events.emit('log', {
+        event.emit('log', {
             message,
             type,
             tag,
