@@ -1,11 +1,8 @@
 <template>
-<div :class="$style.root"></div>
+<div></div>
 </template>
 
 <script>
 export default {};
 </script>
 
-<style module>
-.root {}
-</style>
