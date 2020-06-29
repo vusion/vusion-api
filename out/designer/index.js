@@ -62,6 +62,24 @@ function initLayout(fullPath, type) {
     });
 }
 exports.initLayout = initLayout;
+/**
+ * 添加页面时初始化布局
+ * @param fullPath Vue 文件路径
+ * @param type 布局类型
+ */
+function initViewLayout(fullPath, type) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const vueFile = new vfs.VueFile(fullPath);
+        yield vueFile.open();
+        vueFile.parseTemplate();
+        let tplPath = path.resolve(__dirname, `../../snippets/${type}.vue`);
+        let tpl = yield fs.readFile(tplPath, 'utf8');
+        tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '') + '\n';
+        const rootEl = vueFile.templateHandler.ast;
+        rootEl.children.unshift(compiler.compile(tpl).ast);
+        yield vueFile.save();
+    });
+}
 function addCode(fullPath, nodePath, tpl) {
     return __awaiter(this, void 0, void 0, function* () {
         const vueFile = new vfs.VueFile(fullPath);
@@ -392,7 +410,7 @@ function addLeafView(parentInfo, baseViewInfo, params) {
             tplPath = path.resolve(__dirname, '../../templates/leaf-view.md');
         yield fs.copy(tplPath, dest);
         if (params.layout)
-            yield initLayout(dest, params.layout);
+            yield initViewLayout(dest, params.layout);
         if (baseView)
             yield addLeafViewRoute(parent, baseView, params);
         return dest;
@@ -465,7 +483,7 @@ function addBranchView(parentInfo, baseViewInfo, params) {
         yield fs.copy(tplPath, dir);
         const dest = path.join(dir, 'index' + params.ext);
         if (params.layout)
-            yield initLayout(dest, params.layout);
+            yield initViewLayout(dest, params.layout);
         yield addBranchViewRoute(parent, baseView, params);
         return dest;
     });
