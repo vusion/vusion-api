@@ -44,6 +44,28 @@ export async function initLayout(fullPath: string, type: string) {
     await vueFile.save();
 }
 
+/**
+ * 添加页面时初始化布局
+ * @param fullPath Vue 文件路径
+ * @param type 布局类型
+ */
+async function initViewLayout(fullPath: string, type: string) {
+    const vueFile = new vfs.VueFile(fullPath);
+    await vueFile.open();
+
+    vueFile.parseTemplate();
+
+    let tplPath = path.resolve(__dirname, `../../snippets/${type}.vue`);
+    let tpl = await fs.readFile(tplPath, 'utf8');
+    tpl = tpl.replace(/^<template>\s+/, '').replace(/\s+<\/template>$/, '') + '\n';
+
+    const rootEl = vueFile.templateHandler.ast;
+    rootEl.children.unshift(compiler.compile(tpl).ast);
+
+    await vueFile.save();
+}
+
+
 export async function addCode(fullPath: string, nodePath: string, tpl: string) {
     const vueFile = new vfs.VueFile(fullPath);
     await vueFile.open();
@@ -411,7 +433,7 @@ export async function addLeafView(parentInfo: ViewInfo | vfs.View, baseViewInfo:
     await fs.copy(tplPath, dest);
 
     if (params.layout)
-        await initLayout(dest, params.layout);
+        await initViewLayout(dest, params.layout);
 
     if (baseView)
         await addLeafViewRoute(parent, baseView, params);
@@ -492,7 +514,7 @@ export async function addBranchView(parentInfo: ViewInfo | vfs.View, baseViewInf
 
     const dest = path.join(dir, 'index' + params.ext);
     if (params.layout)
-        await initLayout(dest, params.layout);
+        await initViewLayout(dest, params.layout);
 
     await addBranchViewRoute(parent, baseView, params);
     return dest;
