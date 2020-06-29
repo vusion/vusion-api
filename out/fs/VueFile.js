@@ -42,6 +42,7 @@ exports.SUBFILE_LIST = [
     'index.html',
     'index.js',
     'module.css',
+    'index.vue',
     'README.md',
     'CHANGELOG.md',
     'api.yaml',
