@@ -114,7 +114,7 @@ function ensureHotReload(fullPath) {
 }
 exports.ensureHotReload = ensureHotReload;
 function hasNewParams(params) {
-    return !!(params.title || params.crumb || params.first);
+    return params.hasOwnProperty('title') || params.hasOwnProperty('crumb') || params.hasOwnProperty('first');
 }
 function initView(viewInfo) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -189,9 +189,11 @@ class PageMetaData {
             if (!routeJSON[currentPath])
                 routeJSON[currentPath] = {};
             routeJSON[currentPath].meta = Object.assign(routeJSON[currentPath].meta || {});
-            routeJSON[currentPath].meta.title = params.title;
-            routeJSON[currentPath].meta.crumb = params.crumb || '';
-            if (params.first !== undefined)
+            if (params.hasOwnProperty('title'))
+                routeJSON[currentPath].meta.title = params.title;
+            if (params.hasOwnProperty('crumb'))
+                routeJSON[currentPath].meta.crumb = params.crumb;
+            if (params.hasOwnProperty('first'))
                 routeJSON[currentPath].first = params.first;
             return fs.writeFile(routePath, 'export default ' + utils.JS.stringify(routeJSON, null, 4));
         });
