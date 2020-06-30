@@ -80,12 +80,18 @@ export async function addCode(fullPath: string, nodePath: string, tpl: string) {
     await vueFile.save();
 }
 
-export async function openFile(fullPath: string, content: string) {
-    return fs.readFile(fullPath, content);
+export async function openFile(fullPath: string) {
+    return fs.readFile(fullPath, 'utf8');
 }
 
 export async function saveFile(fullPath: string, content: string) {
     return fs.writeFile(fullPath, content);
+}
+
+export async function ensureHotReload(fullPath: string) {
+    if (!fs.existsSync(fullPath))
+        return;
+    return fs.writeFile(fullPath, await fs.readFile(fullPath, 'utf8'))
 }
 
 // export async function mergeBlock(fullPath: string, type: string) {
@@ -117,6 +123,10 @@ export interface AddParams {
     ext?: string,
     layout?: string,
     crumb?: string,
+    first?: boolean,
+}
+function hasNewParams(params: AddParams) {
+    return !!(params.title || params.crumb || params.first);
 }
 
 async function initView(viewInfo: ViewInfo) {
@@ -191,12 +201,7 @@ class PageMetaData implements MetaData {
         const baseViewPath = baseViewInfo.fullPath;
         const routePath = path.join(baseViewPath, 'routes.map.js');
 
-        const data = {
-            title: params.title,
-            first: false,
-            meta: {},
-        }
-        let routeJSON: { [name: string]: { meta?: { title: string, crumb?: string } } } = {};
+        let routeJSON: { [name: string]: { meta?: { title: string, crumb?: string }, first?: boolean } } = {};
         if (fs.existsSync(routePath))
             routeJSON = utils.JS.parse(await fs.readFile(routePath, 'utf8'));
 
@@ -206,6 +211,8 @@ class PageMetaData implements MetaData {
         routeJSON[currentPath].meta = Object.assign(routeJSON[currentPath].meta || {});
         routeJSON[currentPath].meta.title = params.title;
         routeJSON[currentPath].meta.crumb = params.crumb || '';
+        if (params.first !== undefined)
+            routeJSON[currentPath].first = params.first;
 
         return fs.writeFile(routePath, 'export default ' + utils.JS.stringify(routeJSON, null, 4));
     }
@@ -225,14 +232,15 @@ async function getMetaData(viewInfo: vfs.View, baseViewInfo?: ViewInfo | vfs.Vie
     return viewInfo;
 }
 
-export async function saveMetaData(viewInfo: vfs.View, params: AddParams, baseViewInfo?: vfs.View){
+export async function saveMetaData(viewInfo: ViewInfo | vfs.View, params: AddParams, baseViewInfo?: vfs.View){
+    const view = viewInfo instanceof vfs.View ? viewInfo : await initView(viewInfo);
     let instance;
-    if (viewInfo.viewType === 'entry') {
+    if (view.viewType === 'entry') {
         instance = new EntryMetaData();
-    } else if(viewInfo.viewType === 'branch' || viewInfo.viewType === 'vue') {
+    } else if(view.viewType === 'branch' || view.viewType === 'vue') {
         instance = new PageMetaData();
     }
-    return instance.saveMetaData(viewInfo, params, baseViewInfo);
+    return instance.saveMetaData(view, params, baseViewInfo);
 }
 
 /**
@@ -435,8 +443,19 @@ export async function addLeafView(parentInfo: ViewInfo | vfs.View, baseViewInfo:
     if (params.layout)
         await initViewLayout(dest, params.layout);
 
-    if (baseView)
+    if (baseView) {
         await addLeafViewRoute(parent, baseView, params);
+
+        if (hasNewParams(params)) {
+            await saveMetaData({
+                fullPath: dest,
+                viewType: params.ext === '.vue' ? vfs.ViewType.vue : vfs.ViewType.md,
+                routePath: parent.routePath + params.name,
+            }, params, baseView);
+        } else {
+            await ensureHotReload(path.join(baseView.fullPath, 'routes.map.js'));
+        }
+    }
 
     return dest;
 }
@@ -516,7 +535,19 @@ export async function addBranchView(parentInfo: ViewInfo | vfs.View, baseViewInf
     if (params.layout)
         await initViewLayout(dest, params.layout);
 
-    await addBranchViewRoute(parent, baseView, params);
+    if (baseView) {
+        await addBranchViewRoute(parent, baseView, params);
+
+        if (hasNewParams(params)) {
+            await saveMetaData({
+                fullPath: dest,
+                viewType: vfs.ViewType.branch,
+                routePath: parent.routePath + params.name + '/',
+            }, params, baseView);
+        } else {
+            await ensureHotReload(path.join(baseView.fullPath, 'routes.map.js'));
+        }
+    }
     return dest;
 }
 
@@ -636,56 +667,58 @@ export async function removeView(viewInfo: ViewInfo | vfs.View, baseViewInfo?: V
     if (baseView) {
         const routesPath = path.join(baseView.fullPath, 'routes.js');
         const routesMapPath = path.join(baseView.fullPath, 'routes.map.js');
-        if (!fs.existsSync(routesPath) || fs.existsSync(routesMapPath))
-            return;
-
-        const jsFile = new vfs.JSFile(routesPath);
-        await jsFile.open();
-        const $js = jsFile.parse();
-
-        const relativePath = path.relative(baseView.fullPath, view.fullPath).replace(/\\/g, '/');
-        let changed = false;
-        const exportDefault = $js.export().default();
-        if (exportDefault.is('object')) {
-            const { routeObject, parentArray } = findRouteObjectAndParentArray(exportDefault.node as babel.types.ObjectExpression, relativePath, true);
-
-            if (routeObject) {
-                parentArray.elements.splice(parentArray.elements.indexOf(routeObject), 1);
-
-                // 判断是不是 LWrapper
-                const LWrapper = routeObject.properties.find((property) => property.type === 'ObjectProperty'
-                    && property.key.type === 'Identifier' && property.key.name === 'component'
-                    && property.value.type === 'Identifier' && property.value.name === 'LWrapper');
-                if (LWrapper) {
-                    let wrapperCount = 0;
-                    String(jsFile.content).replace(/LWrapper/, () => String(wrapperCount++));
-                    if (wrapperCount === 2) {
-                        babel.traverse(jsFile.handler.ast, {
-                            ImportDefaultSpecifier(nodeInfo) {
-                                if (nodeInfo.node.local.name === 'LWrapper') {
-                                    nodeInfo.remove();
-                                    nodeInfo.stop();
-                                }
-                            },
-                            ImportSpecifier(nodeInfo) {
-                                if (nodeInfo.node.local.name === 'LWrapper') {
-                                    nodeInfo.remove();
-                                    nodeInfo.stop();
-                                }
-                            },
-                        });
+        if (fs.existsSync(routesPath) && !fs.existsSync(routesMapPath)) {
+            const jsFile = new vfs.JSFile(routesPath);
+            await jsFile.open();
+            const $js = jsFile.parse();
+    
+            const relativePath = path.relative(baseView.fullPath, view.fullPath).replace(/\\/g, '/');
+            let changed = false;
+            const exportDefault = $js.export().default();
+            if (exportDefault.is('object')) {
+                const { routeObject, parentArray } = findRouteObjectAndParentArray(exportDefault.node as babel.types.ObjectExpression, relativePath, true);
+    
+                if (routeObject) {
+                    parentArray.elements.splice(parentArray.elements.indexOf(routeObject), 1);
+    
+                    // 判断是不是 LWrapper
+                    const LWrapper = routeObject.properties.find((property) => property.type === 'ObjectProperty'
+                        && property.key.type === 'Identifier' && property.key.name === 'component'
+                        && property.value.type === 'Identifier' && property.value.name === 'LWrapper');
+                    if (LWrapper) {
+                        let wrapperCount = 0;
+                        String(jsFile.content).replace(/LWrapper/, () => String(wrapperCount++));
+                        if (wrapperCount === 2) {
+                            babel.traverse(jsFile.handler.ast, {
+                                ImportDefaultSpecifier(nodeInfo) {
+                                    if (nodeInfo.node.local.name === 'LWrapper') {
+                                        nodeInfo.remove();
+                                        nodeInfo.stop();
+                                    }
+                                },
+                                ImportSpecifier(nodeInfo) {
+                                    if (nodeInfo.node.local.name === 'LWrapper') {
+                                        nodeInfo.remove();
+                                        nodeInfo.stop();
+                                    }
+                                },
+                            });
+                        }
                     }
+    
+                    changed = true;
                 }
-
-                changed = true;
             }
+    
+            if (changed)
+                await jsFile.save();
         }
-
-        if (changed)
-            await jsFile.save();
     }
-
+    
     await fs.remove(view.fullPath);
+
+    if (baseView)
+        await ensureHotReload(path.join(baseView.fullPath, 'routes.map.js'));
 }
 
 export interface ParseTypes {
@@ -762,7 +795,8 @@ export async function saveService(serviceInfo: vfs.Service) {
 }
 
 export async function removeService(fullPath: string) {
-    return fs.remove(fullPath);
+    await fs.remove(fullPath);
+    await ensureHotReload(path.join(fullPath, '../index.js'));
 }
 
 /**
