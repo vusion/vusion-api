@@ -74,6 +74,18 @@ class TemplateHandler {
         const insideTabs = ' '.repeat(options.tabLength * (level + 1));
         let shouldFormat = true;
         const children = [].concat(el.children, !el.scopedSlots ? [] : Object.keys(el.scopedSlots).map((key) => el.scopedSlots[key]));
+        // 需要处理 v-else-if 和 v-else 的情况
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            if (child.ifConditions) {
+                child.ifConditions.forEach((condition) => {
+                    if (condition.block !== child) {
+                        children.splice(i + 1, 0, condition.block);
+                        i++;
+                    }
+                });
+            }
+        }
         const content = children.map((node) => {
             let text = '';
             if (node.type === 1)

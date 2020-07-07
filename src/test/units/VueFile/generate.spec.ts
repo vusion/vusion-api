@@ -14,6 +14,6 @@ describe('fs.VueFile', () => {
         expect(result).to.equals(vueFile.template);
     };
 
-    const cases = ['simple', 'complex', 'overview']; //, 'u-table-view', 'comment'
+    const cases = ['simple', 'complex', 'overview', 'if-else']; //, 'u-table-view', 'comment'
     cases.forEach((cas) => it('should generator correctly - ' + cas, () => test(cas)));
 });

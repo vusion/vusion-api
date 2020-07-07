@@ -115,4 +115,17 @@ describe('merge', () => {
         expect(vueFile.generate({ startLevel: 0 })).to.equal(await fs.readFile(path.resolve(BASE_PATH, '../results/merge.2.vue'), 'utf8'));
     });
 
+    it('vueFile.mergeShortage', async () => {
+        const vueFile = new VueFile(path.resolve(BASE_PATH, 'view.vue'));
+        await vueFile.open();
+        vueFile.parseAll();
+
+        const vueFile1 = new VueFile(path.resolve(BASE_PATH, 'block-template.vue'));
+        await vueFile1.open();
+        vueFile1.parseAll();
+
+        vueFile.merge(vueFile1);
+        expect(vueFile.generate({ startLevel: 0 })).to.equal(await fs.readFile(path.resolve(BASE_PATH, '../results/merge-shortage.vue'), 'utf8'));
+        // await fs.writeFile(path.resolve(BASE_PATH, '../results/merge-shortage.vue'), vueFile.generate({ startLevel: 0 }))
+    });
 });
