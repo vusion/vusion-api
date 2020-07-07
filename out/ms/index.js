@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createMultiFileWithSubdocs = exports.createMultiFile = exports.createComponentPackage = exports.removeBlock = exports.addBlock = exports.addBlockExternally = exports.fetchBlock = exports.createBlockPackage = exports.refreshMicroVersion = exports.recordMicroAppVersion = exports.recordMicroVersionURL = exports.publishTemplate = exports.publishComponent = exports.publishBlock = exports.teamExist = exports.getComponents = exports.getComponent = exports.getBlocks = exports.getBlock = exports.getTemplate = exports.processOptions = exports.formatTemplateTo = exports.formatTemplate = exports.fetchLatestComponentTemplate = exports.fetchLatestBlockTemplate = exports.upload = exports.getRunControl = exports.getCacheDir = exports.download = void 0;
+exports.install = exports.createMultiFileWithSubdocs = exports.createMultiFile = exports.createComponentPackage = exports.removeBlock = exports.addBlock = exports.addBlockExternally = exports.fetchBlock = exports.createBlockPackage = exports.refreshMicroVersion = exports.recordMicroAppVersion = exports.recordMicroVersionURL = exports.publishTemplate = exports.publishComponent = exports.publishBlock = exports.teamExist = exports.getComponents = exports.getComponent = exports.getBlocks = exports.getBlock = exports.getTemplate = exports.processOptions = exports.formatTemplateTo = exports.formatTemplate = exports.fetchLatestComponentTemplate = exports.fetchLatestBlockTemplate = exports.upload = exports.getRunControl = exports.getCacheDir = exports.download = void 0;
 const path = require("path");
 const fs = require("fs-extra");
 const os = require("os");
@@ -20,6 +20,7 @@ const download = require("./download");
 exports.download = download;
 const _ = require("lodash");
 const FormData = require("form-data");
+const semver = require("semver");
 const axios_1 = require("axios");
 let platformAxios;
 const getPlatformAxios = (prefix = '/internal') => {
@@ -551,4 +552,77 @@ function createMultiFileWithSubdocs(dir, componentName) {
     });
 }
 exports.createMultiFileWithSubdocs = createMultiFileWithSubdocs;
+/**
+ * vusion install，默认安装到 vusion_packages
+ * @param info.registry For example: https://registry.npm.taobao.org
+ * @param info.name Package name. For example: lodash
+ * @param info.version For example: lodash
+ * @param cwd 项目目录
+ */
+function install(info, cwd, save = true) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const registry = info.registry || 'https://registry.npmjs.org';
+        const version = info.version;
+        const data = (yield axios_1.default.get(`${registry}/${info.name}`)).data;
+        const versions = Object.keys(data.versions).reverse();
+        // 获取项目下 package.json 的信息
+        cwd = cwd || process.cwd();
+        const cwdPkgPath = path.resolve(cwd, 'package.json');
+        const cwdPkg = JSON.parse(yield fs.readFile(cwdPkgPath, 'utf8'));
+        const vusionDeps = cwdPkg.vusionDependencies = {};
+        // 计算最合适的版本
+        const currentSemver = vusionDeps[info.name];
+        let versionToInstall; // 需要安装的版本
+        if (version) { // 如果有明确的安装版本要求，按版本要求装
+            if (/^[0-9.]/.test(version))
+                versionToInstall = version;
+            else
+                versionToInstall = data['dist-tags'][version];
+        }
+        else {
+            if (currentSemver) { // 如果没有版本要求，但在项目中已经配置信息，按项目中寻找最合适的版本
+                for (const key of versions) {
+                    if (semver.satisfies(key, currentSemver)) {
+                        versionToInstall = key;
+                        break;
+                    }
+                }
+            }
+            else { // 否则装最新版本
+                versionToInstall = data['dist-tags'].latest || versions[0];
+            }
+        }
+        const packagesDir = path.resolve(cwd, 'vusion_packages');
+        const dest = path.join(packagesDir, info.name);
+        const pkgPath = path.join(dest, 'package.json');
+        let pkg;
+        // 判断当前存在的包符不符合要求
+        if (fs.existsSync(pkgPath))
+            pkg = JSON.parse(yield fs.readFile(pkgPath, 'utf8'));
+        if (!pkg || pkg.version !== versionToInstall) { // 需要重新下载的情况
+            yield fs.remove(dest);
+            yield download.npm({
+                registry,
+                name: info.name,
+                version: versionToInstall,
+            }, packagesDir, info.name, true);
+            const pkg = JSON.parse(yield fs.readFile(pkgPath, 'utf8'));
+            if (!pkg.browser) {
+                if (fs.existsSync(path.join(dest, 'dist-raw/index.js')))
+                    pkg.browser = 'dist-raw/index.js';
+                else if (fs.existsSync(path.join(dest, 'dist-theme/index.js')))
+                    pkg.browser = 'dist-theme/index.js';
+                else if (fs.existsSync(path.join(dest, 'dist/index.js')))
+                    pkg.browser = 'dist/index.js';
+                yield fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2));
+            }
+        }
+        if (save) { // 这里的策略和原生的略有不同，就是始终会将依赖保持到最新
+            vusionDeps[info.name] = '^' + versionToInstall;
+            yield fs.writeFile(cwdPkgPath, JSON.stringify(cwdPkg, null, 2));
+        }
+        return dest;
+    });
+}
+exports.install = install;
 //# sourceMappingURL=index.js.map

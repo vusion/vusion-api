@@ -4,12 +4,12 @@ import * as compiler from 'vue-template-compiler';
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as vfs from '../fs';
-import * as designer from '../designer';
 import * as utils from '../utils';
 import * as rc from '../rc';
 import * as download from './download';
 import * as _ from 'lodash';
 import * as FormData from 'form-data';
+import * as semver from 'semver';
 
 import Block from './Block';
 import Component from './Component';
@@ -592,6 +592,85 @@ export async function createMultiFileWithSubdocs(dir: string, componentName?: st
         componentName: normalized.componentName,
         title: '请输入标题',
     });
+
+    return dest;
+}
+
+/**
+ * vusion install，默认安装到 vusion_packages
+ * @param info.registry For example: https://registry.npm.taobao.org
+ * @param info.name Package name. For example: lodash
+ * @param info.version For example: lodash
+ * @param cwd 项目目录
+ */
+export async function install(info: {
+    registry: string, name: string, version?: string,
+}, cwd?: string, save: boolean = true) {
+    const registry = info.registry || 'https://registry.npmjs.org';
+    const version = info.version;
+    const data = (await axios.get(`${registry}/${info.name}`)).data;
+    const versions = Object.keys(data.versions).reverse();
+
+    // 获取项目下 package.json 的信息
+    cwd = cwd || process.cwd();
+    const cwdPkgPath = path.resolve(cwd, 'package.json');
+    const cwdPkg = JSON.parse(await fs.readFile(cwdPkgPath, 'utf8'));
+    const vusionDeps: { [name: string]: string } = cwdPkg.vusionDependencies = {};
+
+    // 计算最合适的版本
+    const currentSemver = vusionDeps[info.name];
+    let versionToInstall: string; // 需要安装的版本
+    if (version) { // 如果有明确的安装版本要求，按版本要求装
+        if (/^[0-9.]/.test(version))
+            versionToInstall = version;
+        else
+            versionToInstall = data['dist-tags'][version];
+    } else {
+        if (currentSemver) { // 如果没有版本要求，但在项目中已经配置信息，按项目中寻找最合适的版本
+            for (const key of versions) {
+                if (semver.satisfies(key, currentSemver)) {
+                    versionToInstall = key;
+                    break;
+                }
+            }
+        } else { // 否则装最新版本
+            versionToInstall = data['dist-tags'].latest || versions[0];
+        }
+    }
+
+    const packagesDir = path.resolve(cwd, 'vusion_packages');
+    const dest = path.join(packagesDir, info.name);
+    const pkgPath = path.join(dest, 'package.json');
+    let pkg: { [name: string]: string };
+    // 判断当前存在的包符不符合要求
+    if (fs.existsSync(pkgPath))
+        pkg = JSON.parse(await fs.readFile(pkgPath, 'utf8'));
+    
+    if (!pkg || pkg.version !== versionToInstall) { // 需要重新下载的情况
+        await fs.remove(dest);
+        await download.npm({
+            registry,
+            name: info.name,
+            version: versionToInstall,
+        }, packagesDir, info.name, true);
+        const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf8'));
+    
+        if (!pkg.browser) {
+            if (fs.existsSync(path.join(dest, 'dist-raw/index.js')))
+                pkg.browser = 'dist-raw/index.js';
+            else if (fs.existsSync(path.join(dest, 'dist-theme/index.js')))
+                pkg.browser = 'dist-theme/index.js';
+            else if (fs.existsSync(path.join(dest, 'dist/index.js')))
+                pkg.browser = 'dist/index.js';
+    
+            await fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2));
+        }
+    }
+
+    if (save) { // 这里的策略和原生的略有不同，就是始终会将依赖保持到最新
+        vusionDeps[info.name] = '^' + versionToInstall;
+        await fs.writeFile(cwdPkgPath, JSON.stringify(cwdPkg, null, 2));
+    }
 
     return dest;
 }

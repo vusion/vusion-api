@@ -15,12 +15,13 @@ import * as shell from 'shelljs';
  * @param clearExisting
  */
 export async function npm(info: {
-    registry: string, name: string, version?: string,
+    registry?: string, name: string, version?: string,
 }, dir: string, name?: string, clearExisting?: boolean) {
+    const registry = info.registry || 'https://registry.npmjs.org';
     const version = info.version || 'latest';
     let pkgInfo;
-    if (info.registry === 'https://registry.npmjs.org' && info.name[0] === '@') { // npm 有个 bug 去！！
-        const data = (await axios.get(`${info.registry}/${info.name}`)).data;
+    if (registry === 'https://registry.npmjs.org' && info.name[0] === '@') { // npm 有个 bug 去！！
+        const data = (await axios.get(`${registry}/${info.name}`)).data;
         if (data.versions[version])
             pkgInfo = data.versions[version];
         else if (data['dist-tags'][version])
@@ -28,7 +29,7 @@ export async function npm(info: {
         else
             throw new Error(`Cannot find package ${info.name} version ${version}!`);
     } else
-        pkgInfo = (await axios.get(`${info.registry}/${info.name}/${version}`)).data;
+        pkgInfo = (await axios.get(`${registry}/${info.name}/${version}`)).data;
     name = name || pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version;
     const dest = path.join(dir, name);
     if (fs.existsSync(dest)) {

@@ -27,10 +27,11 @@ const shell = require("shelljs");
  */
 function npm(info, dir, name, clearExisting) {
     return __awaiter(this, void 0, void 0, function* () {
+        const registry = info.registry || 'https://registry.npmjs.org';
         const version = info.version || 'latest';
         let pkgInfo;
-        if (info.registry === 'https://registry.npmjs.org' && info.name[0] === '@') { // npm 有个 bug 去！！
-            const data = (yield axios_1.default.get(`${info.registry}/${info.name}`)).data;
+        if (registry === 'https://registry.npmjs.org' && info.name[0] === '@') { // npm 有个 bug 去！！
+            const data = (yield axios_1.default.get(`${registry}/${info.name}`)).data;
             if (data.versions[version])
                 pkgInfo = data.versions[version];
             else if (data['dist-tags'][version])
@@ -39,7 +40,7 @@ function npm(info, dir, name, clearExisting) {
                 throw new Error(`Cannot find package ${info.name} version ${version}!`);
         }
         else
-            pkgInfo = (yield axios_1.default.get(`${info.registry}/${info.name}/${version}`)).data;
+            pkgInfo = (yield axios_1.default.get(`${registry}/${info.name}/${version}`)).data;
         name = name || pkgInfo.name.replace(/\//, '__') + '@' + pkgInfo.version;
         const dest = path.join(dir, name);
         if (fs.existsSync(dest)) {
