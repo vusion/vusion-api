@@ -8,7 +8,7 @@ import * as utils from '../utils';
 import * as rc from '../rc';
 import * as download from './download';
 import * as _ from 'lodash';
-import * as FormData from 'form-data';
+import FormData = require('form-data');
 import * as semver from 'semver';
 
 import Block from './Block';

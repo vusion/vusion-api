@@ -1,4 +1,4 @@
-import * as MarkdownIt from 'markdown-it';
+import MarkdownIt = require('markdown-it');
 import * as Token from 'markdown-it/lib/token';
 
 export default class ExamplesHandler {

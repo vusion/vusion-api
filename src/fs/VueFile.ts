@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as shell from 'shelljs';
 import * as lineReader from 'line-reader';
-import * as pluralize from 'pluralize';
+import pluralize = require('pluralize');
 import { kebab2Camel, Camel2kebab } from '../utils';
 
 import FSEntry from './FSEntry';

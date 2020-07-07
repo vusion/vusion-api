@@ -5,6 +5,8 @@
     "moduleResolution": "node",
     "noImplicitAny": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": false,
     "lib": [
       "es2015",
       "es2016",

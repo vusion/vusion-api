@@ -2,8 +2,8 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as YAML from 'yaml';
 import * as utils from '../utils';
-import * as MarkdownIt from 'markdown-it';
-import * as uslug from 'uslug';
+import MarkdownIt = require('markdown-it');
+import uslug = require('uslug');
 const uslugify = (s: string) => uslug(s);
 
 /**

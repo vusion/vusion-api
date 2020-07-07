@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,22 +27,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SUBFILE_LIST = exports.VueFileExtendMode = void 0;
 /// <reference path="../../types/line-reader.d.ts" />
-const fs = require("fs-extra");
-const path = require("path");
-const shell = require("shelljs");
-const lineReader = require("line-reader");
+const fs = __importStar(require("fs-extra"));
+const path = __importStar(require("path"));
+const shell = __importStar(require("shelljs"));
+const lineReader = __importStar(require("line-reader"));
 const pluralize = require("pluralize");
 const utils_1 = require("../utils");
-const FSEntry_1 = require("./FSEntry");
-const TemplateHandler_1 = require("./TemplateHandler");
-const ScriptHandler_1 = require("./ScriptHandler");
-const StyleHandler_1 = require("./StyleHandler");
-const APIHandler_1 = require("./APIHandler");
-const ExamplesHandler_1 = require("./ExamplesHandler");
-const traverse_1 = require("@babel/traverse");
+const FSEntry_1 = __importDefault(require("./FSEntry"));
+const TemplateHandler_1 = __importDefault(require("./TemplateHandler"));
+const ScriptHandler_1 = __importDefault(require("./ScriptHandler"));
+const StyleHandler_1 = __importDefault(require("./StyleHandler"));
+const APIHandler_1 = __importDefault(require("./APIHandler"));
+const ExamplesHandler_1 = __importDefault(require("./ExamplesHandler"));
+const traverse_1 = __importDefault(require("@babel/traverse"));
 const fs_1 = require("./fs");
 const fetchPartialContent = (content, tag, attrs = '') => {
     const reg = new RegExp(`<${tag}${attrs ? ' ' + attrs : ''}.*?>([\\s\\S]+)<\\/${tag}>`);

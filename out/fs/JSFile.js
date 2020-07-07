@@ -8,9 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const File_1 = require("./File");
-const ScriptHandler_1 = require("./ScriptHandler");
+const File_1 = __importDefault(require("./File"));
+const ScriptHandler_1 = __importDefault(require("./ScriptHandler"));
 class JSFile extends File_1.default {
     parse() {
         if (this.handler)
