@@ -590,8 +590,10 @@ function install(info, cwd, save = true) {
         // 获取项目下 package.json 的信息
         cwd = cwd || process.cwd();
         const cwdPkgPath = path.resolve(cwd, 'package.json');
-        const cwdPkg = JSON.parse(yield fs.readFile(cwdPkgPath, 'utf8'));
-        const vusionDeps = cwdPkg.vusionDependencies = {};
+        let cwdPkgInfo = {};
+        if (fs.existsSync(cwdPkgPath))
+            cwdPkgInfo = JSON.parse(yield fs.readFile(cwdPkgPath, 'utf8'));
+        const vusionDeps = cwdPkgInfo.vusionDependencies || {};
         // 计算最合适的版本
         const currentSemver = vusionDeps[info.name];
         let versionToInstall; // 需要安装的版本
@@ -617,33 +619,33 @@ function install(info, cwd, save = true) {
         const packagesDir = path.resolve(cwd, 'vusion_packages');
         const dest = path.join(packagesDir, info.name);
         const pkgPath = path.join(dest, 'package.json');
-        let pkg;
+        let pkgInfo;
         // 判断当前存在的包符不符合要求
         if (fs.existsSync(pkgPath))
-            pkg = JSON.parse(yield fs.readFile(pkgPath, 'utf8'));
-        if (!pkg || pkg.version !== versionToInstall) { // 需要重新下载的情况
+            pkgInfo = JSON.parse(yield fs.readFile(pkgPath, 'utf8'));
+        if (!pkgInfo || pkgInfo.version !== versionToInstall) { // 需要重新下载的情况
             yield fs.remove(dest);
             yield download.npm({
                 registry,
                 name: info.name,
                 version: versionToInstall,
             }, packagesDir, info.name, true);
-            const pkg = JSON.parse(yield fs.readFile(pkgPath, 'utf8'));
-            if (!pkg.browser) {
+            const pkgInfo = JSON.parse(yield fs.readFile(pkgPath, 'utf8'));
+            if (!pkgInfo.browser) {
                 if (fs.existsSync(path.join(dest, 'dist-raw/index.js')))
-                    pkg.browser = 'dist-raw/index.js';
+                    pkgInfo.browser = 'dist-raw/index.js';
                 else if (fs.existsSync(path.join(dest, 'dist-theme/index.js')))
-                    pkg.browser = 'dist-theme/index.js';
+                    pkgInfo.browser = 'dist-theme/index.js';
                 else if (fs.existsSync(path.join(dest, 'dist/index.js')))
-                    pkg.browser = 'dist/index.js';
-                yield fs.writeFile(pkgPath, JSON.stringify(pkg, null, 2));
+                    pkgInfo.browser = 'dist/index.js';
+                yield fs.writeFile(pkgPath, JSON.stringify(pkgInfo, null, 2));
             }
         }
         if (save) { // 这里的策略和原生的略有不同，就是始终会将依赖保持到最新
             vusionDeps[info.name] = '^' + versionToInstall;
-            yield fs.writeFile(cwdPkgPath, JSON.stringify(cwdPkg, null, 2));
+            yield fs.writeFile(cwdPkgPath, JSON.stringify(cwdPkgInfo, null, 2));
         }
-        return dest;
+        return info.name + '@' + versionToInstall;
     });
 }
 exports.install = install;
