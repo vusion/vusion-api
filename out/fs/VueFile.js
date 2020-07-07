@@ -640,6 +640,7 @@ class VueFile extends FSEntry_1.default {
             }
         });
         this.isDirectory = !this.isDirectory;
+        this.isComposed = !this.isComposed;
     }
     transformExportStyle() {
         this.parseScript();

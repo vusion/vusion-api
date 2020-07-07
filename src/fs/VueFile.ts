@@ -734,6 +734,7 @@ export default class VueFile extends FSEntry {
         });
 
         this.isDirectory = !this.isDirectory;
+        this.isComposed = !this.isComposed;
     }
 
     transformExportStyle() {
