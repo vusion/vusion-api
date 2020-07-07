@@ -745,7 +745,7 @@ export default class VueFile extends FSEntry {
             // const object = this.$js.variables().get(name);
             
             const body = this.$js.variables().body;
-            let object: babel.types.ObjectExpression;
+            let object: babel.types.VariableDeclarator["init"];
             const index = body.findIndex((node) => {
                 if (node.type !== 'ExportNamedDeclaration')
                     return false;
