@@ -593,7 +593,7 @@ function install(info, cwd, save = true) {
         let cwdPkgInfo = {};
         if (fs.existsSync(cwdPkgPath))
             cwdPkgInfo = JSON.parse(yield fs.readFile(cwdPkgPath, 'utf8'));
-        const vusionDeps = cwdPkgInfo.vusionDependencies || {};
+        const vusionDeps = cwdPkgInfo.vusionDependencies = cwdPkgInfo.vusionDependencies || {};
         // 计算最合适的版本
         const currentSemver = vusionDeps[info.name];
         let versionToInstall; // 需要安装的版本
