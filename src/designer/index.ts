@@ -799,7 +799,8 @@ interface BlockInfo {
     name: string,
     title: string,
     tagName: string,
-    dependencies: any,
+    dependencies: { [name: string]: string },
+    vusionDependencies: { [name: string]: string },
     registry: string,
     uuid?: string,
 }

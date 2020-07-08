@@ -9,6 +9,7 @@ export default interface Block {
     author?: string;
     homepage?: string;
     dependencies?: string;
+    vusionDependencies?: string;
     created_at: string;
     updated_at: string;
     repository: string;

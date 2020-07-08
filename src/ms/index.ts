@@ -817,7 +817,7 @@ export async function install(info: {
     let cwdPkgInfo: any = {};
     if (fs.existsSync(cwdPkgPath))
         cwdPkgInfo = JSON.parse(await fs.readFile(cwdPkgPath, 'utf8'));
-    const vusionDeps: { [name: string]: string } = cwdPkgInfo.vusionDependencies || {};
+    const vusionDeps: { [name: string]: string } = cwdPkgInfo.vusionDependencies = cwdPkgInfo.vusionDependencies || {};
 
     // 计算最合适的版本
     const currentSemver = vusionDeps[info.name];
