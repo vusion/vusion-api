@@ -75,7 +75,7 @@ function npm(info, dir, name, clearExisting) {
         const response = yield axios_1.default.get(tgzURL, {
             responseType: 'stream',
         });
-        const temp = path.resolve(os.homedir(), '.tmp', name + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
+        const temp = path.resolve(os.tmpdir(), name + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
         yield compressing.tgz.uncompress(response.data, temp);
         yield fs.move(path.join(temp, 'package'), dest);
         fs.removeSync(temp);
