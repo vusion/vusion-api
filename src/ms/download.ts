@@ -45,7 +45,7 @@ export async function npm(info: {
         responseType: 'stream',
     });
 
-    const temp = path.resolve(os.tmpdir(), name + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
+    const temp = path.resolve(os.homedir(), '.tmp', name + '-' + new Date().toJSON().replace(/[-:TZ]/g, '').slice(0, -4));
     await compressing.tgz.uncompress(response.data, temp);
 
     await fs.move(path.join(temp, 'package'), dest);
