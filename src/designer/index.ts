@@ -731,25 +731,6 @@ export interface ParseTypes {
     examples?: boolean,
 }
 
-export async function loadExternalLibrary(fullPath: string, parseTypes: ParseTypes = {}) {
-    const library = new vfs.Library(fullPath, vfs.LibraryType.external);
-    await library.open();
-    await Promise.all(library.components.map(async (vueFile) => {
-        await vueFile.open();
-        if (parseTypes.template)
-            vueFile.parseTemplate();
-        if (parseTypes.script)
-            vueFile.parseScript();
-        if (parseTypes.style)
-            vueFile.parseStyle();
-        if (parseTypes.api)
-            vueFile.parseAPI();
-        if (parseTypes.examples)
-            vueFile.parseExamples();
-    }));
-    return library;
-}
-
 /**
  * 获取服务信息
  */
@@ -951,6 +932,25 @@ export async function loadPackageJSON(rootPath: string) {
     return JSON.parse(await fs.readFile(pkgPath, 'utf8'));
 }
 
+export async function loadExternalLibrary(fullPath: string, parseTypes: ParseTypes = {}) {
+    const library = new vfs.Library(fullPath, vfs.LibraryType.external);
+    await library.open();
+    await Promise.all(library.components.map(async (vueFile) => {
+        await vueFile.open();
+        if (parseTypes.template)
+            vueFile.parseTemplate();
+        if (parseTypes.script)
+            vueFile.parseScript();
+        if (parseTypes.style)
+            vueFile.parseStyle();
+        if (parseTypes.api)
+            vueFile.parseAPI();
+        if (parseTypes.examples)
+            vueFile.parseExamples();
+    }));
+    return library;
+}
+
 /**
  * 获取单个控件信息
  * @param fullPath 控件路径
@@ -989,7 +989,14 @@ export async function loadCustomComponentsData(rootPath: string, parseTypes: Par
         else
             return name.endsWith('.vue');
     });
-    const tasks = components.map(async (name)=> await loadComponentData(`${rootPath}/node_modules/${name}`, parseTypes));
+    const tasks = components.map((name) => {
+        let packagePath = `${rootPath}/vusion_packages/${name}`;
+        if (fs.existsSync(packagePath))
+            return loadComponentData(packagePath, parseTypes);
+        packagePath = `${rootPath}/node_modules/${name}`;
+        if (fs.existsSync(packagePath))
+            return loadComponentData(packagePath, parseTypes);
+    });
     const datas = await Promise.all(tasks);
     return datas;
 }

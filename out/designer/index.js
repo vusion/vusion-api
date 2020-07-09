@@ -31,7 +31,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadAuthCache = exports.removeAuthCache = exports.addAuthCache = exports.loadCustomComponentsData = exports.loadComponentData = exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.loadExternalLibrary = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadAllViews = exports.loadViews = exports.saveMetaData = exports.ensureHotReload = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
+exports.loadAuthCache = exports.removeAuthCache = exports.addAuthCache = exports.loadCustomComponentsData = exports.loadComponentData = exports.loadExternalLibrary = exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadAllViews = exports.loadViews = exports.saveMetaData = exports.ensureHotReload = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs-extra"));
 const babel = __importStar(require("@babel/core"));
@@ -684,27 +684,6 @@ function removeView(viewInfo, baseViewInfo) {
     });
 }
 exports.removeView = removeView;
-function loadExternalLibrary(fullPath, parseTypes = {}) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const library = new vfs.Library(fullPath, vfs.LibraryType.external);
-        yield library.open();
-        yield Promise.all(library.components.map((vueFile) => __awaiter(this, void 0, void 0, function* () {
-            yield vueFile.open();
-            if (parseTypes.template)
-                vueFile.parseTemplate();
-            if (parseTypes.script)
-                vueFile.parseScript();
-            if (parseTypes.style)
-                vueFile.parseStyle();
-            if (parseTypes.api)
-                vueFile.parseAPI();
-            if (parseTypes.examples)
-                vueFile.parseExamples();
-        })));
-        return library;
-    });
-}
-exports.loadExternalLibrary = loadExternalLibrary;
 /**
  * 获取服务信息
  */
@@ -897,6 +876,27 @@ function loadPackageJSON(rootPath) {
     });
 }
 exports.loadPackageJSON = loadPackageJSON;
+function loadExternalLibrary(fullPath, parseTypes = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const library = new vfs.Library(fullPath, vfs.LibraryType.external);
+        yield library.open();
+        yield Promise.all(library.components.map((vueFile) => __awaiter(this, void 0, void 0, function* () {
+            yield vueFile.open();
+            if (parseTypes.template)
+                vueFile.parseTemplate();
+            if (parseTypes.script)
+                vueFile.parseScript();
+            if (parseTypes.style)
+                vueFile.parseStyle();
+            if (parseTypes.api)
+                vueFile.parseAPI();
+            if (parseTypes.examples)
+                vueFile.parseExamples();
+        })));
+        return library;
+    });
+}
+exports.loadExternalLibrary = loadExternalLibrary;
 /**
  * 获取单个控件信息
  * @param fullPath 控件路径
@@ -938,7 +938,14 @@ function loadCustomComponentsData(rootPath, parseTypes = {}, baseName) {
             else
                 return name.endsWith('.vue');
         });
-        const tasks = components.map((name) => __awaiter(this, void 0, void 0, function* () { return yield loadComponentData(`${rootPath}/node_modules/${name}`, parseTypes); }));
+        const tasks = components.map((name) => {
+            let packagePath = `${rootPath}/vusion_packages/${name}`;
+            if (fs.existsSync(packagePath))
+                return loadComponentData(packagePath, parseTypes);
+            packagePath = `${rootPath}/node_modules/${name}`;
+            if (fs.existsSync(packagePath))
+                return loadComponentData(packagePath, parseTypes);
+        });
         const datas = yield Promise.all(tasks);
         return datas;
     });

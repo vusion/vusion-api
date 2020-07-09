@@ -41,6 +41,7 @@ export const SUBFILE_LIST = [
     'api.yaml',
     'package.json',
     'node_modules',
+    'vusion_packages',
     'assets',
     'docs',
     'i18n',
