@@ -982,35 +982,27 @@ export async function loadComponentData(fullPath: string, parseTypes: ParseTypes
  */
 export async function loadCustomComponentsData(rootPath: string, parseTypes: ParseTypes = {}, baseName?: string){
     const pkg = await loadPackageJSON(rootPath);
-    const pkgDeps = pkg.dependencies || {};
-    const components = Object.keys(pkgDeps).filter((name) => {
+    const tasks: Array<Promise<any>> = [];
+
+    Object.keys(pkg.dependencies || {}).filter((name) => {
         if(baseName)
             return name.includes(baseName + '.vue');
         else
             return name.endsWith('.vue');
+    }).forEach((name) => {
+        tasks.push(loadComponentData(`${rootPath}/node_modules/${name}`, parseTypes));
     });
-    const tasks = components.map((name) => {
-        let packagePath = `${rootPath}/vusion_packages/${name}`;
-        if (fs.existsSync(packagePath))
-            return loadComponentData(packagePath, parseTypes);
-        packagePath = `${rootPath}/node_modules/${name}`;
-        if (fs.existsSync(packagePath))
-            return loadComponentData(packagePath, parseTypes);
+
+    Object.keys(pkg.vusionDependencies || {}).filter((name) => {
+        if(baseName)
+            return name.includes(baseName + '.vue');
+        else
+            return name.endsWith('.vue');
+    }).forEach((name) => {
+        tasks.push(loadComponentData(`${rootPath}/vusion_packages/${name}`, parseTypes));
     });
-    const datas = await Promise.all(tasks);
-    return datas;
-}
-
-export async function addAuthCache(name: string, filePath: string) {
-    await fs.ensureFile(filePath);
-
-    let json: any = {};
-    try {
-        json = JSON.parse(await fs.readFile(filePath, 'utf8'));
-    } catch(e) {}
-
-    json[name] = true;
-    await fs.writeFile(filePath, JSON.stringify(json, null, 4));
+    
+    return Promise.all(tasks);
 }
 
 export async function removeAuthCache(name: string, filePath: string) {
