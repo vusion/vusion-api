@@ -69,6 +69,7 @@ class Service extends FSEntry_1.default {
         this.apiJSON = undefined;
         this.apiConfigHandler = undefined;
         this.indexJS = undefined;
+        this.swaggerDefinitions = undefined;
     }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -89,6 +90,11 @@ class Service extends FSEntry_1.default {
                 this.indexJS = yield fs.readFile(indexJSPath, 'utf8');
             else
                 this.indexJS = yield fs.readFile(path.resolve(TEMPLATE_PATH, 'index.js'), 'utf8');
+            const swaggerPath = path.resolve(this.fullPath, 'swagger.json');
+            if (fs.existsSync(swaggerPath))
+                this.swaggerDefinitions = JSON.parse(yield fs.readFile(swaggerPath, 'utf8'));
+            else
+                this.swaggerDefinitions = {};
         });
     }
     warnIfNotOpen() {
@@ -126,6 +132,7 @@ class Service extends FSEntry_1.default {
             this.api && promises.push(fs.writeFile(path.resolve(this.fullPath, 'api.json'), this.api));
             this.apiConfig && promises.push(fs.writeFile(path.resolve(this.fullPath, 'api.config.js'), this.apiConfig));
             this.indexJS && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), this.indexJS));
+            this.swaggerDefinitions && promises.push(fs.writeFile(path.resolve(this.fullPath, 'swagger.json'), JSON.stringify(this.swaggerDefinitions, null, 4)));
             yield Promise.all(promises);
             _super.save.call(this);
         });

@@ -28,6 +28,7 @@ export default class Service extends FSEntry {
     apiConfig: string;
     apiConfigHandler: ScriptHandler;
     indexJS: string;
+    swaggerDefinitions: { [name: string]: any };
 
     constructor(fullPath: string) {
         super(fullPath, true);
@@ -44,6 +45,7 @@ export default class Service extends FSEntry {
         this.apiJSON = undefined;
         this.apiConfigHandler = undefined;
         this.indexJS = undefined;
+        this.swaggerDefinitions = undefined;
     }
 
     protected async load() {
@@ -67,6 +69,12 @@ export default class Service extends FSEntry {
             this.indexJS = await fs.readFile(indexJSPath, 'utf8');
         else
             this.indexJS = await fs.readFile(path.resolve(TEMPLATE_PATH, 'index.js'), 'utf8');
+
+        const swaggerPath = path.resolve(this.fullPath, 'swagger.json');
+        if (fs.existsSync(swaggerPath))
+            this.swaggerDefinitions = JSON.parse(await fs.readFile(swaggerPath, 'utf8'));
+        else
+            this.swaggerDefinitions = {};
     }
 
     warnIfNotOpen() {
@@ -109,6 +117,7 @@ export default class Service extends FSEntry {
         this.api && promises.push(fs.writeFile(path.resolve(this.fullPath, 'api.json'), this.api));
         this.apiConfig && promises.push(fs.writeFile(path.resolve(this.fullPath, 'api.config.js'), this.apiConfig));
         this.indexJS && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), this.indexJS));
+        this.swaggerDefinitions && promises.push(fs.writeFile(path.resolve(this.fullPath, 'swagger.json'), JSON.stringify(this.swaggerDefinitions, null, 4)))
 
         await Promise.all(promises);
 
