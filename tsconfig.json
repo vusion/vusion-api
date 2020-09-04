@@ -4,6 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
+    "noImplicitThis": true,
     "skipLibCheck": true,
     "lib": [
       "es2015",
@@ -12,7 +13,7 @@
       "dom"
     ],
     "declaration": true,
-    "declarationDir": "types",
+    // "declarationDir": "types",
     "rootDir": "src",
     "outDir": "out",
     "sourceMap": true,
