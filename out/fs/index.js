@@ -27,8 +27,8 @@ Object.defineProperty(exports, "LibraryType", { enumerable: true, get: function 
 var View_1 = require("./View");
 Object.defineProperty(exports, "View", { enumerable: true, get: function () { return View_1.default; } });
 Object.defineProperty(exports, "ViewType", { enumerable: true, get: function () { return View_1.ViewType; } });
-var Service2_1 = require("./Service2");
-Object.defineProperty(exports, "Service", { enumerable: true, get: function () { return Service2_1.default; } });
+var Service_1 = require("./Service");
+Object.defineProperty(exports, "Service", { enumerable: true, get: function () { return Service_1.default; } });
 var TemplateHandler_1 = require("./TemplateHandler");
 Object.defineProperty(exports, "TemplateHandler", { enumerable: true, get: function () { return TemplateHandler_1.default; } });
 var ScriptHandler_1 = require("./ScriptHandler");

@@ -604,7 +604,7 @@ export async function createMultiFileWithSubdocs(dir: string, componentName?: st
  * @param cwd 项目目录
  */
 export async function install(info: {
-    registry: string, name: string, version?: string,
+    registry?: string, name: string, version?: string,
 }, cwd?: string, save: boolean = true) {
     const registry = info.registry || 'https://registry.npmjs.org';
     const version = info.version;

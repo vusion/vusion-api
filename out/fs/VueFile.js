@@ -32,7 +32,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SUBFILE_LIST = exports.VueFileExtendMode = void 0;
-/// <reference path="../../types/line-reader.d.ts" />
+/// <reference path="../types/line-reader.d.ts" />
 const fs = __importStar(require("fs-extra"));
 const path = __importStar(require("path"));
 const shell = __importStar(require("shelljs"));
