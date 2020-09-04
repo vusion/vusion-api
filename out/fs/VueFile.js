@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SUBFILE_LIST = exports.VueFileExtendMode = void 0;
-/// <reference path="../../types/line-reader.d.ts" />
+/// <reference path="../types/line-reader.d.ts" />
 const fs = require("fs-extra");
 const path = require("path");
 const shell = require("shelljs");

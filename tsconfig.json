@@ -11,6 +11,8 @@
       "es2017",
       "dom"
     ],
+    "declaration": true,
+    "declarationDir": "types",
     "rootDir": "src",
     "outDir": "out",
     "sourceMap": true,
