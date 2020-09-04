@@ -4,7 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "skipLibCheck": true,
+    "noImplicitThis": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": false,
     "lib": [
@@ -14,7 +14,7 @@
       "dom"
     ],
     "declaration": true,
-    "declarationDir": "types",
+    // "declarationDir": "types",
     "rootDir": "src",
     "outDir": "out",
     "sourceMap": true,

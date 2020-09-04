@@ -24,6 +24,7 @@ export enum ManagerInstallSaveOptions {
 export default {
     config: undefined as VusionRC,
     rcPath,
+    yaml: undefined as string,
     /**
      * 从用户目录下的 .vusionrc 加载配置
      * 如果已经加载，则会直接从缓存中读取

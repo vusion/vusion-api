@@ -35,6 +35,7 @@ var ManagerInstallSaveOptions;
 exports.default = {
     config: undefined,
     rcPath,
+    yaml: undefined,
     /**
      * 从用户目录下的 .vusionrc 加载配置
      * 如果已经加载，则会直接从缓存中读取

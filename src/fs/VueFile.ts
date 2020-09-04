@@ -59,7 +59,7 @@ export const SUBFILE_LIST = [
  * #### 打开：一般分为四个阶段
  * - const vueFile = new VueFile(fullPath); // 根据路径创建对象，可以为虚拟路径。
  * - await vueFile.preOpen(); // 异步方法。获取 isDirectory，获取子组件、标题信息。
- * - await vueFile.open(); // 异步方法。如果已经打开则不会重新打开，如果没有 preOpen 会先执行 preOpen。获取常用操作的内容块：script, template, style, api, examples, package。
+ * - await vueFile.open(); // 异步方法。如果已经打开则不会重新打开，如果没有 preOpen 会先执行 preOpen。获取常用操作的内容块：script, template, style, api, examples, definition, package。
  * - vueFile.parseAll(); // 解析全部内容块
  *
  * #### 保存：
@@ -115,6 +115,7 @@ export default class VueFile extends FSEntry {
     style: string;
     api: string;
     examples: string;
+    definition: string;
     package: PackageJSON;
 
     /**
@@ -152,6 +153,10 @@ export default class VueFile extends FSEntry {
      * 文档示例处理器
      */
     examplesHandler: ExamplesHandler;
+    /**
+     * 定义处理器
+     */
+    definitionHandler: void;
 
     /**
      * @param fullPath 完整路径，必须以`.vue`结尾。也可以是一个相对的虚拟路径
@@ -271,6 +276,7 @@ export default class VueFile extends FSEntry {
         this.style = undefined;
         this.api = undefined;
         this.examples = undefined;
+        this.definition = undefined;
         this.package = undefined;
 
         this.templateHandler = undefined;
@@ -281,6 +287,7 @@ export default class VueFile extends FSEntry {
         this.$css = undefined;
         this.apiHandler = undefined;
         this.examplesHandler = undefined;
+        this.definitionHandler = undefined;
 
         this.isOpen = false;
     }
@@ -295,6 +302,7 @@ export default class VueFile extends FSEntry {
         await this.loadPackage();
         await this.loadAPI();
         await this.loadExamples();
+        await this.loadDefinition();
     }
 
      /**
@@ -396,6 +404,17 @@ export default class VueFile extends FSEntry {
         }
     }
 
+    async loadDefinition() {
+        await this.preload();
+
+        if (this.isDirectory) {
+            if (fs.existsSync(path.join(this.fullPath, 'definition.json')))
+                return this.definition = await fs.readFile(path.join(this.fullPath, 'definition.json'), 'utf8');
+        } else {
+            return this.definition = fetchPartialContent(this.content, 'definition');
+        }
+    }
+
     hasAssets() {
         return !!this.subfiles && this.subfiles.includes('assets');
     }
@@ -458,6 +477,7 @@ export default class VueFile extends FSEntry {
         this.parseStyle();
         this.parseAPI();
         this.parseExamples();
+        // this.parseDefinition();
     }
 
     parseTemplate() {
@@ -547,6 +567,7 @@ export default class VueFile extends FSEntry {
         vueFile.style = this.style;
         vueFile.api = this.api;
         vueFile.examples = this.examples;
+        vueFile.definition = this.definition;
         vueFile.package = this.package && Object.assign({}, this.package);
 
         return vueFile;
@@ -637,6 +658,7 @@ export default class VueFile extends FSEntry {
         vueFile.style = this.style;
         vueFile.api = this.api;
         vueFile.examples = this.examples;
+        vueFile.definition = this.definition;
         vueFile.package = this.package && Object.assign({}, this.package);
 
         vueFile.save();
@@ -932,6 +954,7 @@ export default ${vueFile.componentName};
         vueFile.examples = fetchPartialContent(vueFile.content, 'doc', 'name="blocks"');
         if (!vueFile.examples)
             vueFile.examples = fetchPartialContent(vueFile.content, 'doc', 'name="examples"');
+        vueFile.definition = fetchPartialContent(vueFile.content, 'definition');
         return vueFile;
     }
 }

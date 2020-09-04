@@ -21,7 +21,7 @@ export declare const SUBFILE_LIST: string[];
  * #### 打开：一般分为四个阶段
  * - const vueFile = new VueFile(fullPath); // 根据路径创建对象，可以为虚拟路径。
  * - await vueFile.preOpen(); // 异步方法。获取 isDirectory，获取子组件、标题信息。
- * - await vueFile.open(); // 异步方法。如果已经打开则不会重新打开，如果没有 preOpen 会先执行 preOpen。获取常用操作的内容块：script, template, style, api, examples, package。
+ * - await vueFile.open(); // 异步方法。如果已经打开则不会重新打开，如果没有 preOpen 会先执行 preOpen。获取常用操作的内容块：script, template, style, api, examples, definition, package。
  * - vueFile.parseAll(); // 解析全部内容块
  *
  * #### 保存：
@@ -76,6 +76,7 @@ export default class VueFile extends FSEntry {
     style: string;
     api: string;
     examples: string;
+    definition: string;
     package: PackageJSON;
     /**
      * 模板处理器
@@ -112,6 +113,10 @@ export default class VueFile extends FSEntry {
      * 文档示例处理器
      */
     examplesHandler: ExamplesHandler;
+    /**
+     * 定义处理器
+     */
+    definitionHandler: void;
     /**
      * @param fullPath 完整路径，必须以`.vue`结尾。也可以是一个相对的虚拟路径
      */
@@ -154,6 +159,7 @@ export default class VueFile extends FSEntry {
     loadPackage(): Promise<any>;
     loadAPI(): Promise<string>;
     loadExamples(from?: string): Promise<string>;
+    loadDefinition(): Promise<string>;
     hasAssets(): boolean;
     /**
      * 是否有额外的

@@ -17,6 +17,7 @@ export declare enum ManagerInstallSaveOptions {
 declare const _default: {
     config: VusionRC;
     rcPath: string;
+    yaml: string;
     /**
      * 从用户目录下的 .vusionrc 加载配置
      * 如果已经加载，则会直接从缓存中读取
@@ -30,7 +31,7 @@ declare const _default: {
     /**
      * 快速获取下载源地址
      */
-    getDownloadRegistry(): any;
+    getDownloadRegistry(): string;
     /**
      * 快速获取安装命令
      */
