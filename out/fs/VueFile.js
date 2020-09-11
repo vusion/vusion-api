@@ -424,6 +424,7 @@ class VueFile extends FSEntry_1.default {
         let template = this.template;
         let script = this.script;
         let style = this.style;
+        let definition = this.definition;
         if (this.templateHandler) {
             if (!this.isDirectory)
                 this.templateHandler.options.startLevel = 1;
@@ -437,6 +438,7 @@ class VueFile extends FSEntry_1.default {
         template && contents.push(`<template>\n${template}</template>`);
         script && contents.push(`<script>\n${script}</script>`);
         style && contents.push(`<style module>\n${style}</style>`);
+        definition && contents.push(`<definition>\n${definition}</definition>`);
         return this.content = contents.join('\n\n') + '\n';
     }
     /**
@@ -497,6 +499,7 @@ class VueFile extends FSEntry_1.default {
                     this.template && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.html'), this.template));
                     this.script && promises.push(fs.writeFile(path.resolve(this.fullPath, 'index.js'), this.script));
                     this.style && promises.push(fs.writeFile(path.resolve(this.fullPath, 'module.css'), this.style));
+                    this.definition && promises.push(fs.writeFile(path.resolve(this.fullPath, 'definition.json'), this.definition));
                     if (this.package && typeof this.package === 'object')
                         promises.push(fs.writeFile(path.resolve(this.fullPath, 'package.json'), JSON.stringify(this.package, null, 2) + '\n'));
                     yield Promise.all(promises);
