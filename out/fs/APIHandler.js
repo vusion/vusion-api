@@ -54,6 +54,9 @@ function formatValue(type, value) {
     else if (typeof value === 'string') {
         return `\`'${escape(value)}'\``;
     }
+    else if (value.name) {
+        return `\`'${escape(value.name)}'\` (${escape(value.description)})`;
+    }
     else
         return `\`${value}\``;
 }
@@ -142,7 +145,7 @@ class APIHandler {
                 name += '.sync';
             if (attr.model)
                 name += ', v-model';
-            outputs.push(`| ${name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(attr.type, option)).join(', ') : ''} | ${formatValue(attr.type, attr.default)} | ${attr.description} |`);
+            outputs.push(`| ${name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(attr.type, option)).join('<br/>') : ''} | ${formatValue(attr.type, attr.default)} | ${attr.description} |`);
         });
         outputs.push('');
         return outputs.join('\n');

@@ -11,6 +11,18 @@
       type: any
       default: null
       description: 当前选择的值
+    - name: overflow
+      title: 隐藏处理
+      type: string
+      options:
+        - name: normal
+          description: 默认不处理
+        - name: ellipsis
+          description: 多余的文本省略
+        - name: break
+          description: 强制换行且英文自动添加换行符
+        - name: nowrap
+          description: 始终不换行
     - name: collapsible
       type: boolean
       default: false
