@@ -13,4 +13,4 @@ export declare const kebab2Camel: (name: string) => string;
  * @return 转换后的名称
  */
 export declare const Camel2kebab: (name: string) => string;
-export declare function uniqueInMap(key: string, map: Map<string, any>, start?: number): string;
+export declare function uniqueInMap(key: string, map: Map<string, any> | Set<string>, start?: number): string;

@@ -233,6 +233,11 @@ export default class VueFile extends FSEntry {
             [old: string]: string;
         };
     };
+    mergeDefinition(that: VueFile): {
+        [key: string]: {
+            [old: string]: string;
+        };
+    };
     extend(mode: VueFileExtendMode, fullPath: string, fromPath: string): VueFile;
     /**
      * 根据 extends 查找基类组件

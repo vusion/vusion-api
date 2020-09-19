@@ -16,7 +16,7 @@ import ExamplesHandler from './ExamplesHandler';
 import traverse from '@babel/traverse';
 import PackageJSON from '../types/PackageJSON';
 import { FileExistsError } from './fs';
-import { connect } from 'http2';
+import { uniqueInMap } from '../utils/shared';
 
 const fetchPartialContent = (content: string, tag: string, attrs: string = '') => {
     const reg = new RegExp(`<${tag}${attrs ? ' ' + attrs : ''}.*?>([\\s\\S]+)<\\/${tag}>`);
@@ -844,9 +844,45 @@ export default class VueFile extends FSEntry {
     merge(that: VueFile, route: string | number | { line: number, character: number } = '') {
         const scriptReplacements = this.scriptHandler.merge(that.scriptHandler);
         const styleReplacements = this.styleHandler.merge(that.styleHandler);
-        const replacements = { ...scriptReplacements, ...styleReplacements };
+        const definitionReplacements = this.mergeDefinition(that);
+        const replacements = { ...scriptReplacements, ...styleReplacements, ...definitionReplacements };
 
         this.templateHandler.merge(that.templateHandler, route, replacements);
+        return replacements;
+    }
+
+    mergeDefinition(that: VueFile) {
+        const thisDefinition = JSON.parse(this.definition || '{}');
+        thisDefinition.params = thisDefinition.params || [];
+        thisDefinition.logics = thisDefinition.logics || [];
+        const thatDefinition = JSON.parse(that.definition || '{}');
+        thatDefinition.params = thatDefinition.params || [];
+        thatDefinition.logics = thatDefinition.logics || [];
+        
+        const replacements: { [key: string]: { [old: string]: string } } = { data2: {}, logic: {} };
+
+        const thisParamKeys: Set<string> = new Set();
+        thisDefinition.params.forEach((param: { name: string }) => thisParamKeys.add(param.name));
+        thatDefinition.params.forEach((param: { name: string }) => {
+            const newName = uniqueInMap(param.name, thisParamKeys);
+            if (newName !== param.name)
+                replacements['data2'][param.name] = newName;
+            thisDefinition.params.push(Object.assign(param, {
+                name: newName,
+            }));
+        });
+
+        const thisLogicKeys: Set<string> = new Set();
+        thisDefinition.logics.forEach((logic: { name: string }) => thisLogicKeys.add(logic.name));
+        thatDefinition.logics.forEach((logic: { name: string }) => {
+            const newName = uniqueInMap(logic.name, thisLogicKeys);
+            if (newName !== logic.name)
+                replacements['logic'][logic.name] = newName;
+            thisDefinition.logics.push(Object.assign(logic, {
+                name: newName,
+            }));
+        });
+
         return replacements;
     }
 

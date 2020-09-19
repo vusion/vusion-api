@@ -47,6 +47,7 @@ const APIHandler_1 = __importDefault(require("./APIHandler"));
 const ExamplesHandler_1 = __importDefault(require("./ExamplesHandler"));
 const traverse_1 = __importDefault(require("@babel/traverse"));
 const fs_1 = require("./fs");
+const shared_1 = require("../utils/shared");
 const fetchPartialContent = (content, tag, attrs = '') => {
     const reg = new RegExp(`<${tag}${attrs ? ' ' + attrs : ''}.*?>([\\s\\S]+)<\\/${tag}>`);
     const m = content.match(reg);
@@ -735,8 +736,39 @@ class VueFile extends FSEntry_1.default {
     merge(that, route = '') {
         const scriptReplacements = this.scriptHandler.merge(that.scriptHandler);
         const styleReplacements = this.styleHandler.merge(that.styleHandler);
-        const replacements = Object.assign(Object.assign({}, scriptReplacements), styleReplacements);
+        const definitionReplacements = this.mergeDefinition(that);
+        const replacements = Object.assign(Object.assign(Object.assign({}, scriptReplacements), styleReplacements), definitionReplacements);
         this.templateHandler.merge(that.templateHandler, route, replacements);
+        return replacements;
+    }
+    mergeDefinition(that) {
+        const thisDefinition = JSON.parse(this.definition || '{}');
+        thisDefinition.params = thisDefinition.params || [];
+        thisDefinition.logics = thisDefinition.logics || [];
+        const thatDefinition = JSON.parse(that.definition || '{}');
+        thatDefinition.params = thatDefinition.params || [];
+        thatDefinition.logics = thatDefinition.logics || [];
+        const replacements = { data2: {}, logic: {} };
+        const thisParamKeys = new Set();
+        thisDefinition.params.forEach((param) => thisParamKeys.add(param.name));
+        thatDefinition.params.forEach((param) => {
+            const newName = shared_1.uniqueInMap(param.name, thisParamKeys);
+            if (newName !== param.name)
+                replacements['data2'][param.name] = newName;
+            thisDefinition.params.push(Object.assign(param, {
+                name: newName,
+            }));
+        });
+        const thisLogicKeys = new Set();
+        thisDefinition.logics.forEach((logic) => thisLogicKeys.add(logic.name));
+        thatDefinition.logics.forEach((logic) => {
+            const newName = shared_1.uniqueInMap(logic.name, thisLogicKeys);
+            if (newName !== logic.name)
+                replacements['logic'][logic.name] = newName;
+            thisDefinition.logics.push(Object.assign(logic, {
+                name: newName,
+            }));
+        });
         return replacements;
     }
     extend(mode, fullPath, fromPath) {
