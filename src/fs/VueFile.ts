@@ -883,6 +883,8 @@ export default class VueFile extends FSEntry {
             }));
         });
 
+        this.definition = JSON.stringify(thisDefinition) + '\n';
+
         return replacements;
     }
 

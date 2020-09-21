@@ -769,6 +769,7 @@ class VueFile extends FSEntry_1.default {
                 name: newName,
             }));
         });
+        this.definition = JSON.stringify(thisDefinition) + '\n';
         return replacements;
     }
     extend(mode, fullPath, fromPath) {
