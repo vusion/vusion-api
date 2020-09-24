@@ -743,19 +743,19 @@ class VueFile extends FSEntry_1.default {
     }
     mergeDefinition(that) {
         const thisDefinition = JSON.parse(this.definition || '{}');
-        thisDefinition.params = thisDefinition.params || [];
+        thisDefinition.variables = thisDefinition.variables || [];
         thisDefinition.logics = thisDefinition.logics || [];
         const thatDefinition = JSON.parse(that.definition || '{}');
-        thatDefinition.params = thatDefinition.params || [];
+        thatDefinition.variables = thatDefinition.variables || [];
         thatDefinition.logics = thatDefinition.logics || [];
         const replacements = { data2: {}, logic: {} };
         const thisParamKeys = new Set();
-        thisDefinition.params.forEach((param) => thisParamKeys.add(param.name));
-        thatDefinition.params.forEach((param) => {
-            const newName = shared_1.uniqueInMap(param.name, thisParamKeys);
-            if (newName !== param.name)
-                replacements['data2'][param.name] = newName;
-            thisDefinition.params.push(Object.assign(param, {
+        thisDefinition.variables.forEach((variable) => thisParamKeys.add(variable.name));
+        thatDefinition.variables.forEach((variable) => {
+            const newName = shared_1.uniqueInMap(variable.name, thisParamKeys);
+            if (newName !== variable.name)
+                replacements['data2'][variable.name] = newName;
+            thisDefinition.variables.push(Object.assign(variable, {
                 name: newName,
             }));
         });
