@@ -853,16 +853,30 @@ export default class VueFile extends FSEntry {
 
     mergeDefinition(that: VueFile) {
         const thisDefinition = JSON.parse(this.definition || '{}');
+        thisDefinition.params = thisDefinition.params || [];
         thisDefinition.variables = thisDefinition.variables || [];
+        thisDefinition.lifecycles = thisDefinition.lifecycles || [];
         thisDefinition.logics = thisDefinition.logics || [];
         const thatDefinition = JSON.parse(that.definition || '{}');
+        thatDefinition.params = thatDefinition.params || [];
         thatDefinition.variables = thatDefinition.variables || [];
+        thatDefinition.lifecycles = thatDefinition.lifecycles || [];
         thatDefinition.logics = thatDefinition.logics || [];
         
         const replacements: { [key: string]: { [old: string]: string } } = { data2: {}, logic: {} };
 
         const thisParamKeys: Set<string> = new Set();
+        thisDefinition.params.forEach((param: { name: string }) => thisParamKeys.add(param.name));
         thisDefinition.variables.forEach((variable: { name: string }) => thisParamKeys.add(variable.name));
+
+        thatDefinition.params.forEach((param: { name: string }) => {
+            const newName = uniqueInMap(param.name, thisParamKeys);
+            if (newName !== param.name)
+                replacements['data2'][param.name] = newName;
+            thisDefinition.params.push(Object.assign(param, {
+                name: newName,
+            }));
+        });
         thatDefinition.variables.forEach((variable: { name: string }) => {
             const newName = uniqueInMap(variable.name, thisParamKeys);
             if (newName !== variable.name)
@@ -870,6 +884,13 @@ export default class VueFile extends FSEntry {
             thisDefinition.variables.push(Object.assign(variable, {
                 name: newName,
             }));
+        });
+
+        thatDefinition.lifecycles.forEach((thatLC: { name: string }) => {
+            if (thisDefinition.lifecycles.find((thisLC: { name: string }) => thisLC.name == thatLC.name))
+                return;
+
+            thisDefinition.lifecycles.push(thatLC);
         });
 
         const thisLogicKeys: Set<string> = new Set();
@@ -883,7 +904,7 @@ export default class VueFile extends FSEntry {
             }));
         });
 
-        this.definition = JSON.stringify(thisDefinition) + '\n';
+        this.definition = JSON.stringify(thisDefinition, null, 4) + '\n';
 
         return replacements;
     }
