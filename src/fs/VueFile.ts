@@ -852,6 +852,23 @@ export default class VueFile extends FSEntry {
     }
 
     mergeDefinition(that: VueFile) {
+        type PartialNode = { [key: string]: any };
+
+        function traverse(
+            node: PartialNode,
+            func: (node: PartialNode, parent?: PartialNode, index?: number) => any,
+            parent: PartialNode = null,
+            index?: number
+        ) {
+            func(node, parent, index);
+            Object.values(node).forEach((value) => {
+                if (Array.isArray(value)) {
+                    value.forEach((child, index) => traverse(child, func, node, index));
+                } else if (typeof value === 'object')
+                    traverse(value, func, parent, index);
+            });
+        }
+
         const thisDefinition = JSON.parse(this.definition || '{}');
         thisDefinition.params = thisDefinition.params || [];
         thisDefinition.variables = thisDefinition.variables || [];
@@ -863,7 +880,7 @@ export default class VueFile extends FSEntry {
         thatDefinition.lifecycles = thatDefinition.lifecycles || [];
         thatDefinition.logics = thatDefinition.logics || [];
         
-        const replacements: { [key: string]: { [old: string]: string } } = { data2: {}, logic: {} };
+        const replacements: { [key: string]: { [old: string]: string } } = { 'data2': {}, logic: {} };
 
         const thisParamKeys: Set<string> = new Set();
         thisDefinition.params.forEach((param: { name: string }) => thisParamKeys.add(param.name));
@@ -899,9 +916,19 @@ export default class VueFile extends FSEntry {
             const newName = uniqueInMap(logic.name, thisLogicKeys);
             if (newName !== logic.name)
                 replacements['logic'][logic.name] = newName;
-            thisDefinition.logics.push(Object.assign(logic, {
-                name: newName,
-            }));
+            
+            logic.name = newName;
+            thisDefinition.logics.push(logic);
+        });
+
+        const identifierMap = { ...replacements['data2'], ...replacements['logic'] };
+        thatDefinition.logics.forEach((logic: { name: string }) => {
+            traverse(logic, (node) => {
+                if (node.type === 'Identifier') {
+                    if (identifierMap[node.name])
+                        node.name = identifierMap[node.name];
+                }
+            });
         });
 
         this.definition = JSON.stringify(thisDefinition, null, 4) + '\n';

@@ -742,6 +742,16 @@ class VueFile extends FSEntry_1.default {
         return replacements;
     }
     mergeDefinition(that) {
+        function traverse(node, func, parent = null, index) {
+            func(node, parent, index);
+            Object.values(node).forEach((value) => {
+                if (Array.isArray(value)) {
+                    value.forEach((child, index) => traverse(child, func, node, index));
+                }
+                else if (typeof value === 'object')
+                    traverse(value, func, parent, index);
+            });
+        }
         const thisDefinition = JSON.parse(this.definition || '{}');
         thisDefinition.params = thisDefinition.params || [];
         thisDefinition.variables = thisDefinition.variables || [];
@@ -752,7 +762,7 @@ class VueFile extends FSEntry_1.default {
         thatDefinition.variables = thatDefinition.variables || [];
         thatDefinition.lifecycles = thatDefinition.lifecycles || [];
         thatDefinition.logics = thatDefinition.logics || [];
-        const replacements = { data2: {}, logic: {} };
+        const replacements = { 'data2': {}, logic: {} };
         const thisParamKeys = new Set();
         thisDefinition.params.forEach((param) => thisParamKeys.add(param.name));
         thisDefinition.variables.forEach((variable) => thisParamKeys.add(variable.name));
@@ -783,9 +793,17 @@ class VueFile extends FSEntry_1.default {
             const newName = shared_1.uniqueInMap(logic.name, thisLogicKeys);
             if (newName !== logic.name)
                 replacements['logic'][logic.name] = newName;
-            thisDefinition.logics.push(Object.assign(logic, {
-                name: newName,
-            }));
+            logic.name = newName;
+            thisDefinition.logics.push(logic);
+        });
+        const identifierMap = Object.assign(Object.assign({}, replacements['data2']), replacements['logic']);
+        thatDefinition.logics.forEach((logic) => {
+            traverse(logic, (node) => {
+                if (node.type === 'Identifier') {
+                    if (identifierMap[node.name])
+                        node.name = identifierMap[node.name];
+                }
+            });
         });
         this.definition = JSON.stringify(thisDefinition, null, 4) + '\n';
         return replacements;

@@ -26,6 +26,8 @@ exports.ASTNodeInfo = void 0;
 const compiler = __importStar(require("vue-template-compiler"));
 const babel = __importStar(require("@babel/core"));
 const generator_1 = __importDefault(require("@babel/generator"));
+// import * as prettier from 'prettier';
+const shared_1 = require("../utils/shared");
 class ASTNodeInfo {
     constructor(node, parent, route = '') {
         this.node = node;
@@ -201,10 +203,33 @@ class TemplateHandler {
      * @param replacements 需要跟着替换的样式和变量
      */
     merge(that, route, replacements) {
-        if (replacements) {
-            const classKeys = Object.keys(replacements['class']);
+        replacements = replacements || {};
+        replacements.ref = {};
+        const thisRefKeys = new Set();
+        this.traverse((nodeInfo) => {
+            if (nodeInfo.node.type !== 1)
+                return;
+            if (nodeInfo.node.attrsMap.ref)
+                thisRefKeys.add(nodeInfo.node.attrsMap.ref);
+        });
+        that.traverse((nodeInfo) => {
+            if (nodeInfo.node.type !== 1)
+                return;
+            const ref = nodeInfo.node.attrsMap.ref;
+            if (ref) {
+                const newRef = shared_1.uniqueInMap(ref, thisRefKeys);
+                if (newRef !== ref)
+                    replacements['ref'][ref] = newRef;
+                nodeInfo.node.attrsMap.ref = newRef;
+            }
+        });
+        /**
+         * Replacements
+         */
+        {
+            const classKeys = Object.keys(replacements['class'] || {});
             // @TODO: 'directives', 'filters'
-            const identifierMap = Object.assign(Object.assign(Object.assign(Object.assign({}, replacements['props']), replacements['data']), replacements['computed']), replacements['methods']);
+            const identifierMap = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, replacements['props']), replacements['data']), replacements['computed']), replacements['methods']), replacements['data2']), replacements['logic']);
             const identifierKeys = Object.keys(identifierMap);
             function fix(expr) {
                 const ast = babel.parse('const __RESULT__ = ' + expr, {
@@ -214,6 +239,12 @@ class TemplateHandler {
                 // 替换是个小概率事件，而且主要是替换 Block，因此不用考虑太多情况
                 babel.traverse(ast, {
                     Identifier(nodeInfo) {
+                        if (nodeInfo.parent.type === 'MemberExpression' && nodeInfo.parent.object.type === 'Identifier' && nodeInfo.parent.object.name === '$refs') {
+                            if (replacements['ref'][nodeInfo.node.name]) {
+                                nodeInfo.node.name = replacements['ref'][nodeInfo.node.name];
+                                changed = true;
+                            }
+                        }
                         if (nodeInfo.parent.type === 'MemberExpression' && nodeInfo.parent.object.type !== 'ThisExpression' && nodeInfo.parent.property === nodeInfo.node)
                             return nodeInfo.skip();
                         if (identifierMap[nodeInfo.node.name]) {
