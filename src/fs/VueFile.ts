@@ -863,9 +863,9 @@ export default class VueFile extends FSEntry {
             func(node, parent, index);
             Object.values(node).forEach((value) => {
                 if (Array.isArray(value)) {
-                    value.forEach((child, index) => traverse(child, func, node, index));
+                    value.forEach((child, index) => child && traverse(child, func, node, index));
                 } else if (typeof value === 'object')
-                    traverse(value, func, parent, index);
+                    value && traverse(value, func, node, index);
             });
         }
 
@@ -924,7 +924,7 @@ export default class VueFile extends FSEntry {
         const identifierMap = { ...replacements['data2'], ...replacements['logic'] };
         thatDefinition.logics.forEach((logic: { name: string }) => {
             traverse(logic, (node) => {
-                if (node.type === 'Identifier') {
+                if (node.level === 'expressionNode' && node.type === 'Identifier') {
                     if (identifierMap[node.name])
                         node.name = identifierMap[node.name];
                 }
