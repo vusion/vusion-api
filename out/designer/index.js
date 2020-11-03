@@ -31,7 +31,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadAuthCache = exports.removeAuthCache = exports.loadCustomComponentsData = exports.loadComponentData = exports.loadExternalLibrary = exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadAllViews = exports.loadViews = exports.saveMetaData = exports.ensureHotReload = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
+exports.loadAuthCache = exports.removeAuthCache = exports.addAuthCache = exports.loadCustomComponentsData = exports.loadComponentData = exports.loadExternalLibrary = exports.loadPackageJSON = exports.addCustomComponent = exports.addBlock = exports.removeService = exports.saveService = exports.addOrRenameService = exports.loadServices = exports.removeView = exports.addBranchWrapper = exports.addBranchView = exports.addBranchViewRoute = exports.addLeafView = exports.addLeafViewRoute = exports.findRouteObjectAndParentArray = exports.mergeCode = exports.saveCode = exports.saveViewContent = exports.getViewContent = exports.loadAllViews = exports.loadViews = exports.saveMetaData = exports.ensureHotReload = exports.saveFile = exports.openFile = exports.addCode = exports.initLayout = exports.addLayout = void 0;
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs-extra"));
 const babel = __importStar(require("@babel/core"));
@@ -952,6 +952,19 @@ function loadCustomComponentsData(rootPath, parseTypes = {}, baseName) {
     });
 }
 exports.loadCustomComponentsData = loadCustomComponentsData;
+function addAuthCache(name, filePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield fs.ensureFile(filePath);
+        let json = {};
+        try {
+            json = JSON.parse(yield fs.readFile(filePath, 'utf8'));
+        }
+        catch (e) { }
+        json[name] = true;
+        yield fs.writeFile(filePath, JSON.stringify(json, null, 4));
+    });
+}
+exports.addAuthCache = addAuthCache;
 function removeAuthCache(name, filePath) {
     return __awaiter(this, void 0, void 0, function* () {
         yield fs.ensureFile(filePath);

@@ -141,5 +141,6 @@ export declare function loadComponentData(fullPath: string, parseTypes?: ParseTy
  * @param baseName 组件信息，有该信息则获取该组件信息
  */
 export declare function loadCustomComponentsData(rootPath: string, parseTypes?: ParseTypes, baseName?: string): Promise<any[]>;
+export declare function addAuthCache(name: string, filePath: string): Promise<void>;
 export declare function removeAuthCache(name: string, filePath: string): Promise<void>;
 export declare function loadAuthCache(filePath: string): Promise<any>;
