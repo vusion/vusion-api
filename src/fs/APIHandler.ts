@@ -17,11 +17,20 @@ function escape(name: string = '') {
     return name.replace(/\\?([[\]<>|])/g, '\\$1');
 }
 
-function formatValue(type: string, value: string | string[] | { name: string, description: string }) {
+function formatValue(value: any): string {
     if (value === null || value === undefined) {
         return '';
     } else if (Array.isArray(value))
-        return `\`[${escape(value.join(', '))}]\``;
+        return `[${((value as any).map((valItem: any) => {
+            return formatValue(valItem);
+        }).join(','))}]`;
+    else if (Object.prototype.toString.call(value) === '[object Object]') {
+        const codeItems = [];
+        for (const key in value) {
+            codeItems.push(`${key}: ${formatValue(value[key])}`);
+        }
+        return `{${codeItems.join(',')}}`;
+    }
     else if (typeof value === 'string') {
         return `\`'${escape(value)}'\``;
     } else if (value.name) {
@@ -185,7 +194,7 @@ export default class APIHandler {
     parse(content: string) {
         try {
             return YAML.parse(content);
-        } catch(e) {
+        } catch (e) {
             console.error(this.fullPath);
             console.error(e);
         }
@@ -211,7 +220,7 @@ export default class APIHandler {
         outputs.push('| ------ | ---- | ------- | ----------- |');
 
         options.forEach((option) => {
-            outputs.push(`| ${option.name} | ${escape(option.type)} | ${formatValue(option.type, option.default)} | ${option.description} |`);
+            outputs.push(`| ${option.name} | ${escape(option.type)} | ${formatValue(option.default)} | ${option.description} |`);
         });
         outputs.push('');
 
@@ -236,7 +245,7 @@ export default class APIHandler {
                 name += '.sync';
             if (attr.model)
                 name += ', v-model';
-            outputs.push(`| ${name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(attr.type, option)).join('<br/>') : ''} | ${formatValue(attr.type, attr.default)} | ${attr.description} |`);
+            outputs.push(`| ${name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(option)).join('<br/>') : ''} | ${formatValue(attr.default)} | ${attr.description} |`);
         });
         outputs.push('');
 
@@ -256,7 +265,7 @@ export default class APIHandler {
         outputs.push('| ---- | ---- | ------- | ----------- |');
 
         data.forEach((item) => {
-            outputs.push(`| ${item.name} | ${escape(item.type)} | ${formatValue(item.type, item.default)} | ${item.description} |`);
+            outputs.push(`| ${item.name} | ${escape(item.type)} | ${formatValue(item.default)} | ${item.description} |`);
         });
         outputs.push('');
 
@@ -369,7 +378,7 @@ export default class APIHandler {
                 outputs.push('| ----- | ---- | ------- | ----------- |');
 
                 method.params.forEach((param) => {
-                    outputs.push(`| ${param.name} | ${escape(param.type)} | ${formatValue(param.type, param.default)} | ${param.description} |`);
+                    outputs.push(`| ${param.name} | ${escape(param.type)} | ${formatValue(param.default)} | ${param.description} |`);
                 });
                 outputs.push('');
             }
@@ -524,7 +533,7 @@ export default class APIHandler {
             tocLinks.forEach((link) => {
                 if (typeof link.to === 'object')
                     link.to.hash = unique(link.to);
-                const start = indent(level + 1) + `<u-toc-item${ link.development ? ' v-if="NODE_ENV === \'development\'"' : ''} label="${link.title}" ${typeof link.to === 'object' ? ':to=\'' + JSON.stringify(link.to) + '\'' : 'to="' + link.to + '"'}>`;
+                const start = indent(level + 1) + `<u-toc-item${link.development ? ' v-if="NODE_ENV === \'development\'"' : ''} label="${link.title}" ${typeof link.to === 'object' ? ':to=\'' + JSON.stringify(link.to) + '\'' : 'to="' + link.to + '"'}>`;
                 if (link.children && link.children.length) {
                     outputs.push(start);
                     outputs.push(this.markdownTOC(link.children, vue, level + 1, toHashMap));
@@ -571,7 +580,7 @@ export default class APIHandler {
             const tocLinks = await this.getTOCFromFile(path.resolve(docsDir, fileName), to);
             const link: TOCLink = { title, to, development, children: tocLinks };
             tocRoot.push(link);
-            outputs.push(`    <u-h2-tab${ development ? ' v-if="NODE_ENV === \'development\'"' : ''} title="${title}" to="${to}"></u-h2-tab>`);
+            outputs.push(`    <u-h2-tab${development ? ' v-if="NODE_ENV === \'development\'"' : ''} title="${title}" to="${to}"></u-h2-tab>`);
         }
         /**
          * API 中的主组件

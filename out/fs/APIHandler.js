@@ -45,12 +45,21 @@ function escape(name = '') {
         name = String(name);
     return name.replace(/\\?([[\]<>|])/g, '\\$1');
 }
-function formatValue(type, value) {
+function formatValue(value) {
     if (value === null || value === undefined) {
         return '';
     }
     else if (Array.isArray(value))
-        return `\`[${escape(value.join(', '))}]\``;
+        return `[${(value.map((valItem) => {
+            return formatValue(valItem);
+        }).join(','))}]`;
+    else if (Object.prototype.toString.call(value) === '[object Object]') {
+        const codeItems = [];
+        for (const key in value) {
+            codeItems.push(`${key}: ${formatValue(value[key])}`);
+        }
+        return `{${codeItems.join(',')}}`;
+    }
     else if (typeof value === 'string') {
         return `\`'${escape(value)}'\``;
     }
@@ -124,7 +133,7 @@ class APIHandler {
         outputs.push('| Option | Type | Default | Description |');
         outputs.push('| ------ | ---- | ------- | ----------- |');
         options.forEach((option) => {
-            outputs.push(`| ${option.name} | ${escape(option.type)} | ${formatValue(option.type, option.default)} | ${option.description} |`);
+            outputs.push(`| ${option.name} | ${escape(option.type)} | ${formatValue(option.default)} | ${option.description} |`);
         });
         outputs.push('');
         return outputs.join('\n');
@@ -145,7 +154,7 @@ class APIHandler {
                 name += '.sync';
             if (attr.model)
                 name += ', v-model';
-            outputs.push(`| ${name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(attr.type, option)).join('<br/>') : ''} | ${formatValue(attr.type, attr.default)} | ${attr.description} |`);
+            outputs.push(`| ${name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(option)).join('<br/>') : ''} | ${formatValue(attr.default)} | ${attr.description} |`);
         });
         outputs.push('');
         return outputs.join('\n');
@@ -161,7 +170,7 @@ class APIHandler {
         outputs.push('| Data | Type | Default | Description |');
         outputs.push('| ---- | ---- | ------- | ----------- |');
         data.forEach((item) => {
-            outputs.push(`| ${item.name} | ${escape(item.type)} | ${formatValue(item.type, item.default)} | ${item.description} |`);
+            outputs.push(`| ${item.name} | ${escape(item.type)} | ${formatValue(item.default)} | ${item.description} |`);
         });
         outputs.push('');
         return outputs.join('\n');
@@ -251,7 +260,7 @@ class APIHandler {
                 outputs.push('| Param | Type | Default | Description |');
                 outputs.push('| ----- | ---- | ------- | ----------- |');
                 method.params.forEach((param) => {
-                    outputs.push(`| ${param.name} | ${escape(param.type)} | ${formatValue(param.type, param.default)} | ${param.description} |`);
+                    outputs.push(`| ${param.name} | ${escape(param.type)} | ${formatValue(param.default)} | ${param.description} |`);
                 });
                 outputs.push('');
             }
