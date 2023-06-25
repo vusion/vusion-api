@@ -245,7 +245,7 @@ export default class APIHandler {
                 name += '.sync';
             if (attr.model)
                 name += ', v-model';
-            outputs.push(`| ${name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(option)).join('<br/>') : ''} | ${formatValue(attr.default)} | ${attr.description} |`);
+            outputs.push(`| ${name} | ${escape(attr.type)} | ${attr.options ? attr.options.map((option) => formatValue(option)).join('<br/>') : ''} | ${formatValue(attr.default)} | ${escape(attr.description)} |`);
         });
         outputs.push('');
 
