@@ -11,7 +11,7 @@ import * as logger from './logger';
 export function execSync(...args: Array<string>) {
     const command = args.join(' ');
     return spawnSync(command, { shell: true, stdio: 'inherit' });
-};
+}
 
 /**
  * 使用 spawnSync 的 shell inherit 模式，直接对接主进程的 stdio
@@ -28,7 +28,7 @@ export function justExecSync(...args: Array<string>) {
         logger.error(String(result.stderr || result.stdout));
         process.exit(1);
     }
-};
+}
 
 /**
  * 使用 spawn 的 shell inherit 模式，直接对接主进程的 stdio
@@ -42,6 +42,6 @@ export function exec(...args: Array<string>) {
     return new Promise(((resolve, reject) => {
         const result = spawn(command, { shell: true, stdio: 'inherit' });
         result.on('error', reject);
-        result.on('close', (code) => code === 0 ? resolve() : reject());
+        result.on('close', (code) => code === 0 ? resolve(true) : reject());
     }));
-};
+}
