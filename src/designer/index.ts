@@ -576,7 +576,7 @@ export async function addBranchWrapper(parentInfo: ViewInfo | vfs.View, baseView
     params.ext = params.ext || '.vue';
 
     // parent view 必然是个目录
-    const dir = path.join(parent.fullPath, parent.viewsPath, name);
+    const dir = path.join(parent.fullPath, parent.viewsPath, params.name);
 
     const tplPath = path.resolve(__dirname, '../../templates/branch-view');
     await fs.copy(tplPath, dir);

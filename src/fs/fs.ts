@@ -396,7 +396,7 @@ export async function extendToLibrary(vueFile: VueFile, from: Library | string, 
 
                 if (nodeInfo.node.specifiers) {
                     nodeInfo.node.specifiers.forEach((specifier) => {
-                        exportNames.push(specifier.exported.name);
+                        exportNames.push((specifier.exported as babel.types.Identifier).name);
                     });
                 }
             },
